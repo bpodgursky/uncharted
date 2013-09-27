@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>three.js webgl - materials - cube reflection [balls]</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <style>
+    body {
+      background: #777;
+      padding: 0;
+      margin: 0;
+      font-weight: bold;
+      overflow: hidden;
+    }
+
+    #info {
+      position: absolute;
+      top: 0px;
+      width: 100%;
+      color: #ffffff;
+      padding: 5px;
+      font-family: Monospace;
+      font-size: 13px;
+      text-align: center;
+      z-index: 1000;
+    }
+
+    a {
+      color: #ffffff;
+    }
+
+    #oldie a {
+      color: #da0
+    }
+  </style>
+</head>
+
+<body>
+<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl cube reflection demo. skybox by <a
+    href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a></div>
+
+<script src="resources/three.min.js"></script>
+<!--<script src="resources/TrackballControls.js"></script>-->
+<script src="resources/FirstPersonControls.js"></script>
+<script src="resources/Detector.js"></script>
+
+<script>
+
+  if (!Detector.webgl) Detector.addGetWebGLMessage();
+
+  var container;
+
+  var camera, scene, renderer;
+  var cameraCube;
+
+  var mesh, lightMesh, sphere;
+  var spheres = [];
+
+  var directionalLight, pointLight;
+
+  //  var mouseX = 0;
+  //  var mouseY = 0;
+
+  var windowHalfX = window.innerWidth / 2;
+  var windowHalfY = window.innerHeight / 2;
+
+  var clock = new THREE.Clock();
+
+  init();
+  animate();
+
+  var controls;
+
+  function init() {
+
+    scene = new THREE.Scene();
+
+    container = document.createElement('div');
+    document.body.appendChild(container);
+
+    directionalLight = new THREE.DirectionalLight(0xffffff);
+    directionalLight.position.set(1, 1, 2).normalize();
+    scene.add(directionalLight);
+
+//    pointLight = new THREE.PointLight(0xffffff);
+//    scene.add(pointLight);
+
+    sphere = new THREE.SphereGeometry(100, 16, 8);
+//    lightMesh = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0xffaa00 }));
+//    lightMesh.scale.set(0.05, 0.05, 0.05);
+//    lightMesh.position = pointLight.position;
+//    scene.add(lightMesh);
+
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100000);
+    camera.position.z = 3200;
+
+    cameraCube = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100000);
+
+    controls = new THREE.FirstPersonControls(camera);
+
+    controls.movementSpeed = 10000;
+    controls.lookSpeed = 0.125;
+    controls.lookVertical = true;
+
+    for (var i = 0; i < 500; i++) {
+
+      var mesh = new THREE.Mesh(sphere, new THREE.MeshPhongMaterial({ ambient: 0x000000, color: 0x55ff00, specular: 0x555555, shininess: 30 }));
+
+      mesh.position.x = Math.random() * 10000 - 5000;
+      mesh.position.y = Math.random() * 10000 - 5000;
+      mesh.position.z = Math.random() * 10000 - 5000;
+
+      mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
+
+      scene.add(mesh);
+      spheres.push(mesh);
+
+    }
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.autoClear = false;
+    container.appendChild(renderer.domElement);
+
+    //
+
+    window.addEventListener('resize', onWindowResize, false);
+
+  }
+
+  function onWindowResize() {
+
+    windowHalfX = window.innerWidth / 2,
+        windowHalfY = window.innerHeight / 2,
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    cameraCube.aspect = window.innerWidth / window.innerHeight;
+    cameraCube.updateProjectionMatrix();
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    controls.handleResize();
+
+  }
+
+  function animate() {
+
+    requestAnimationFrame(animate);
+
+    render();
+
+  }
+
+  function render() {
+
+    controls.update(clock.getDelta());
+
+    var timer = 0.0001 * Date.now();
+
+    for (var i = 0, il = spheres.length; i < il; i++) {
+
+      var sphere = spheres[ i ];
+
+      sphere.position.x = 5000 * Math.cos(timer + i);
+      sphere.position.y = 5000 * Math.sin(timer + i * 1.1);
+
+    }
+
+    renderer.render(scene, camera);
+
+  }
+
+</script>
+
+</body>
+</html>
