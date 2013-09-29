@@ -1,7 +1,10 @@
 package com.bpodgursky.uncharted;
 
+import com.bpodgursky.uncharted.api.AllGliese;
+import com.bpodgursky.uncharted.datasets.GlieseCatalog;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.GzipFilter;
 import org.eclipse.jetty.webapp.WebAppContext;
 
@@ -31,7 +34,7 @@ public class WebServer implements Runnable {
       final String warUrlString = warUrl.toExternalForm();
 
       WebAppContext context = new WebAppContext(warUrlString, "/");
-      //context.addServlet(new ServletHolder(new ParseServlet()), PARSER);
+      context.addServlet(new ServletHolder(new AllGliese(new GlieseCatalog())), "/all_gliese");
       context.addFilter(GzipFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
 
       uiServer.setHandler(context);

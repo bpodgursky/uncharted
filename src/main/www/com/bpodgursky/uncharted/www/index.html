@@ -51,15 +51,12 @@
   var container;
 
   var camera, scene, renderer;
-  var cameraCube;
 
   var mesh, lightMesh, sphere;
   var spheres = [];
 
-  var directionalLight, pointLight;
 
-  //  var mouseX = 0;
-  //  var mouseY = 0;
+  var directionalLight, pointLight;
 
   var windowHalfX = window.innerWidth / 2;
   var windowHalfY = window.innerHeight / 2;
@@ -82,19 +79,10 @@
     directionalLight.position.set(1, 1, 2).normalize();
     scene.add(directionalLight);
 
-//    pointLight = new THREE.PointLight(0xffffff);
-//    scene.add(pointLight);
-
     sphere = new THREE.SphereGeometry(100, 16, 8);
-//    lightMesh = new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0xffaa00 }));
-//    lightMesh.scale.set(0.05, 0.05, 0.05);
-//    lightMesh.position = pointLight.position;
-//    scene.add(lightMesh);
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100000);
     camera.position.z = 3200;
-
-    cameraCube = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100000);
 
     controls = new THREE.FirstPersonControls(camera);
 
@@ -122,22 +110,17 @@
     renderer.autoClear = false;
     container.appendChild(renderer.domElement);
 
-    //
-
     window.addEventListener('resize', onWindowResize, false);
 
   }
 
   function onWindowResize() {
 
-    windowHalfX = window.innerWidth / 2,
-        windowHalfY = window.innerHeight / 2,
+    windowHalfX = window.innerWidth / 2;
+    windowHalfY = window.innerHeight / 2;
+    camera.aspect = window.innerWidth / window.innerHeight;
 
-        camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
-    cameraCube.aspect = window.innerWidth / window.innerHeight;
-    cameraCube.updateProjectionMatrix();
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 

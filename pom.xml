@@ -200,6 +200,7 @@
         <includes>
           <include>**/*.xml</include>
           <include>**/*.bin</include>
+          <include>**/*.gz</include>
         </includes>
       </resource>
       <resource>
@@ -215,6 +216,27 @@
       </resource>
     </resources>
 
+    <testResources>
+        <testResource>
+          <directory>src/main/resources/</directory>
+          <includes>
+            <include>**/*.xml</include>
+            <include>**/*.bin</include>
+            <include>**/*.gz</include>
+          </includes>
+        </testResource>
+        <testResource>
+          <directory>src/main/www/</directory>
+          <includes>
+            <include>**/*.jsp</include>
+            <include>**/*.css</include>
+            <include>**/*.js</include>
+            <include>**/*.html</include>
+            <include>**/*.png</include>
+            <include>**/*.gif</include>
+          </includes>
+        </testResource>
+    </testResources>
   </build>
 
 </project>
