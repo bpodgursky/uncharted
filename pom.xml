@@ -207,7 +207,7 @@
             </manifestEntries>
           </archive>
           <descriptors>
-            <descriptor>src/main/resources/com/bpodgursky/nlpviz/jobjar.xml</descriptor>
+            <descriptor>src/main/resources/com/bpodgursky/uncharted/jobjar.xml</descriptor>
           </descriptors>
           <attach>false</attach>
         </configuration>
