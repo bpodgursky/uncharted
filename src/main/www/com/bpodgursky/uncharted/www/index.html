@@ -1,59 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>three.js webgl - materials - cube reflection [balls]</title>
+  <title>Gliese Catalog of Nearby Stars</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <style>
-    body {
-      background: #777;
-      padding: 0;
-      margin: 0;
-      font-weight: bold;
-      overflow: hidden;
-    }
 
-    #info {
-      position: absolute;
-      top: 0px;
-      width: 100%;
-      color: #ffffff;
-      padding: 5px;
-      font-family: Monospace;
-      font-size: 13px;
-      text-align: center;
-      z-index: 1000;
-    }
+  <link rel="stylesheet" type="text/css" href="resources/css/bootstrap.min.css" media="screen">
+  <link rel="stylesheet" type="text/css" href="css/uncharted.css">
 
-    a {
-      color: #ffffff;
-    }
+  <script type="text/javascript" src="resources/jquery-2.0.0.min.js"></script>
+  <script src="resources/three.min.js"></script>
+  <script src="resources/FirstPersonControls.js"></script>
+  <script src="resources/Detector.js"></script>
 
-    #oldie a {
-      color: #da0
-    }
-  </style>
 </head>
 
 <body>
 
-<script type="text/javascript" src="resources/jquery-2.0.0.min.js"></script>
-<script src="resources/three.min.js"></script>
-<script src="resources/TrackballControls.js"></script>
-<script src="resources/FirstPersonControls.js"></script>
-<script src="resources/OrbitControls.js"></script>
-<script src="resources/Detector.js"></script>
+<div class="row-fluid row">
+  <div class="span10">
+    <canvas id='webgl_canvas'></canvas>
+  </div>
+  <div class="span2">
+    <table class="table">
+      <tbody>
+      <tr>
+        <td>
+          Name
+        </td>
+        <td id="name_box">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Distance (lys)
+        </td>
+        <td id="distance_box">
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
 <script>
 
   if (!Detector.webgl) Detector.addGetWebGLMessage();
 
-  var container;
-
   var camera, scene, renderer;
 
   var mesh, lightMesh, sphere;
-  var spheres = [];
+  var stars = [];
+  var starsByName = {};
 
   var projector;
 
@@ -63,8 +61,6 @@
   var windowHalfY = window.innerHeight / 2;
 
   var clock = new THREE.Clock();
-
-  var currentInfo;
 
   $.ajax({
     type: 'GET',
@@ -80,30 +76,25 @@
   });
 
   var controls;
+  var currentStarName = "";
+  var currentStarMesh;
 
-  function init(stars) {
+  var currentName = $("#name_box");
+  var currentDistance = $("#distance_box");
+
+  function init(starData) {
 
     scene = new THREE.Scene();
 
-    container = document.createElement('div');
-    document.body.appendChild(container);
-
-    currentInfo = document.createElement( 'div' );
-    currentInfo.style.position = 'absolute';
-    currentInfo.style.top = '10px';
-    currentInfo.style.width = '100%';
-    currentInfo.style.textAlign = 'right';
-    currentInfo.innerHTML = '';
-    container.appendChild( currentInfo );
-
+    currentStarName = "";
 
     directionalLight = new THREE.DirectionalLight(0xffffff);
     directionalLight.position.set(1, 1, 2).normalize();
     scene.add(directionalLight);
 
-    sphere = new THREE.SphereGeometry(.1, 16, 8);
+    sphere = new THREE.SphereGeometry(.1, 16, 16);
 
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+    camera = new THREE.PerspectiveCamera(60, (window.innerWidth ) / window.innerHeight, 1, 1000);
     camera.position.z = 0;
 
     controls = new THREE.FirstPersonControls(camera);
@@ -116,12 +107,10 @@
     mesh.position.y = 0;
     mesh.position.z = 0;
     scene.add(mesh);
-    spheres.push(mesh);
+    stars.push(mesh);
 
-    stars.forEach(function (star) {
+    starData.forEach(function (star) {
       var mesh = new THREE.Mesh(sphere, new THREE.MeshPhongMaterial({ ambient: 0x000000, color: 0x55ff00, specular: 0x555555, shininess: 30 }));
-
-      console.log(star.cartesianCoordsInLys);
 
       mesh.position.x = star.cartesianCoordsInLys.x;
       mesh.position.y = star.cartesianCoordsInLys.y;
@@ -132,62 +121,78 @@
       mesh.starData = star;
 
       scene.add(mesh);
-      spheres.push(mesh);
+      stars.push(mesh);
+
+      starsByName[star.name] = mesh;
     });
 
     projector = new THREE.Projector();
 
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer({
+      canvas: $("#webgl_canvas").get(0)
+    });
+
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.autoClear = false;
-    container.appendChild(renderer.domElement);
+
+//    $("webgl_canvas").append(renderer.domElement);
 
     window.addEventListener('resize', onWindowResize, false);
 
-//    document.addEventListener('mousedown', onDocumentMouseDown, false);
     document.addEventListener('mousemove', onMouseMove, false);
 
   }
-//  function onDocumentMouseDown(event) {
-//
-//  }
 
-  var onMouseMove = function ( event ) {
-    console.log("mousey");
+  var onMouseMove = function (event) {
+    var vector = new THREE.Vector3(( event.clientX / window.innerWidth ) * 2 - 1, -( event.clientY / window.innerHeight ) * 2 + 1, 0.5);
+    projector.unprojectVector(vector, camera);
 
-    var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
-    projector.unprojectVector( vector, camera );
+    var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
 
-    var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+    var intersects = raycaster.intersectObjects(stars);
 
-    var intersects = raycaster.intersectObjects( spheres );
+    if (intersects.length > 0) {
+      var mesh = intersects[0].object;
+      var newStar = mesh.starData;
+      var newStarName = newStar.name;
 
-    if ( intersects.length > 0 ) {
-      currentInfo.innerHTML = intersects[0].object.starData.name;
+      if (newStarName != currentStarName) {
+
+        //  reset old selected star, set new one
+        mesh.material.color.setHex( 0xFF0000 );
+        if(currentStarMesh != null){
+          currentStarMesh.material.color.setHex(0x55ff00);
+        }
+
+        buildStarInfo(newStar);
+
+        currentStarMesh = mesh;
+        currentStarName = newStarName;
+      }
     }
   };
 
-  function onWindowResize() {
+  function buildStarInfo(newStar) {
+    //  TODO flesh out
 
+    currentName.text(newStar.name);
+    currentDistance.text(newStar.lightYearDistance);
+
+  }
+
+  function onWindowResize() {
     windowHalfX = window.innerWidth / 2;
     windowHalfY = window.innerHeight / 2;
     camera.aspect = window.innerWidth / window.innerHeight;
-
     camera.updateProjectionMatrix();
-
     renderer.setSize(window.innerWidth, window.innerHeight);
-
     controls.handleResize();
-
     render();
-
   }
 
 
   function animate() {
-
     requestAnimationFrame(animate);
-
     render();
   }
 

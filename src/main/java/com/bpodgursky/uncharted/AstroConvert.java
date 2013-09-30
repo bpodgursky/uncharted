@@ -11,12 +11,7 @@ public class AstroConvert {
     double y = distance * Math.sin(rightAscension.getRadians()) * Math.cos(declination.getRadians());
     double z = distance * Math.sin(declination.getRadians());
 
-
-    Coordinate coordinate = new Coordinate(x, y, z);
-
-    System.out.println(coordinate);
-
-    return coordinate;
+    return new Coordinate(x, y, z);
   }
 
 }
