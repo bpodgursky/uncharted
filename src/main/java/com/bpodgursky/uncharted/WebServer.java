@@ -14,7 +14,7 @@ import java.util.EnumSet;
 import java.util.concurrent.Semaphore;
 
 public class WebServer implements Runnable {
-  public static final int DEFAULT_PORT = 43315;
+  public static final int DEFAULT_PORT = 42315;
 
 
   private final Semaphore shutdownLock = new Semaphore(0);

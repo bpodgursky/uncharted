@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.bpodgursky</groupId>
@@ -194,6 +194,37 @@
   </dependencies>
 
   <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+              <Implementation-Build>${build-commit}</Implementation-Build>
+            </manifestEntries>
+          </archive>
+          <descriptors>
+            <descriptor>src/main/resources/com/bpodgursky/nlpviz/jobjar.xml</descriptor>
+          </descriptors>
+          <attach>false</attach>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <attach>false</attach>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
     <resources>
       <resource>
         <directory>src/main/resources/</directory>
@@ -217,25 +248,25 @@
     </resources>
 
     <testResources>
-        <testResource>
-          <directory>src/main/resources/</directory>
-          <includes>
-            <include>**/*.xml</include>
-            <include>**/*.bin</include>
-            <include>**/*.gz</include>
-          </includes>
-        </testResource>
-        <testResource>
-          <directory>src/main/www/</directory>
-          <includes>
-            <include>**/*.jsp</include>
-            <include>**/*.css</include>
-            <include>**/*.js</include>
-            <include>**/*.html</include>
-            <include>**/*.png</include>
-            <include>**/*.gif</include>
-          </includes>
-        </testResource>
+      <testResource>
+        <directory>src/main/resources/</directory>
+        <includes>
+          <include>**/*.xml</include>
+          <include>**/*.bin</include>
+          <include>**/*.gz</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>src/main/www/</directory>
+        <includes>
+          <include>**/*.jsp</include>
+          <include>**/*.css</include>
+          <include>**/*.js</include>
+          <include>**/*.html</include>
+          <include>**/*.png</include>
+          <include>**/*.gif</include>
+        </includes>
+      </testResource>
     </testResources>
   </build>
 
