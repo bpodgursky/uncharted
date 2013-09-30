@@ -18,7 +18,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
   this.autoForward = false;
   // this.invertVertical = false;
 
-  this.activeLook = true;
+//  this.activeLook = true;
 
   this.heightSpeed = false;
   this.heightCoef = 1.0;
@@ -45,10 +45,10 @@ THREE.FirstPersonControls = function ( object, domElement ) {
   this.moveRight = false;
   this.freeze = false;
 
-  this.mouseDragOn = false;
-
   this.viewHalfX = 0;
   this.viewHalfY = 0;
+
+  this.dragView = false;
 
   if ( this.domElement !== document ) {
 
@@ -85,18 +85,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
     event.preventDefault();
     event.stopPropagation();
 
-    if ( this.activeLook ) {
-
-      switch ( event.button ) {
-
-        case 0: this.moveForward = true; break;
-        case 2: this.moveBackward = true; break;
-
-      }
-
-    }
-
-    this.mouseDragOn = true;
+    this.dragView = true;
 
   };
 
@@ -105,18 +94,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
     event.preventDefault();
     event.stopPropagation();
 
-    if ( this.activeLook ) {
-
-      switch ( event.button ) {
-
-        case 0: this.moveForward = false; break;
-        case 2: this.moveBackward = false; break;
-
-      }
-
-    }
-
-    this.mouseDragOn = false;
+    this.dragView = false;
 
   };
 
@@ -132,6 +110,27 @@ THREE.FirstPersonControls = function ( object, domElement ) {
       this.mouseX = event.pageX - this.domElement.offsetLeft - this.viewHalfX;
       this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
 
+    }
+
+  };
+
+  this.onMouseWheel = function ( event ) {
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    var delta = 0;
+
+    if ( event.wheelDelta ) { // WebKit / Opera / Explorer 9
+      delta = event.wheelDelta / 40;
+    } else if ( event.detail ) { // Firefox
+      delta = - event.detail / 3;
+    }
+
+    if(delta > 0){
+      this.moveForward = true;
+    }else if (delta < 0) {
+      this.moveBackward = true;
     }
 
   };
@@ -209,8 +208,16 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
     var actualMoveSpeed = delta * this.movementSpeed;
 
-    if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
-    if ( this.moveBackward ) this.object.translateZ( actualMoveSpeed );
+    if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ) {
+      this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+    }
+
+    if ( this.moveBackward ) {
+      this.object.translateZ( actualMoveSpeed );
+    }
+
+    this.moveForward = false;
+    this.moveBackward = false;
 
     if ( this.moveLeft ) this.object.translateX( - actualMoveSpeed );
     if ( this.moveRight ) this.object.translateX( actualMoveSpeed );
@@ -220,7 +227,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
     var actualLookSpeed = delta * this.lookSpeed;
 
-    if ( !this.activeLook ) {
+    if ( ! this.dragView) {
 
       actualLookSpeed = 0;
 
@@ -264,6 +271,8 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
   this.domElement.addEventListener( 'mousemove', bind( this, this.onMouseMove ), false );
   this.domElement.addEventListener( 'mousedown', bind( this, this.onMouseDown ), false );
+  this.domElement.addEventListener( 'mousewheel', bind( this, this.onMouseWheel ), false );
+
   this.domElement.addEventListener( 'mouseup', bind( this, this.onMouseUp ), false );
   this.domElement.addEventListener( 'keydown', bind( this, this.onKeyDown ), false );
   this.domElement.addEventListener( 'keyup', bind( this, this.onKeyUp ), false );

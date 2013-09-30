@@ -1,44 +1,60 @@
 package com.bpodgursky.uncharted.datasets;
 
 public class Angle {
-  private final double hour;
-  private final double minute;
-  private final double second;
 
-  public Angle(double hour, double minute, double second) {
+  private final int hour;
+  private final int arcMinutes;
+  private final double arcSeconds;
+
+  private final double radians;
+
+  public static final double RADIANS_PER_HOUR = Math.PI / 12;
+  public static final double RADIANS_PER_ARCMINUTE = Math.PI / 720;
+  public static final double RADIANS_PER_ARCSECOND = Math.PI / 43200;
+
+  public Angle(int hour, int minute, double arcSeconds) {
     this.hour = hour;
-    this.minute = minute;
-    this.second = second;
+    this.arcMinutes = minute;
+    this.arcSeconds = arcSeconds;
+
+    this.radians = hour * RADIANS_PER_HOUR +
+        arcMinutes * RADIANS_PER_ARCMINUTE +
+        arcSeconds * RADIANS_PER_ARCSECOND;
   }
 
   public static Angle parse(String str){
     String[] split = str.split(" ");
 
-    double hour = Double.parseDouble(split[0]);
-    double minute = Double.parseDouble(split[1]);
+    int degrees = Integer.parseInt(split[0]);
+    int minute = Integer.parseInt(split[1]);
     double second = Double.parseDouble(split[2]);
 
-    return new Angle(hour, minute, second);
+    return new Angle(degrees, minute, second);
   }
 
-  public double getHour() {
+  public int getDegrees() {
     return hour;
   }
 
-  public double getMinute() {
-    return minute;
+  public int getArcMinutes() {
+    return arcMinutes;
   }
 
-  public double getSecond() {
-    return second;
+  public double getArcSeconds() {
+    return arcSeconds;
   }
+
+  public double getRadians(){
+    return radians;
+  }
+
 
   @Override
   public String toString() {
     return "Angle{" +
         "hour=" + hour +
-        ", minute=" + minute +
-        ", second=" + second +
+        ", arcMinutes=" + arcMinutes +
+        ", arcSeconds=" + arcSeconds +
         '}';
   }
 }

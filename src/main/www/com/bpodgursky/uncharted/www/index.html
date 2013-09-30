@@ -36,12 +36,12 @@
 </head>
 
 <body>
-<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl cube reflection demo. skybox by <a
-    href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a></div>
 
+<script type="text/javascript" src="resources/jquery-2.0.0.min.js"></script>
 <script src="resources/three.min.js"></script>
-<!--<script src="resources/TrackballControls.js"></script>-->
+<script src="resources/TrackballControls.js"></script>
 <script src="resources/FirstPersonControls.js"></script>
+<script src="resources/OrbitControls.js"></script>
 <script src="resources/Detector.js"></script>
 
 <script>
@@ -55,6 +55,7 @@
   var mesh, lightMesh, sphere;
   var spheres = [];
 
+  var projector;
 
   var directionalLight, pointLight;
 
@@ -63,47 +64,78 @@
 
   var clock = new THREE.Clock();
 
-  init();
-  animate();
+  var currentInfo;
+
+  $.ajax({
+    type: 'GET',
+    dataType: 'html',
+    url: "all_gliese",
+    success: function (data) {
+      var dataParsed = JSON.parse(data);
+
+      init(dataParsed);
+      animate();
+
+    }
+  });
 
   var controls;
 
-  function init() {
+  function init(stars) {
 
     scene = new THREE.Scene();
 
     container = document.createElement('div');
     document.body.appendChild(container);
 
+    currentInfo = document.createElement( 'div' );
+    currentInfo.style.position = 'absolute';
+    currentInfo.style.top = '10px';
+    currentInfo.style.width = '100%';
+    currentInfo.style.textAlign = 'right';
+    currentInfo.innerHTML = '';
+    container.appendChild( currentInfo );
+
+
     directionalLight = new THREE.DirectionalLight(0xffffff);
     directionalLight.position.set(1, 1, 2).normalize();
     scene.add(directionalLight);
 
-    sphere = new THREE.SphereGeometry(100, 16, 8);
+    sphere = new THREE.SphereGeometry(.1, 16, 8);
 
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100000);
-    camera.position.z = 3200;
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+    camera.position.z = 0;
 
     controls = new THREE.FirstPersonControls(camera);
+    controls.movementSpeed = 15;
+    controls.lookSpeed = 0.1;
 
-    controls.movementSpeed = 10000;
-    controls.lookSpeed = 0.125;
-    controls.lookVertical = true;
+    //  the sun
+    var mesh = new THREE.Mesh(sphere, new THREE.MeshPhongMaterial({ ambient: 0x000000, color: 0xFFCC00, specular: 0x555555, shininess: 30 }));
+    mesh.position.x = 0;
+    mesh.position.y = 0;
+    mesh.position.z = 0;
+    scene.add(mesh);
+    spheres.push(mesh);
 
-    for (var i = 0; i < 500; i++) {
-
+    stars.forEach(function (star) {
       var mesh = new THREE.Mesh(sphere, new THREE.MeshPhongMaterial({ ambient: 0x000000, color: 0x55ff00, specular: 0x555555, shininess: 30 }));
 
-      mesh.position.x = Math.random() * 10000 - 5000;
-      mesh.position.y = Math.random() * 10000 - 5000;
-      mesh.position.z = Math.random() * 10000 - 5000;
+      console.log(star.cartesianCoordsInLys);
 
-      mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
+      mesh.position.x = star.cartesianCoordsInLys.x;
+      mesh.position.y = star.cartesianCoordsInLys.y;
+      mesh.position.z = star.cartesianCoordsInLys.z;
+
+      mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
+
+      mesh.starData = star;
 
       scene.add(mesh);
       spheres.push(mesh);
+    });
 
-    }
+    projector = new THREE.Projector();
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -112,7 +144,28 @@
 
     window.addEventListener('resize', onWindowResize, false);
 
+//    document.addEventListener('mousedown', onDocumentMouseDown, false);
+    document.addEventListener('mousemove', onMouseMove, false);
+
   }
+//  function onDocumentMouseDown(event) {
+//
+//  }
+
+  var onMouseMove = function ( event ) {
+    console.log("mousey");
+
+    var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
+    projector.unprojectVector( vector, camera );
+
+    var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+
+    var intersects = raycaster.intersectObjects( spheres );
+
+    if ( intersects.length > 0 ) {
+      currentInfo.innerHTML = intersects[0].object.starData.name;
+    }
+  };
 
   function onWindowResize() {
 
@@ -126,30 +179,21 @@
 
     controls.handleResize();
 
+    render();
+
   }
+
 
   function animate() {
 
     requestAnimationFrame(animate);
 
     render();
-
   }
 
   function render() {
 
     controls.update(clock.getDelta());
-
-    var timer = 0.0001 * Date.now();
-
-    for (var i = 0, il = spheres.length; i < il; i++) {
-
-      var sphere = spheres[ i ];
-
-      sphere.position.x = 5000 * Math.cos(timer + i);
-      sphere.position.y = 5000 * Math.sin(timer + i * 1.1);
-
-    }
 
     renderer.render(scene, camera);
 

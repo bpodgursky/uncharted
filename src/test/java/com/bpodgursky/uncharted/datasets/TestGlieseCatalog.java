@@ -9,5 +9,10 @@ public class TestGlieseCatalog {
   public void testCatalog() throws Exception {
     GlieseCatalog catalog = new GlieseCatalog();
     assertEquals("STAR LUYTEN COLOR CLASS M", catalog.getStar("GJ 1131").getStarClass());
+
+    //  Proxima Centauri
+    Star priximaCentari = catalog.getStar("Gl 551");
+    assertEquals(priximaCentari.getLightYearDistance(), 4.22, .01);
+
   }
 }
