@@ -52,6 +52,8 @@ public class Star {
   private final Double parsecDistance;
   private final Double lightYearDistance;
 
+  private final StellarClassification parsedStellarClassification;
+
   private final Coordinate cartesianCoordsInLys;
 
   public Star(String name, Angle rightAscension, Angle declination, Double apparentMagnitude, String spectralType, Double resultParallax, Double resultParallaxError, String component, String distanceCode, Double galacticLongitude, Double galacticLatitude, Double totalProperMotion, String flagProperMotion, Double directionProperMotion, Double radialVelocity, String radialVelocityCode, String referenceSpectralType, String apparentMagnitudeCode, String apparentMagnitudeJoint, String bvColor, String bvColorCode, String bvColorJoint, String ubColor, String ubColorCode, String ubColorJoint, String riColor, String riColorCode, String riColorJoint, Double trigonometricParallax, Double trigonometricParallaxError, String resultParallaxCode, Double absoluteVisualMagnitude, String absoluteVisualMagnitudeCode, Double uVelocity, Double vVelocity, Double wVelocity, String henryDraperCatalogNumber, String durchmusterungNumber, String giclasNumber, String lhsNumber, String otherName, String remarks, String starClass) {
@@ -102,6 +104,8 @@ public class Star {
     this.parsecDistance = 1000 / resultParallax;
     this.lightYearDistance =  3.26163344 * parsecDistance;
     this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(rightAscension, declination, lightYearDistance);
+
+    this.parsedStellarClassification = StarClassHelper.parseClass(spectralType);
   }
 
   public String getName() {
@@ -122,6 +126,10 @@ public class Star {
 
   public String getSpectralType() {
     return spectralType;
+  }
+
+  public StellarClassification getStellarClassification() {
+    return parsedStellarClassification;
   }
 
   public Double getResultParallax() {

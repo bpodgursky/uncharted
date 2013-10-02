@@ -11,9 +11,8 @@ import java.util.zip.GZIPInputStream;
 
 /**
  * super hacky text dump of the Gliese 3 catalog
- *
+ * <p/>
  * TODO abstract?  I guess?
- *
  */
 public class GlieseCatalog {
 
@@ -85,6 +84,7 @@ public class GlieseCatalog {
       starsByName.put(star.getName(), star);
 
     }
+
   }
 
   public Collection<Star> getAllStars() {
@@ -116,6 +116,5 @@ public class GlieseCatalog {
 
     return Double.parseDouble(s);
   }
-
 
 }

@@ -16,9 +16,6 @@ THREE.FirstPersonControls = function (object, domElement) {
 
   this.lookVertical = true;
   this.autoForward = false;
-  // this.invertVertical = false;
-
-//  this.activeLook = true;
 
   this.heightSpeed = false;
   this.heightCoef = 1.0;
@@ -55,8 +52,6 @@ THREE.FirstPersonControls = function (object, domElement) {
     this.domElement.setAttribute('tabindex', -1);
 
   }
-
-  //
 
   this.handleResize = function () {
 
