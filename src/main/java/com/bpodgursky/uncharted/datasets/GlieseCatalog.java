@@ -1,6 +1,7 @@
 package com.bpodgursky.uncharted.datasets;
 
 import com.google.common.collect.Maps;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +33,8 @@ public class GlieseCatalog {
     scan.nextLine();  //  coordinate system
     scan.nextLine();  //  headers
     scan.nextLine();  //  sun
+
+    DescriptiveStatistics stats = new DescriptiveStatistics();
 
     while (scan.hasNext()) {
       String line = scan.nextLine();
@@ -81,9 +84,21 @@ public class GlieseCatalog {
           safeTrim(split[42]),
           safeTrim(split[43]));
 
+      stats.addValue(star.getAbsoluteVisualMagnitude());
+
+      System.out.println(star.getBvColor()+"\t"+star.getSpectralType());
+//      System.out.println(star.getBvColor());
+//      System.out.println(star.getRiColor());
+
       starsByName.put(star.getName(), star);
 
+
     }
+
+    System.out.println(stats.getMax());
+    System.out.println(stats.getMin());
+    System.out.println(stats.getMean());
+    System.out.println(stats.getStandardDeviation());
 
   }
 

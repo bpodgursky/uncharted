@@ -45,6 +45,13 @@
         </tr>
         <tr>
           <td>
+            Absolute Magnitude
+          </td>
+          <td id="abs-magnitude">
+          </td>
+        </tr>
+        <tr>
+          <td>
             Class
           </td>
           <td id="class">
@@ -81,7 +88,20 @@
 
   if (!Detector.webgl) Detector.addGetWebGLMessage();
 
-  //  TODO size and color of stars
+  var CLASS_TO_APPARENT_COLOR = {
+    O:0x9db4ff,
+    B:0xaabfff,
+    A:0xcad8ff,
+    F:0xfbf8ff,
+    G:0xfff4e8,
+    K:0xffddb4,
+    M:0xffbd6f,
+    L:0xf84235,
+    T:0xba3059,
+    Y:0x605170
+  };
+
+  //  TODO size and magnitude of stars
 
   var camera, scene, renderer, raycaster;
 
@@ -120,6 +140,7 @@
   var currentClass = $("#class");
   var currentOtherName = $("#other-name");
   var currentSpectralType = $("#spectral-type");
+  var currentAbsMagnitude = $("#abs-magnitude");
   var currentMagnitude = $("#magnitude");
   var currentRemarks = $("remarks");
 
@@ -128,10 +149,6 @@
     scene = new THREE.Scene();
 
     currentStarName = "";
-
-    var directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-    directionalLight.position.set(1, 1, 1).normalize();
-    scene.add(directionalLight);
 
     var ambientLight = new THREE.AmbientLight(0xcccccc);
     scene.add(ambientLight);
@@ -158,6 +175,8 @@
     scene.add(mesh);
     stars.push(mesh);
 
+    //  TODO make the selectors look cooler
+
     //  for hightlighting stuff
     selector = new THREE.Mesh(new THREE.TetrahedronGeometry(.5), new THREE.MeshBasicMaterial({ color: 0xffffff,
       wireframe: true
@@ -182,9 +201,28 @@
 
     starData.forEach(function (star) {
 
-      var mesh = new THREE.Mesh(sphere, new THREE.MeshPhongMaterial({ ambient: 0xFFA500,
-        color: 0x55ff00,
-        specular: 0x555555,
+      //  TODO white dwarfs
+      //  TODO use range to scale
+      var pureColor = CLASS_TO_APPARENT_COLOR[star.parsedStellarClassification.mainClass];
+      console.log(pureColor);
+      if(pureColor == null){
+        pureColor = CLASS_TO_APPARENT_COLOR["M"];
+      }
+
+//      console.log();
+
+      console.log(pureColor);
+
+//      //  TODO requires no explanation why this is hacky...
+//      var fractionStrength = (20-star.absoluteVisualMagnitude)/21;
+//      console.log(fractionStrength);
+//
+//      var adjColor = shadeColor(pureColor, fractionStrength*100);
+//      console.log(adjColor);
+
+      var mesh = new THREE.Mesh(sphere, new THREE.MeshPhongMaterial({ ambient: pureColor,
+        color: pureColor,
+        specular: pureColor,
         shininess: 30
       }));
 
@@ -217,6 +255,15 @@
 
     document.addEventListener('mousemove', onMouseMove, false);
 
+  }
+
+  function shadeColor(color, percent) {
+    var num = parseInt(color,16),
+        amt = Math.round(2.55 * percent),
+        R = (num >> 16) + amt,
+        B = (num >> 8 & 0x00FF) + amt,
+        G = (num & 0x0000FF) + amt;
+    return (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
   }
 
   var onMouseMove = function (event) {
@@ -256,6 +303,7 @@
     currentDistance.text(newStar.lightYearDistance.toFixed(2));
     currentOtherName.text(newStar.otherName);
     currentSpectralType.text(newStar.spectralType);
+    currentAbsMagnitude.text(newStar.absoluteVisualMagnitude);
     currentMagnitude.text(newStar.apparentMagnitude);
     currentRemarks.text(newStar.remarks);
     currentClass.text(newStar.starClass);

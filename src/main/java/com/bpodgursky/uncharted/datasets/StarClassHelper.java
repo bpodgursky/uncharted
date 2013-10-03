@@ -134,8 +134,7 @@ public class StarClassHelper {
     }
 
     LOG.warn("Warning: could not parse star classification: "+glieseType);
-
-    return null;
+    return new StellarClassification();
   }
 
 }
