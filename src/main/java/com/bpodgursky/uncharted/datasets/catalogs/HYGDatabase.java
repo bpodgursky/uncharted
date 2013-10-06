@@ -7,7 +7,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.sun.istack.internal.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +103,7 @@ public class HYGDatabase implements StarCatalog {
     LOG.info("Filtering "+stars.size()+" stars for distance "+maxLyDistance);
     Collection<StarRecord> filteredSet = Collections2.filter(stars, new Predicate<StarRecord>() {
       @Override
-      public boolean apply(@Nullable com.bpodgursky.uncharted.datasets.StarRecord input) {
+      public boolean apply(StarRecord input) {
         return input.getLightYearDistance() <= maxLyDistance;
       }
     });

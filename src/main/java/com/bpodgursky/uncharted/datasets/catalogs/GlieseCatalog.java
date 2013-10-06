@@ -6,7 +6,6 @@ import com.bpodgursky.uncharted.datasets.StarRecord;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
-import com.sun.istack.internal.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -114,7 +113,7 @@ public class GlieseCatalog implements StarCatalog {
   public Collection<StarRecord> getAllStars(final double maxLyDistance) {
     return Collections2.filter(starsByName.values(), new Predicate<StarRecord>() {
       @Override
-      public boolean apply(@Nullable com.bpodgursky.uncharted.datasets.StarRecord input) {
+      public boolean apply(StarRecord input) {
         return input.getLightYearDistance() <= maxLyDistance;
       }
     });
