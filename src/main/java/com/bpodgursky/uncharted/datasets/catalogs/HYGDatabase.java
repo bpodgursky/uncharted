@@ -1,11 +1,13 @@
 package com.bpodgursky.uncharted.datasets.catalogs;
 
 import com.bpodgursky.uncharted.datasets.AstroConvert;
+import com.bpodgursky.uncharted.datasets.ExternalLinks;
 import com.bpodgursky.uncharted.datasets.StarIdentifiers;
 import com.bpodgursky.uncharted.datasets.StarRecord;
 import com.bpodgursky.uncharted.datasets.identifiers.BayerFlamsteed;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
@@ -26,6 +29,17 @@ public class HYGDatabase implements StarCatalog {
 
     stars = Sets.newHashSet();
 
+    Scanner wikiLinks = new Scanner(new GZIPInputStream(GlieseCatalog.class.getClassLoader()
+        .getResourceAsStream("com/bpodgursky/uncharted/datasets/hyg_wikipedia_links.txt.gz")));
+
+    Map<String, String> idToWikiLink = Maps.newHashMap();
+
+    while(wikiLinks.hasNext()){
+      String line = wikiLinks.nextLine();
+      String[] split = line.split("\t");
+      idToWikiLink.put(split[0], split[1]);
+    }
+
     InputStream resourceAsStream = GlieseCatalog.class.getClassLoader().getResourceAsStream("com/bpodgursky/uncharted/datasets/hygxyz.csv.gz");
 
     GZIPInputStream gzis = new GZIPInputStream(resourceAsStream);
@@ -38,9 +52,9 @@ public class HYGDatabase implements StarCatalog {
     while(scan.hasNext()){
       String line = scan.nextLine();
       String[] split = line.split(",");
+      String mainId = split[0];
 
-      StarIdentifiers identifiers = new StarIdentifiers(split[0]);
-
+      StarIdentifiers identifiers = new StarIdentifiers(mainId);
 
       String hipparcosID = split[1];
       if(!hipparcosID.equals("") && !hipparcosID.equals("0")){
@@ -81,8 +95,16 @@ public class HYGDatabase implements StarCatalog {
 
         String absMag = split[14];
 
+
+        ExternalLinks links = new ExternalLinks();
+
+        if(idToWikiLink.containsKey(mainId)){
+          links.setWikipedia(idToWikiLink.get(mainId));
+        }
+
         StarRecord record = new StarRecord(
             identifiers,
+            links,
             AstroConvert.parsecsToLightyears(Double.parseDouble(distanceParsecs)),
             AstroConvert.hoursToRadians(Double.parseDouble(rightAscension)),
             AstroConvert.degreesToRadians(Double.parseDouble(declination)),

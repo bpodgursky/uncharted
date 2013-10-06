@@ -3,6 +3,7 @@ package com.bpodgursky.uncharted.datasets;
 public class StarRecord {
 
   private final StarIdentifiers identifiers;
+  private final ExternalLinks links;
 
   private final Double lightYearDistance;
   private final Double rightAscensionRadians;
@@ -15,12 +16,14 @@ public class StarRecord {
   private final Coordinate cartesianCoordsInLys;
 
   public StarRecord(StarIdentifiers identifiers,
-      Double lightYearDistance,
-      Double rightAscensionRadians,
-      Double declinationRadians,
-      Double absoluteMagnitude,
-      String stellarClass) {
+                    ExternalLinks links,
+                    Double lightYearDistance,
+                    Double rightAscensionRadians,
+                    Double declinationRadians,
+                    Double absoluteMagnitude,
+                    String stellarClass) {
     this.identifiers = identifiers;
+    this.links = links;
     this.lightYearDistance = lightYearDistance;
     this.rightAscensionRadians = rightAscensionRadians;
     this.declinationRadians = declinationRadians;

@@ -71,9 +71,18 @@ THREE.FirstPersonControls = function (object, domElement) {
 
   this.onMouseDown = function (event) {
 
+    if ( this.domElement !== document ) {
+      this.domElement.focus();
+    }
+
+
     //  hacky?  yeah probably
+
+    console.log(event);
     if(event.target.tagName == "CANVAS"){
       this.dragView = true;
+
+      console.log("on canvas");
 
       event.preventDefault();
       event.stopPropagation();

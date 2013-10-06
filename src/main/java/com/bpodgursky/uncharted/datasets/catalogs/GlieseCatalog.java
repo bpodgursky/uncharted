@@ -2,6 +2,7 @@ package com.bpodgursky.uncharted.datasets.catalogs;
 
 import com.bpodgursky.uncharted.datasets.AstroConvert;
 import com.bpodgursky.uncharted.datasets.DatasetName;
+import com.bpodgursky.uncharted.datasets.ExternalLinks;
 import com.bpodgursky.uncharted.datasets.StarIdentifiers;
 import com.bpodgursky.uncharted.datasets.StarRecord;
 import com.google.common.base.Predicate;
@@ -48,6 +49,7 @@ public class GlieseCatalog implements StarCatalog {
     starsByName.put("Sol",
         new StarRecord(
             sunIdentifiers,
+            new ExternalLinks(),
             0.0,
             0.0,
             0.0,
@@ -58,6 +60,8 @@ public class GlieseCatalog implements StarCatalog {
     while (scan.hasNext()) {
       String line = scan.nextLine();
       String[] split = line.split("\\|");
+
+//      Map<DatasetName, String> identitiers = Maps.newHashMap();
 
       String glieseName = split[1].trim();
 
@@ -73,6 +77,7 @@ public class GlieseCatalog implements StarCatalog {
       if (parallax != null) {
         StarRecord record = new StarRecord(
             identifiers,
+            new ExternalLinks(),
             AstroConvert.parallaxToLightyears(parseOrNull(split[6])),
             AstroConvert.parseDegreeMinSec(split[2]),
             AstroConvert.parseDegreeMinSec(split[3]),

@@ -19,8 +19,6 @@
 
 <div>
   <div>
-    <canvas id='webgl_canvas'></canvas>
-
     <div id="info">
       <table>
         <tbody>
@@ -139,13 +137,20 @@
 
         <tr class="header-row">
           <td>
-            <b>Links</b>
+            <b>More Information</b>
+          </td>
+        </tr>
+
+        <tr class="data-row">
+          <td>
+            <a id="wiki_box" href="" target="_blank">Wikipedia</a>
           </td>
         </tr>
 
         </tbody>
       </table>
     </div>
+    <canvas id='webgl_canvas'></canvas>
   </div>
 </div>
 
@@ -232,6 +237,12 @@
   var infoDistance = $("#distance_box");
   var infoRightAscension = $("#right_ascension_box");
   var infoDeclination = $("#declination_box");
+  var infoWiki = $("#wiki_box");
+
+  infoWiki.click(function(e){
+    console.log("clicked me "+e);
+    window.open(infoWiki.attr('href'),'_blank');
+  });
 
   function init(starData) {
 
@@ -392,13 +403,25 @@
         setInfoData(newStar.declinationRadians.toFixed(5), infoDeclination);
         setInfoData(newStar.rightAscensionRadians.toFixed(5), infoRightAscension);
 
+        console.log(newStar);
+
+        setLink(newStar.links.wikipedia, infoWiki);
+
         selector.position = mesh.position;
 
         currentStarMesh = mesh;
         currentStarPrimaryId = newStarPrimaryId;
       }
     }
+  }
 
+  function setLink(data, element){
+    if(data != null){
+      element.parent().parent().show();
+      element.attr('href', data);
+    }else{
+      element.parent().parent().hide();
+    }
   }
 
   function setInfoData(data, element){
@@ -406,7 +429,6 @@
       element.parent().show();
       element.text(data);
     }else{
-      console.log("hiding");
       element.parent().hide();
     }
   }
