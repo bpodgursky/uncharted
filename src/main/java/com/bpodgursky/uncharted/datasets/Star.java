@@ -1,12 +1,10 @@
 package com.bpodgursky.uncharted.datasets;
 
-import com.bpodgursky.uncharted.AstroConvert;
-
 public class Star {
 
   private final String name;
-  private final Angle rightAscension;
-  private final Angle declination;
+  private final Double rightAscensionRadians;
+  private final Double declinationRadians;
   private final Double apparentMagnitude;
   private final String spectralType;
   private final Double resultParallax;
@@ -56,10 +54,10 @@ public class Star {
 
   private final Coordinate cartesianCoordsInLys;
 
-  public Star(String name, Angle rightAscension, Angle declination, Double apparentMagnitude, String spectralType, Double resultParallax, Double resultParallaxError, String component, String distanceCode, Double galacticLongitude, Double galacticLatitude, Double totalProperMotion, String flagProperMotion, Double directionProperMotion, Double radialVelocity, String radialVelocityCode, String referenceSpectralType, String apparentMagnitudeCode, String apparentMagnitudeJoint, String bvColor, String bvColorCode, String bvColorJoint, String ubColor, String ubColorCode, String ubColorJoint, String riColor, String riColorCode, String riColorJoint, Double trigonometricParallax, Double trigonometricParallaxError, String resultParallaxCode, Double absoluteVisualMagnitude, String absoluteVisualMagnitudeCode, Double uVelocity, Double vVelocity, Double wVelocity, String henryDraperCatalogNumber, String durchmusterungNumber, String giclasNumber, String lhsNumber, String otherName, String remarks, String starClass) {
+  public Star(String name, Double rightAscensionRadians, Double declinationRadians, Double apparentMagnitude, String spectralType, Double resultParallax, Double resultParallaxError, String component, String distanceCode, Double galacticLongitude, Double galacticLatitude, Double totalProperMotion, String flagProperMotion, Double directionProperMotion, Double radialVelocity, String radialVelocityCode, String referenceSpectralType, String apparentMagnitudeCode, String apparentMagnitudeJoint, String bvColor, String bvColorCode, String bvColorJoint, String ubColor, String ubColorCode, String ubColorJoint, String riColor, String riColorCode, String riColorJoint, Double trigonometricParallax, Double trigonometricParallaxError, String resultParallaxCode, Double absoluteVisualMagnitude, String absoluteVisualMagnitudeCode, Double uVelocity, Double vVelocity, Double wVelocity, String henryDraperCatalogNumber, String durchmusterungNumber, String giclasNumber, String lhsNumber, String otherName, String remarks, String starClass) {
     this.name = name;
-    this.rightAscension = rightAscension;
-    this.declination = declination;
+    this.rightAscensionRadians = rightAscensionRadians;
+    this.declinationRadians = declinationRadians;
     this.apparentMagnitude = apparentMagnitude;
     this.spectralType = spectralType;
     this.resultParallax = resultParallax;
@@ -102,22 +100,14 @@ public class Star {
     this.starClass = starClass;
 
     this.parsecDistance = 1000 / resultParallax;
-    this.lightYearDistance =  3.26163344 * parsecDistance;
-    this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(rightAscension, declination, lightYearDistance);
+    this.lightYearDistance =   AstroConvert.parsecsToLightyears(parsecDistance);
+    this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(rightAscensionRadians, declinationRadians, lightYearDistance);
 
     this.parsedStellarClassification = StarClassHelper.parseClass(spectralType);
   }
 
   public String getName() {
     return name;
-  }
-
-  public Angle getRightAscension() {
-    return rightAscension;
-  }
-
-  public Angle getDeclination() {
-    return declination;
   }
 
   public Double getApparentMagnitude() {
@@ -296,8 +286,8 @@ public class Star {
   public String toString() {
     return "Star{" +
         "name='" + name + '\'' +
-        ", rightAscension=" + rightAscension +
-        ", declination=" + declination +
+        ", rightAscensionRadians=" + rightAscensionRadians +
+        ", declinationRadians=" + declinationRadians +
         ", apparentMagnitude=" + apparentMagnitude +
         ", spectralType='" + spectralType + '\'' +
         ", resultParallax=" + resultParallax +

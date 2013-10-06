@@ -8,6 +8,7 @@
   <link rel="stylesheet" type="text/css" href="css/uncharted.css">
 
   <script type="text/javascript" src="resources/jquery-2.0.0.min.js"></script>
+  <script type="text/javascript" src="resources/tinycolor-min.js"></script>
   <script src="resources/three.min.js"></script>
   <script src="resources/FirstPersonControls.js"></script>
   <script src="resources/Detector.js"></script>
@@ -22,62 +23,117 @@
     <div id="info">
       <table>
         <tbody>
-        <tr>
+
+        <tr class="header-row">
           <td>
-            Name
-          </td>
-          <td id="name_box">
+            <b>Names</b>
           </td>
         </tr>
-        <tr>
+
+        <tr class="data-row">
           <td>
-            Distance (lys)
+            Proper Name
           </td>
-          <td id="distance_box">
+          <td id="proper_name_box">
           </td>
         </tr>
-        <tr>
+
+        <tr class="data-row">
           <td>
-            Magnitude
+            Bayer Flamsteed
           </td>
-          <td id="magnitude">
+          <td id="bayer_flamsteed_box">
           </td>
         </tr>
-        <tr>
+
+        <tr class="data-row">
+          <td>
+            Gliese Catalog
+          </td>
+          <td id="gliese_catalog_box">
+          </td>
+        </tr>
+
+        <tr class="data-row">
+          <td>
+            Harvard Revised ID
+          </td>
+          <td id="harvard_revised_box">
+          </td>
+        </tr>
+
+        <tr class="data-row">
+          <td>
+            Hipparcos ID
+          </td>
+          <td id="hipparcos_box">
+          </td>
+        </tr>
+
+        <tr class="data-row">
+          <td>
+            Henry Draper
+          </td>
+          <td id="henry_draper_box">
+          </td>
+        </tr>
+
+        <tr><td>&nbsp;</td></tr>
+
+        <tr class="header-row">
+          <td>
+            <b>Details</b>
+          </td>
+        </tr>
+
+        <tr class="data-row">
           <td>
             Absolute Magnitude
           </td>
           <td id="abs-magnitude">
           </td>
         </tr>
-        <tr>
-          <td>
-            Class
-          </td>
-          <td id="class">
-          </td>
-        </tr>
-        <tr>
-          <td>
-            Other Name
-          </td>
-          <td id="other-name">
-          </td>
-        <tr>
+
+        <tr class="data-row">
           <td>
             Spectral Type
           </td>
           <td id="spectral-type">
           </td>
         </tr>
-        <tr>
+
+        <tr><td>&nbsp;</td></tr>
+
+        <tr class="header-row">
           <td>
-            Remarks
-          </td>
-          <td id="remarks">
+            <b>Relative Location</b>
           </td>
         </tr>
+
+        <tr class="data-row">
+          <td>
+            Distance (lys)
+          </td>
+          <td id="distance_box">
+          </td>
         </tr>
+
+        <tr class="data-row">
+          <td>
+            Right Ascension (radians)
+          </td>
+          <td id="right_ascension_box">
+          </td>
+        </tr>
+
+        <tr class="data-row">
+          <td>
+            Declination (radians)
+          </td>
+          <td id="declination_box">
+          </td>
+        </tr>
+
         </tbody>
       </table>
     </div>
@@ -87,6 +143,19 @@
 <script>
 
   if (!Detector.webgl) Detector.addGetWebGLMessage();
+
+  var CLASS_TO_APPARENT_COLOR_STR = {
+    O:"#9db4ff",
+    B:"#aabfff",
+    A:"#cad8ff",
+    F:"#fbf8ff",
+    G:"#fff4e8",
+    K:"#ffddb4",
+    M:"#ffbd6f",
+    L:"#f84235",
+    T:"#ba3059",
+    Y:"#60517"
+  };
 
   var CLASS_TO_APPARENT_COLOR = {
     O:0x9db4ff,
@@ -101,7 +170,7 @@
     Y:0x605170
   };
 
-  //  TODO size and magnitude of stars
+  //  TODO use size of star
 
   var camera, scene, renderer, raycaster;
 
@@ -121,7 +190,10 @@
   $.ajax({
     type: 'GET',
     dataType: 'html',
-    url: "all_gliese",
+    url: "star_catalog",
+    data: {
+      "max_lys": 75
+    },
     success: function (data) {
       var dataParsed = JSON.parse(data);
 
@@ -132,52 +204,47 @@
   });
 
   var controls;
-  var currentStarName = "";
+  var currentStarPrimaryId = "";
   var currentStarMesh;
 
-  var currentName = $("#name_box");
-  var currentDistance = $("#distance_box");
-  var currentClass = $("#class");
-  var currentOtherName = $("#other-name");
-  var currentSpectralType = $("#spectral-type");
-  var currentAbsMagnitude = $("#abs-magnitude");
-  var currentMagnitude = $("#magnitude");
-  var currentRemarks = $("remarks");
+  //  infobox stuff
+  var infoProperName = $("#proper_name_box");
+  var infoBayerFlamteed= $("#bayer_flamsteed_box");
+  var infoGliese = $("#gliese_catalog_box");
+  var infoHarvard = $("#harvard_revised_box");
+  var infoHipparcos = $("#hipparcos_box");
+  var infoHenryDraper = $("#henry_draper_box");
+  var infoSpectralType = $("#spectral-type");
+  var infoAbsMagnitude = $("#abs-magnitude");
+  var infoDistance = $("#distance_box");
+  var infoRightAscension = $("#right_ascension_box");
+  var infoDeclination = $("#declination_box");
 
   function init(starData) {
 
     scene = new THREE.Scene();
 
-    currentStarName = "";
+    currentStarPrimaryId = "";
 
     var ambientLight = new THREE.AmbientLight(0xcccccc);
     scene.add(ambientLight);
 
     sphere = new THREE.SphereGeometry(.1, 16, 16);
 
-    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000);
-    camera.position.z = 0;
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, .1, 10000);
+    scene.add(camera);
+
+    //  TODO this is really not the best starting direction, but I can't get the goddamned camera
+    //  to point where I want it to
+    camera.position.set(-7, 1.283, 2.188);
 
     controls = new THREE.FirstPersonControls(camera);
     controls.movementSpeed = 15;
     controls.lookSpeed = 0.1;
 
-    //  the sun
-    var mesh = new THREE.Mesh(sphere, new THREE.MeshPhongMaterial({ ambient: 0xFFA500,
-      color: 0xFFCC00,
-      specular: 0x555555,
-      shininess: 30
-    }));
-
-    mesh.position.x = 0;
-    mesh.position.y = 0;
-    mesh.position.z = 0;
-    scene.add(mesh);
-    stars.push(mesh);
-
     //  TODO make the selectors look cooler
 
-    //  for hightlighting stuff
+    //  for highlighting stuff
     selector = new THREE.Mesh(new THREE.TetrahedronGeometry(.5), new THREE.MeshBasicMaterial({ color: 0xffffff,
       wireframe: true
     }));
@@ -185,6 +252,8 @@
     selector.position.x = 0;
     selector.position.y = 0;
     selector.position.z = 0;
+
+    selector.rotation.x = 1;
 
     scene.add(selector);
 
@@ -203,26 +272,30 @@
 
       //  TODO white dwarfs
       //  TODO use range to scale
-      var pureColor = CLASS_TO_APPARENT_COLOR[star.parsedStellarClassification.mainClass];
-      console.log(pureColor);
+      var pureColor = CLASS_TO_APPARENT_COLOR_STR[star.parsedStellarClassification.mainClass];
       if(pureColor == null){
-        pureColor = CLASS_TO_APPARENT_COLOR["M"];
+        pureColor = CLASS_TO_APPARENT_COLOR_STR["M"];
       }
 
-//      console.log();
+      //  TODO requires no explanation why this is hacky...
+      var fractionStrength = (20-star.absoluteMagnitude)/21;
 
-      console.log(pureColor);
+      var hsv = tinycolor(pureColor).toHsv();
 
-//      //  TODO requires no explanation why this is hacky...
-//      var fractionStrength = (20-star.absoluteVisualMagnitude)/21;
-//      console.log(fractionStrength);
-//
-//      var adjColor = shadeColor(pureColor, fractionStrength*100);
-//      console.log(adjColor);
+      hsv.v = fractionStrength;
 
-      var mesh = new THREE.Mesh(sphere, new THREE.MeshPhongMaterial({ ambient: pureColor,
-        color: pureColor,
-        specular: pureColor,
+      console.log();
+      console.log(hsv);
+      console.log("hsv "+hsv.h+" "+hsv.s+" "+hsv.s);
+
+      var adjusted = tinycolor("hsv "+hsv.h+" "+hsv.s+" "+hsv.v);
+
+      console.log(adjusted);
+      var rgb = adjusted.toHexString();
+
+      var mesh = new THREE.Mesh(sphere, new THREE.MeshPhongMaterial({ ambient: rgb,
+        color: rgb,
+        specular: rgb,
         shininess: 30
       }));
 
@@ -237,7 +310,7 @@
       scene.add(mesh);
       stars.push(mesh);
 
-      starsByName[star.name] = mesh;
+      starsByName[star.primaryId] = mesh;
     });
 
     projector = new THREE.Projector();
@@ -255,15 +328,8 @@
 
     document.addEventListener('mousemove', onMouseMove, false);
 
-  }
+    select(starsByName[70667]);
 
-  function shadeColor(color, percent) {
-    var num = parseInt(color,16),
-        amt = Math.round(2.55 * percent),
-        R = (num >> 16) + amt,
-        B = (num >> 8 & 0x00FF) + amt,
-        G = (num & 0x0000FF) + amt;
-    return (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
   }
 
   var onMouseMove = function (event) {
@@ -275,39 +341,54 @@
     var intersects = raycaster.intersectObjects(stars);
 
     if (intersects.length > 0) {
-      var mesh = intersects[0].object;
-      var newStar = mesh.starData;
-      if(newStar != null){
-        var newStarName = newStar.name;
-
-        if (newStarName != currentStarName) {
-
-          buildStarInfo(newStar);
-
-          selector.position = mesh.position;
-
-          currentStarMesh = mesh;
-          currentStarName = newStarName;
-        }
-      }
+      select(intersects[0].object);
     }
   };
 
-  function buildStarInfo(newStar) {
+  function select(mesh) {
 
     //  TODO flesh out with more fields
     //     links to wiki
     //     find more common names (alpha centari, etc)
     //     # planets (display them?)
-    currentName.text(newStar.name);
-    currentDistance.text(newStar.lightYearDistance.toFixed(2));
-    currentOtherName.text(newStar.otherName);
-    currentSpectralType.text(newStar.spectralType);
-    currentAbsMagnitude.text(newStar.absoluteVisualMagnitude);
-    currentMagnitude.text(newStar.apparentMagnitude);
-    currentRemarks.text(newStar.remarks);
-    currentClass.text(newStar.starClass);
 
+    var newStar = mesh.starData;
+    if(newStar != null){
+      var newStarPrimaryId = newStar.primaryId;
+
+      if (newStarPrimaryId != currentStarPrimaryId) {
+
+        setInfoData(newStar.allIdentifiers.BAYER_FLAMSTEED, infoBayerFlamteed);
+        setInfoData(newStar.allIdentifiers.GLIESE_ID, infoGliese);
+        setInfoData(newStar.allIdentifiers.HARVARD_REVISED_ID, infoHarvard);
+        setInfoData(newStar.allIdentifiers.HENRY_DRAPER_ID, infoHenryDraper);
+        setInfoData(newStar.allIdentifiers.HIPPARCOS_ID, infoHipparcos);
+        setInfoData(newStar.allIdentifiers.PROPER_NAME, infoProperName);
+
+        setInfoData(newStar.rawStellarClassification, infoSpectralType);
+        setInfoData(newStar.absoluteMagnitude.toFixed(2), infoAbsMagnitude);
+
+        setInfoData(newStar.lightYearDistance.toFixed(2), infoDistance);
+        setInfoData(newStar.declinationRadians.toFixed(5), infoDeclination);
+        setInfoData(newStar.rightAscensionRadians.toFixed(5), infoRightAscension);
+
+        selector.position = mesh.position;
+
+        currentStarMesh = mesh;
+        currentStarPrimaryId = newStarPrimaryId;
+      }
+    }
+
+  }
+
+  function setInfoData(data, element){
+    if(data != null){
+      element.parent().show();
+      element.text(data);
+    }else{
+      console.log("hiding");
+      element.parent().hide();
+    }
   }
 
   function onWindowResize() {

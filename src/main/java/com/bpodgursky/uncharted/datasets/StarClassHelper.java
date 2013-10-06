@@ -1,5 +1,6 @@
 package com.bpodgursky.uncharted.datasets;
 
+import com.bpodgursky.uncharted.datasets.catalogs.GlieseCatalog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,44 +27,44 @@ public class StarClassHelper {
 
   private static final Pattern SUB_DWARF_CLASSIFICATION = Pattern.compile("sd(?<class>[OBAFGKMLTY])(?<range>\\d+\\.?\\d*([\\-/]\\d+\\.?\\d*)?)?[CNG:VnKv wkPmpabeJ]*");
 
-  public static StellarClassification parseClass(String glieseType) {
+  public static StellarClassification parseClass(String starClass) {
 
-    if (glieseType.equals("")) {
+    if (starClass.equals("")) {
       return new StellarClassification();
     }
 
-    if (glieseType.equals("pec")) {
+    if (starClass.equals("pec")) {
       return new StellarClassification();
     }
 
     //  TODO I'm not an astronomer, are these next three ok?  Call it halfway
 
-    if (glieseType.equals("k-m")) {
+    if (starClass.equals("k-m")) {
       return new StellarClassification()
           .setMainClass(SpectralClass.K)
           .setRange(5.0);
     }
 
-    if (glieseType.equals("g-k")) {
+    if (starClass.equals("g-k")) {
       return new StellarClassification()
           .setMainClass(SpectralClass.G)
           .setRange(5.0);
     }
 
-    if (glieseType.equals("f-g")) {
+    if (starClass.equals("f-g")) {
       return new StellarClassification()
           .setMainClass(SpectralClass.F)
           .setRange(5.0);
     }
 
-    Matcher specBase = SPEC_BASE.matcher(glieseType);
+    Matcher specBase = SPEC_BASE.matcher(starClass);
     if (specBase.matches()) {
 
       return new StellarClassification()
           .setMainClass(SpectralClass.valueOf(specBase.group(1).toUpperCase()));
     }
 
-    Matcher specDwarf = DWARF_CLASSIFICATION.matcher(glieseType);
+    Matcher specDwarf = DWARF_CLASSIFICATION.matcher(starClass);
     if (specDwarf.matches()) {
       String aClass = specDwarf.group("class");
       String range = specDwarf.group("range");
@@ -79,7 +80,7 @@ public class StarClassHelper {
 
       return star;
     }
-    Matcher specSubDwarf = SUB_DWARF_CLASSIFICATION.matcher(glieseType);
+    Matcher specSubDwarf = SUB_DWARF_CLASSIFICATION.matcher(starClass);
     if (specSubDwarf.matches()) {
       String aClass = specSubDwarf.group("class");
       String range = specSubDwarf.group("range");
@@ -96,7 +97,7 @@ public class StarClassHelper {
       return star;
     }
 
-    Matcher specLumin2 = SPEC_LUMINOSITY_PATTERN2.matcher(glieseType);
+    Matcher specLumin2 = SPEC_LUMINOSITY_PATTERN2.matcher(starClass);
     if (specLumin2.matches()) {
       String mainClass = specLumin2.group("class");
       String range = specLumin2.group("range");
@@ -118,7 +119,7 @@ public class StarClassHelper {
       return star;
     }
 
-    Matcher specWD = SPEC_WHITE_DWARF.matcher(glieseType);
+    Matcher specWD = SPEC_WHITE_DWARF.matcher(starClass);
     if (specWD.matches()) {
       String type = specWD.group("type");
       String temp = specWD.group("temp");
@@ -133,7 +134,7 @@ public class StarClassHelper {
       return star;
     }
 
-    LOG.warn("Warning: could not parse star classification: "+glieseType);
+    LOG.warn("Warning: could not parse star classification: "+starClass);
     return new StellarClassification();
   }
 

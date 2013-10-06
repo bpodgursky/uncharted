@@ -10,14 +10,27 @@ body {
 #info {
   position: absolute;
   top: 10px;
-  width: 100%;
-  color: #ffffff;
   padding: 5px;
+  width: 20%;
+  background-color: #0b0b0b;
+  z-index: 1000;
+  border: 2px solid #5b0000;
+}
+
+.header-row {
+  color: #ffbec0;
+  font-family: Monospace;
+  font-size: 16px;
+  text-align: left;
+}
+
+.data-row {
+  color: #ffffff;
   font-family: Monospace;
   font-size: 13px;
   text-align: left;
-  z-index: 1000;
 }
+
 
 #controls {
   position: absolute;

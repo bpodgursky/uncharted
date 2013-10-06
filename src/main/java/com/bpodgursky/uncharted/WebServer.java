@@ -1,7 +1,7 @@
 package com.bpodgursky.uncharted;
 
-import com.bpodgursky.uncharted.api.AllGliese;
-import com.bpodgursky.uncharted.datasets.GlieseCatalog;
+import com.bpodgursky.uncharted.api.StarCatalogServlet;
+import com.bpodgursky.uncharted.datasets.catalogs.HYGDatabase;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -34,7 +34,7 @@ public class WebServer implements Runnable {
       final String warUrlString = warUrl.toExternalForm();
 
       WebAppContext context = new WebAppContext(warUrlString, "/");
-      context.addServlet(new ServletHolder(new AllGliese(new GlieseCatalog())), "/all_gliese");
+      context.addServlet(new ServletHolder(new StarCatalogServlet(new HYGDatabase())), "/star_catalog");
       context.addFilter(GzipFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
 
       uiServer.setHandler(context);
