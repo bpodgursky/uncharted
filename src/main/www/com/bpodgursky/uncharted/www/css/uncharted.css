@@ -32,6 +32,9 @@ body {
   text-align: left;
 }
 
+#wiki_box {
+  color: #8597ff;
+}
 
 #controls {
   position: absolute;
