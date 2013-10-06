@@ -23,7 +23,7 @@ public class FindWikiLinks {
 
     FileWriter matchFile = new FileWriter("hyg_wikipedia_links.txt");
 
-    for (StarRecord record : hygDatabase.getAllStars(75)) {
+    for (StarRecord record : hygDatabase.getAllStars(Integer.MAX_VALUE)) {
 
       String properName = record.getIdentifiers().getProperName();
       String foundUrl = fetch(properName);
@@ -44,7 +44,7 @@ public class FindWikiLinks {
 
       if(foundUrl != null){
         System.out.println("Found: "+ foundUrl+"\t"+record.getIdentifiers());
-        matchFile.write(record.getIdentifiers().getPrimaryId()+"\n");
+        matchFile.write(record.getIdentifiers().getPrimaryId() + "\t" + foundUrl + "\n");
       }
 
       //  if we had a reasonable chance...
