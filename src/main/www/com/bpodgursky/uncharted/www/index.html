@@ -20,6 +20,7 @@
 <div>
   <div>
     <canvas id='webgl_canvas'></canvas>
+
     <div id="info">
       <table>
         <tbody>
@@ -134,6 +135,14 @@
           </td>
         </tr>
 
+        <tr><td>&nbsp;</td></tr>
+
+        <tr class="header-row">
+          <td>
+            <b>Links</b>
+          </td>
+        </tr>
+
         </tbody>
       </table>
     </div>
@@ -186,6 +195,10 @@
   var clock = new THREE.Clock();
 
   var selector, solMarker;
+
+  $("#info").click(function(e){
+    e.preventDefault();
+  });
 
   $.ajax({
     type: 'GET',

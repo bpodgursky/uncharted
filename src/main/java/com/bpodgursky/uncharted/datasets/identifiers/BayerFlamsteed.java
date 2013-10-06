@@ -43,36 +43,82 @@ public class BayerFlamsteed {
     this.prettyName = StringUtils.join(parts, " ");
   }
 
+  public String getPrettyName() {
+    return prettyName;
+  }
 
-  private static final Pattern PATTERN = Pattern.compile("(?<flam>[\\d]+)? *(?<bayer>[a-zA-Z]+)? *(?<number>[\\d]+)? *(?<cons>[a-zA-Z]+)?");
+  public Integer getFlamsteedDesignation() {
+    return flamsteedDesignation;
+  }
+
+  public String getBayerDesignation() {
+    return bayerDesignation;
+  }
+
+  public Integer getNumber() {
+    return number;
+  }
+
+  public Constellation getConstellation() {
+    return constellation;
+  }
+
+  private static final Pattern PATTERN1 = Pattern.compile("(?<flam>[\\d]+) *(?<bayer>[a-zA-Z]+) *(?<number>[\\d]+) *(?<cons>[a-zA-Z]+)");
+  private static final Pattern PATTERN2 = Pattern.compile("(?<bayer>[a-zA-Z]+) *(?<cons>[a-zA-Z]+)");
+  private static final Pattern PATTERN3 = Pattern.compile("(?<bayer>[a-zA-Z]+) *(?<number>[\\d]+) *(?<cons>[a-zA-Z]+)");
+  private static final Pattern PATTERN4 = Pattern.compile("(?<flam>[\\d]+) *(?<cons>[a-zA-Z]+)");
+  private static final Pattern PATTERN5 = Pattern.compile("(?<flam>[\\d]+) *(?<bayer>[a-zA-Z]+) *(?<cons>[a-zA-Z]+)");
 
   public static BayerFlamsteed parse(String s) throws IOException {
 
-    Matcher matcher = PATTERN.matcher(s);
+    String flam= null;
+    String bayer= null;
+    String numberStr= null;
+    String constellation = null;
 
-    if(matcher.matches()){
+    Matcher matcher1 = PATTERN1.matcher(s);
+    Matcher matcher2 = PATTERN2.matcher(s);
+    Matcher matcher3 = PATTERN3.matcher(s);
+    Matcher matcher4 = PATTERN4.matcher(s);
+    Matcher matcher5 = PATTERN5.matcher(s);
 
-      String flam = matcher.group("flam");
-      String bayer = matcher.group("bayer");
-      String numberStr = matcher.group("number");
-      String constellation = matcher.group("cons");
-
-      Integer flamNum= null;
-      if(flam != null){
-         flamNum = Integer.parseInt(flam);
-      }
-
-      Integer number = null;
-      if(numberStr != null){
-        number = Integer.parseInt(numberStr);
-      }
-
-      return new BayerFlamsteed(flamNum, GreekLetter.getByAbbr(bayer), number, ConstellationCorpus.get().get(constellation));
+    if(matcher1.matches()){
+      flam = matcher1.group("flam");
+      bayer = matcher1.group("bayer");
+      numberStr = matcher1.group("number");
+      constellation = matcher1.group("cons");
+    } else if(matcher2.matches()){
+      bayer = matcher2.group("bayer");
+      constellation = matcher2.group("cons");
+    }else if(matcher3.matches()){
+      bayer = matcher3.group("bayer");
+      numberStr = matcher3.group("number");
+      constellation = matcher3.group("cons");
+    }else if(matcher4.matches()){
+      flam = matcher4.group("flam");
+      constellation = matcher4.group("cons");
+    }else if(matcher5.matches()){
+      flam = matcher5.group("flam");
+      bayer = matcher5.group("bayer");
+      constellation = matcher5.group("cons");
     }
 
+    Integer flamNum= null;
+    if(flam != null){
+       flamNum = Integer.parseInt(flam);
+    }
 
-    throw new RuntimeException("Unable to parse BF designation: "+s);
+    Integer number = null;
+    if(numberStr != null){
+      number = Integer.parseInt(numberStr);
+    }
 
+    Constellation constellation1 = ConstellationCorpus.get().get(constellation);
+    if(constellation == null || flam == null && bayer == null){
+      throw new RuntimeException(s);
+    }
+
+    return new BayerFlamsteed(flamNum, GreekLetter.getByAbbr(bayer), number, constellation1);
 
   }
 

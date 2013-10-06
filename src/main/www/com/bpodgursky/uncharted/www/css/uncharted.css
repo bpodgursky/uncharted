@@ -12,6 +12,7 @@ body {
   top: 10px;
   padding: 5px;
   width: 20%;
+  height: 50%;
   background-color: #0b0b0b;
   z-index: 1000;
   border: 2px solid #5b0000;

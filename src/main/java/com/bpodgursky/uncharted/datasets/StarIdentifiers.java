@@ -43,6 +43,34 @@ public class StarIdentifiers {
     this.properName = properName;
   }
 
+  public String getPrimaryId() {
+    return primaryId;
+  }
+
+  public String getHipparcosId() {
+    return hipparcosId;
+  }
+
+  public String getHenryDraperId() {
+    return henryDraperId;
+  }
+
+  public String getHarvardRevisedId() {
+    return harvardRevisedId;
+  }
+
+  public String getGlieseId() {
+    return glieseId;
+  }
+
+  public BayerFlamsteed getBayerFlamsteed() {
+    return bayerFlamsteed;
+  }
+
+  public String getProperName() {
+    return properName;
+  }
+
   @Override
   public String toString() {
     return "StarIdentifiers{" +
