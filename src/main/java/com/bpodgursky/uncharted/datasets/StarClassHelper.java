@@ -19,13 +19,13 @@ public class StarClassHelper {
 
   private static final Pattern SPEC_BASE = Pattern.compile("([obafgkmlty])\\+?");
 
-  private static final Pattern SPEC_LUMINOSITY_PATTERN2 = Pattern.compile("(?<class>[OBAFGKMLTY])[\\+ \\-]*(?<range>\\d+\\.?\\d*([\\-/]\\d+\\.?\\d*)?)?[\\+ \\-]*\\(?(?<luminosity>[IV]+([\\-/][IV]+)?)?\\)?[\\+ \\-]*[CNG:Vnv PwkmpKabesJ]*");
+  private static final Pattern SPEC_LUMINOSITY_PATTERN2 = Pattern.compile("(?<class>[OBAFGKMLTY])[\\+ \\-]*(?<range>\\d+\\.?\\d*([\\-/]\\d+\\.?\\d*)?)?[\\+ \\-]*\\(?(?<luminosity>[IV]+([\\-/][IV]+)?)?\\)?[\\+ \\-]*[CNG:Vnv PwkmpKabesJ]*\\.*");
 
-  private static final Pattern SPEC_WHITE_DWARF = Pattern.compile("(?<type>D[ABOQZCX]):?(?<temp>\\d+\\.?\\d*([\\-/]\\d+\\.?\\d*)?)?\\+?[CNG:Vnv wkPmpKsabeJ]*");
+  private static final Pattern SPEC_WHITE_DWARF = Pattern.compile("(?<type>D[ABOQZCX]):?(?<temp>\\d+\\.?\\d*([\\-/]\\d+\\.?\\d*)?)?\\+?[CNG:Vnv wkPmpKsabeJ]*\\.*");
 
-  private static final Pattern DWARF_CLASSIFICATION = Pattern.compile("d(?<class>[OBAFGKMLTY])(?<range>\\d+\\.?\\d*([\\-/]\\d+\\.?\\d*)?)?[CNG:VnKv wkPmpabeJ]*");
+  private static final Pattern DWARF_CLASSIFICATION = Pattern.compile("d(?<class>[OBAFGKMLTY])(?<range>\\d+\\.?\\d*([\\-/]\\d+\\.?\\d*)?)?[CNG:VnKv wkPmpabeJ]*\\.*");
 
-  private static final Pattern SUB_DWARF_CLASSIFICATION = Pattern.compile("sd(?<class>[OBAFGKMLTY])(?<range>\\d+\\.?\\d*([\\-/]\\d+\\.?\\d*)?)?[CNG:VnKv wkPmpabeJ]*");
+  private static final Pattern SUB_DWARF_CLASSIFICATION = Pattern.compile("sd(?<class>[OBAFGKMLTY])(?<range>\\d+\\.?\\d*([\\-/]\\d+\\.?\\d*)?)?[CNG:VnKv wkPmpabeJ]*\\.*");
 
   public static StellarClassification parseClass(String starClass) {
 

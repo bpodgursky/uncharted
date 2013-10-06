@@ -310,7 +310,7 @@
       scene.add(mesh);
       stars.push(mesh);
 
-      starsByName[star.primaryId] = mesh;
+      starsByName[star.identifiers.primaryId] = mesh;
     });
 
     projector = new THREE.Projector();
@@ -354,16 +354,23 @@
 
     var newStar = mesh.starData;
     if(newStar != null){
-      var newStarPrimaryId = newStar.primaryId;
+      var newStarPrimaryId = newStar.identifiers.primaryId;
 
       if (newStarPrimaryId != currentStarPrimaryId) {
 
-        setInfoData(newStar.allIdentifiers.BAYER_FLAMSTEED, infoBayerFlamteed);
-        setInfoData(newStar.allIdentifiers.GLIESE_ID, infoGliese);
-        setInfoData(newStar.allIdentifiers.HARVARD_REVISED_ID, infoHarvard);
-        setInfoData(newStar.allIdentifiers.HENRY_DRAPER_ID, infoHenryDraper);
-        setInfoData(newStar.allIdentifiers.HIPPARCOS_ID, infoHipparcos);
-        setInfoData(newStar.allIdentifiers.PROPER_NAME, infoProperName);
+        console.log(newStar);
+
+        var bf = null;
+        if(newStar.identifiers.bayerFlamsteed){
+          bf = newStar.identifiers.bayerFlamsteed.prettyName;
+        }
+
+        setInfoData(bf, infoBayerFlamteed);
+        setInfoData(newStar.identifiers.glieseId, infoGliese);
+        setInfoData(newStar.identifiers.harvardRevisedId, infoHarvard);
+        setInfoData(newStar.identifiers.henryDraperId, infoHenryDraper);
+        setInfoData(newStar.identifiers.hipparcosId, infoHipparcos);
+        setInfoData(newStar.identifiers.properName, infoProperName);
 
         setInfoData(newStar.rawStellarClassification, infoSpectralType);
         setInfoData(newStar.absoluteMagnitude.toFixed(2), infoAbsMagnitude);

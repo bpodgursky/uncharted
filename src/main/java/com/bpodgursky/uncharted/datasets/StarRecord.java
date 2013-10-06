@@ -1,12 +1,9 @@
 package com.bpodgursky.uncharted.datasets;
 
-import java.util.Map;
-
 public class StarRecord {
 
-  private final Map<DatasetName, String> allIdentifiers;
+  private final StarIdentifiers identifiers;
 
-  private final String primaryId;
   private final Double lightYearDistance;
   private final Double rightAscensionRadians;
   private final Double declinationRadians;
@@ -17,15 +14,13 @@ public class StarRecord {
 
   private final Coordinate cartesianCoordsInLys;
 
-  public StarRecord(String primaryId,
-      Map<DatasetName, String> allIdentifiers,
+  public StarRecord(StarIdentifiers identifiers,
       Double lightYearDistance,
       Double rightAscensionRadians,
       Double declinationRadians,
       Double absoluteMagnitude,
       String stellarClass) {
-    this.primaryId = primaryId;
-    this.allIdentifiers = allIdentifiers;
+    this.identifiers = identifiers;
     this.lightYearDistance = lightYearDistance;
     this.rightAscensionRadians = rightAscensionRadians;
     this.declinationRadians = declinationRadians;
@@ -35,8 +30,8 @@ public class StarRecord {
     this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(rightAscensionRadians, declinationRadians, lightYearDistance);
   }
 
-  public Map<DatasetName, String> getIdentifiers() {
-    return allIdentifiers;
+  public StarIdentifiers getIdentifiers() {
+    return identifiers;
   }
 
   public Double getLightYearDistance() {
@@ -59,14 +54,6 @@ public class StarRecord {
     return cartesianCoordsInLys;
   }
 
-  public Map<DatasetName, String> getAllIdentifiers() {
-    return allIdentifiers;
-  }
-
-  public String getPrimaryId() {
-    return primaryId;
-  }
-
   public String getRawStellarClassification() {
     return rawStellarClassification;
   }
@@ -76,18 +63,4 @@ public class StarRecord {
   }
 
 
-  @Override
-  public String toString() {
-    return "StarRecord{" +
-        "allIdentifiers=" + allIdentifiers +
-        ", primaryId='" + primaryId + '\'' +
-        ", lightYearDistance=" + lightYearDistance +
-        ", rightAscensionRadians=" + rightAscensionRadians +
-        ", declinationRadians=" + declinationRadians +
-        ", absoluteMagnitude=" + absoluteMagnitude +
-        ", rawStellarClassification='" + rawStellarClassification + '\'' +
-        ", parsedStellarClassification=" + parsedStellarClassification +
-        ", cartesianCoordsInLys=" + cartesianCoordsInLys +
-        '}';
-  }
 }

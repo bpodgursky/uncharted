@@ -2,6 +2,7 @@ package com.bpodgursky.uncharted.datasets.catalogs;
 
 import com.bpodgursky.uncharted.datasets.AstroConvert;
 import com.bpodgursky.uncharted.datasets.DatasetName;
+import com.bpodgursky.uncharted.datasets.StarIdentifiers;
 import com.bpodgursky.uncharted.datasets.StarRecord;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -40,10 +41,13 @@ public class GlieseCatalog implements StarCatalog {
     sunIds.put(DatasetName.GLIESE_ID, "Sun");
     sunIds.put(DatasetName.PROPER_NAME, "The Sun");
 
+    StarIdentifiers sunIdentifiers = new StarIdentifiers("Sun");
+    sunIdentifiers.setProperName("The Sun");
+    sunIdentifiers.setGlieseId("Sun");
+
     starsByName.put("Sol",
         new StarRecord(
-            "Sun",
-            sunIds,
+            sunIdentifiers,
             0.0,
             0.0,
             0.0,
@@ -55,22 +59,20 @@ public class GlieseCatalog implements StarCatalog {
       String line = scan.nextLine();
       String[] split = line.split("\\|");
 
-      Map<DatasetName, String> identitiers = Maps.newHashMap();
-
       String glieseName = split[1].trim();
 
-      identitiers.put(DatasetName.GLIESE_ID, glieseName);
+      StarIdentifiers identifiers = new StarIdentifiers(glieseName);
+      identifiers.setGlieseId(glieseName);
 
       String otherName = safeTrim(split[41]);
       if (otherName != null) {
-        identitiers.put(DatasetName.PROPER_NAME, otherName);
+        identifiers.setProperName(otherName);
       }
 
       Double parallax = parseOrNull(split[6]);
       if (parallax != null) {
         StarRecord record = new StarRecord(
-            glieseName,
-            identitiers,
+            identifiers,
             AstroConvert.parallaxToLightyears(parseOrNull(split[6])),
             AstroConvert.parseDegreeMinSec(split[2]),
             AstroConvert.parseDegreeMinSec(split[3]),
