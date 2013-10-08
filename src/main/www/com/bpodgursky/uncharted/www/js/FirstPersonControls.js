@@ -78,11 +78,8 @@ THREE.FirstPersonControls = function (object, domElement) {
 
     //  hacky?  yeah probably
 
-    console.log(event);
     if(event.target.tagName == "CANVAS"){
       this.dragView = true;
-
-      console.log("on canvas");
 
       event.preventDefault();
       event.stopPropagation();
