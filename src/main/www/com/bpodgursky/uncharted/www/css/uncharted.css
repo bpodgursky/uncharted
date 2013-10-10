@@ -7,52 +7,43 @@ body {
   overflow: hidden;
 }
 
-#info {
-  position: absolute;
-  top: 10px;
-  padding: 5px;
-  width: 20%;
-  height: 50%;
+.overlay-panel {
+  font-family: Monospace;
+  text-align: left;
+
   background-color: #0b0b0b;
   z-index: 1000;
   border: 2px solid #5b0000;
 }
 
-.header-row {
-  color: #ffbec0;
-  font-family: Monospace;
-  font-size: 16px;
-  text-align: left;
-}
-
-.data-row {
-  color: #ffffff;
-  font-family: Monospace;
-  font-size: 13px;
-  text-align: left;
-}
-
-#wiki_box {
-  color: #8597ff;
-}
-
-#controls {
+#info {
   position: absolute;
   top: 10px;
-  width: 100%;
-  color: #ffffff;
+  left: 10px;
   padding: 5px;
-  font-family: Monospace;
-  font-size: 13px;
-  text-align: left;
-  z-index: 1000;
+  width: 20%;
+  height: 50%;
 }
 
+#selector {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  padding: 5px;
+  width: 20%;
+  height: 20%;
+}
 
-a {
+.header-row {
+  color: #ffbec0;
+  font-size: 16px;
+}
+
+.child-row {
   color: #ffffff;
+  font-size: 13px;
 }
 
-#oldie a {
-  color: #da0
+.external-link {
+  color: #8597ff;
 }

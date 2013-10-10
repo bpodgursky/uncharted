@@ -20,7 +20,7 @@
 
 <div>
   <div>
-    <div id="info">
+    <div class="overlay-panel" id="info">
       <table>
         <tbody>
 
@@ -30,7 +30,7 @@
           </td>
         </tr>
 
-        <tr class="data-row">
+        <tr class="child-row">
           <td>
             Proper Name
           </td>
@@ -38,7 +38,7 @@
           </td>
         </tr>
 
-        <tr class="data-row">
+        <tr class="child-row">
           <td>
             Bayer Flamsteed
           </td>
@@ -46,7 +46,7 @@
           </td>
         </tr>
 
-        <tr class="data-row">
+        <tr class="child-row">
           <td>
             Gliese Catalog
           </td>
@@ -54,7 +54,7 @@
           </td>
         </tr>
 
-        <tr class="data-row">
+        <tr class="child-row">
           <td>
             Harvard Revised ID
           </td>
@@ -62,7 +62,7 @@
           </td>
         </tr>
 
-        <tr class="data-row">
+        <tr class="child-row">
           <td>
             Hipparcos ID
           </td>
@@ -70,7 +70,7 @@
           </td>
         </tr>
 
-        <tr class="data-row">
+        <tr class="child-row">
           <td>
             Henry Draper
           </td>
@@ -88,7 +88,7 @@
           </td>
         </tr>
 
-        <tr class="data-row">
+        <tr class="child-row">
           <td>
             Absolute Magnitude
           </td>
@@ -96,7 +96,7 @@
           </td>
         </tr>
 
-        <tr class="data-row">
+        <tr class="child-row">
           <td>
             Spectral Type
           </td>
@@ -114,7 +114,7 @@
           </td>
         </tr>
 
-        <tr class="data-row">
+        <tr class="child-row">
           <td>
             Distance (lys)
           </td>
@@ -122,7 +122,7 @@
           </td>
         </tr>
 
-        <tr class="data-row">
+        <tr class="child-row">
           <td>
             Right Ascension (radians)
           </td>
@@ -130,7 +130,7 @@
           </td>
         </tr>
 
-        <tr class="data-row">
+        <tr class="child-row">
           <td>
             Declination (radians)
           </td>
@@ -148,22 +148,61 @@
           </td>
         </tr>
 
-        <tr class="data-row">
+        <tr class="child-row">
           <td>
-            <a id="wiki_box" href="" target="_blank">Wikipedia</a>
+            <a id="wiki_box" class="external-link" href="" target="_blank">Wikipedia</a>
           </td>
         </tr>
 
         </tbody>
       </table>
     </div>
+
+    <div class="overlay-panel" id="selector">
+
+      <table>
+        <tbody>
+
+        <tr class="header-row">
+          <td>
+            <b>Render Radius (lys)</b>
+          </td>
+        </tr>
+
+        <tr class="child-row">
+          <td>
+            <form id="render_radius" name="render_radius" action="#" method="POST">
+              <div>
+                <label>
+                  <input type="radio" name="render_radius" value="10">
+                </label> 10
+                <label>
+                  <input type="radio" name="render_radius" value="25">
+                </label> 25
+                <label>
+                  <input type="radio" name="render_radius" value="50" checked>
+                </label> 50
+                <label>
+                  <input type="radio" name="render_radius" value="75" checked>
+                </label> 75
+              </div>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
     <canvas id='webgl_canvas'></canvas>
   </div>
 </div>
 
 <script>
+//  TODO use size of star
 
 if (!Detector.webgl) Detector.addGetWebGLMessage();
+
+//  constant stuff
 
 var CLASS_TO_APPARENT_COLOR_STR = {
   O: "#9db4ff",
@@ -191,45 +230,70 @@ var CLASS_TO_APPARENT_COLOR = {
   Y: 0x605170
 };
 
-//  TODO use size of star
+var STAR_GEOMETRY = new THREE.SphereGeometry(.1, 16, 16);
 
-var camera, scene, renderer, raycaster;
+//  webgl init
 
-var mesh, lightMesh, sphere;
-var stars = [];
-var starsByName = {};
+var scene = new THREE.Scene();
 
-var projector;
+var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, .1, 10000);
+camera.position.set(-1.514, 2.100, 2.031);
+
+var ambientLight = new THREE.AmbientLight(0xcccccc);
 
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 
 var clock = new THREE.Clock();
 
-var selector, solMarker;
+var solMarker = new THREE.Mesh(new THREE.SelectorGeometry(.5, .1), new THREE.MeshBasicMaterial({ color: 0x0000FF,
+  side: THREE.DoubleSide,
+  wireframe: false
+}));
+solMarker.position.x = 0;
+solMarker.position.y = 0;
+solMarker.position.z = 0;
 
-THREE.TetrahedronGeometry.prototype = Object.create(THREE.Geometry.prototype);
+var selector = new THREE.Mesh(new THREE.SelectorGeometry(.5, .1), new THREE.MeshBasicMaterial({ color: 0xFF0000,
+  side: THREE.DoubleSide,
+  wireframe: false
+}));
+selector.rotation.z = .5;
+
+var projector = new THREE.Projector();
+
+var renderer = new THREE.WebGLRenderer({
+  canvas: $("#webgl_canvas").get(0)
+});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.autoClear = true;
+
+var raycaster = new THREE.Raycaster();
+
+var controls = new THREE.FirstPersonControls(camera);
+controls.lat = -35.38;
+controls.lon = -83.44;
+controls.movementSpeed = 15;
+controls.lookSpeed = 0.1;
+
+scene.add(camera);
+scene.add(ambientLight);
+scene.add(solMarker);
+scene.add(selector);
+
+//  other data
+
+var stars = [];
+var starsByID = {};
+
+$("#render_radius").click(function (e) {
+  loadStarData($('input[name=render_radius]:checked', '#render_radius').val(), renderOnLoad);
+});
+
 $("#info").click(function (e) {
   e.preventDefault();
 });
 
-$.ajax({
-  type: 'GET',
-  dataType: 'html',
-  url: "star_catalog",
-  data: {
-    "max_lys": 75
-  },
-  success: function (data) {
-    var dataParsed = JSON.parse(data);
-
-    init(dataParsed);
-    animate();
-
-  }
-});
-
-var controls;
 var currentStarPrimaryId = "";
 var currentStarMesh;
 
@@ -248,53 +312,45 @@ var infoDeclination = $("#declination_box");
 var infoWiki = $("#wiki_box");
 
 infoWiki.click(function (e) {
-  console.log("clicked me " + e);
   window.open(infoWiki.attr('href'), '_blank');
 });
 
-function init(starData) {
+function loadStarDatas(distances) {
+  if (distances.length > 0) {
+    var distance = distances.splice(0, 1)[0];
+    loadStarData(distance, function (data) {
+      renderOnLoad(data);
+      loadStarDatas(distances);
+    });
+  }
+}
 
-  scene = new THREE.Scene();
+function renderOnLoad(data) {
+  renderStarData(JSON.parse(data));
+}
 
-  currentStarPrimaryId = "";
+function loadStarData(distance, onLoad) {
+  $.ajax({
+    type: 'GET',
+    dataType: 'html',
+    url: "star_catalog",
+    data: {
+      "max_lys": distance
+    },
+    success: onLoad
+  });
+}
 
-  var ambientLight = new THREE.AmbientLight(0xcccccc);
-  scene.add(ambientLight);
+function renderStarData(starData) {
 
-  sphere = new THREE.SphereGeometry(.1, 16, 16);
+  //  clear previous data
+  stars.forEach(function (star) {
+    scene.remove(star);
 
-  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, .1, 10000);
-  scene.add(camera);
-
-  camera.position.set(-1.514, 2.100, 2.031);
-
-  controls = new THREE.FirstPersonControls(camera);
-
-  controls.lat = -35.38;
-  controls.lon = -83.44;
-  controls.movementSpeed = 15;
-  controls.lookSpeed = 0.1;
-
-  //  for highlighting stuff
-  selector = new THREE.Mesh(new THREE.SelectorGeometry(.5, .1), new THREE.MeshBasicMaterial({ color: 0xFF0000,
-    side: THREE.DoubleSide,
-    wireframe: false
-  }));
-  selector.rotation.z = .5;
-
-  scene.add(selector);
-
-  //  tetrahedron phone home
-  solMarker = new THREE.Mesh(new THREE.SelectorGeometry(.5, .1), new THREE.MeshBasicMaterial({ color: 0x0000FF,
-    side: THREE.DoubleSide,
-    wireframe: false
-  }));
-
-  solMarker.position.x = 0;
-  solMarker.position.y = 0;
-  solMarker.position.z = 0;
-
-  scene.add(solMarker);
+    star.material.dispose();
+  });
+  stars = [];
+  starsByID = {};
 
   starData.forEach(function (star) {
 
@@ -306,22 +362,12 @@ function init(starData) {
     }
 
     //  TODO requires no explanation why this is hacky...
-    var fractionStrength = (20 - star.absoluteMagnitude) / 21;
-
     var hsv = tinycolor(pureColor).toHsv();
+    hsv.v = (20 - star.absoluteMagnitude) / 21;
 
-    hsv.v = fractionStrength;
+    var rgb = tinycolor("hsv " + hsv.h + " " + hsv.s + " " + hsv.v).toHexString();
 
-    console.log();
-    console.log(hsv);
-    console.log("hsv " + hsv.h + " " + hsv.s + " " + hsv.s);
-
-    var adjusted = tinycolor("hsv " + hsv.h + " " + hsv.s + " " + hsv.v);
-
-    console.log(adjusted);
-    var rgb = adjusted.toHexString();
-
-    var mesh = new THREE.Mesh(sphere, new THREE.MeshPhongMaterial({ ambient: rgb,
+    var mesh = new THREE.Mesh(STAR_GEOMETRY, new THREE.MeshPhongMaterial({ ambient: rgb,
       color: rgb,
       specular: rgb,
       shininess: 30
@@ -332,34 +378,21 @@ function init(starData) {
     mesh.position.z = star.cartesianCoordsInLys.z;
 
     mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
-
     mesh.starData = star;
 
     scene.add(mesh);
     stars.push(mesh);
 
-    starsByName[star.identifiers.primaryId] = mesh;
+    starsByID[star.identifiers.primaryId] = mesh;
   });
 
-  projector = new THREE.Projector();
-
-  renderer = new THREE.WebGLRenderer({
-    canvas: $("#webgl_canvas").get(0)
-  });
-
-  raycaster = new THREE.Raycaster();
-
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.autoClear = false;
-
-  window.addEventListener('resize', onWindowResize, false);
-  document.addEventListener('mousemove', onMouseMove, false);
-
-  select(starsByName[70667]);
-
+  if (currentStarPrimaryId == "") {
+    select(starsByID[70667]);
+  }
 }
 
-var onMouseMove = function (event) {
+
+function dragOnMouseMove(event) {
   if (!controls.dragView) {
     var vector = new THREE.Vector3(( event.clientX / window.innerWidth ) * 2 - 1, -( event.clientY / window.innerHeight ) * 2 + 1, 1.0);
     projector.unprojectVector(vector, camera);
@@ -372,7 +405,7 @@ var onMouseMove = function (event) {
       select(intersects[0].object);
     }
   }
-};
+}
 
 function select(mesh) {
 
@@ -464,6 +497,13 @@ function render() {
   controls.update(delta);
   renderer.render(scene, camera);
 }
+
+window.addEventListener('resize', onWindowResize, false);
+document.addEventListener('mousemove', dragOnMouseMove, false);
+
+animate();
+
+loadStarDatas([25, 75]);
 
 </script>
 
