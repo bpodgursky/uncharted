@@ -389,6 +389,10 @@ function renderStarData(starData) {
   if (currentStarPrimaryId == "") {
     select(starsByID[70667]);
   }
+  //  if we shrunk the render distance
+  else if(!starsByID[currentStarPrimaryId]){
+    select(starsByID[0]);
+  }
 }
 
 
