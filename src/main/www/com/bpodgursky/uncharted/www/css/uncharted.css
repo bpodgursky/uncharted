@@ -31,7 +31,7 @@ body {
   left: 10px;
   padding: 5px;
   width: 20%;
-  height: 20%;
+  height: 25%;
 }
 
 .header-row {
@@ -47,3 +47,16 @@ body {
 .external-link {
   color: #8597ff;
 }
+
+
+#attribution-overlay {
+  position: absolute;
+  font-family: Monospace;
+  top: 10px;
+  right: 10px;
+  width: 100%;
+  text-align: right;
+  color: #ffffff;
+  font-size: 13px;
+}
+

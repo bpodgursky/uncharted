@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Gliese Catalog of Nearby Stars</title>
+  <title>Galactic Neighorhood</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
@@ -19,182 +19,260 @@
 <body>
 
 <div>
-  <div>
-    <div class="overlay-panel" id="info">
-      <table>
-        <tbody>
+<div>
+<div class="overlay-panel" id="info">
+  <table>
+    <tbody>
 
-        <tr class="header-row">
-          <td>
-            <b>Names</b>
-          </td>
-        </tr>
+    <tr class="header-row">
+      <td>
+        <b>Names</b>
+      </td>
+    </tr>
 
-        <tr class="child-row">
-          <td>
-            Proper Name
-          </td>
-          <td id="proper_name_box">
-          </td>
-        </tr>
+    <tr class="child-row">
+      <td>
+        Proper Name
+      </td>
+      <td id="proper_name_box">
+      </td>
+    </tr>
 
-        <tr class="child-row">
-          <td>
-            Bayer Flamsteed
-          </td>
-          <td id="bayer_flamsteed_box">
-          </td>
-        </tr>
+    <tr class="child-row">
+      <td>
+        Bayer Flamsteed
+      </td>
+      <td id="bayer_flamsteed_box">
+      </td>
+    </tr>
 
-        <tr class="child-row">
-          <td>
-            Gliese Catalog
-          </td>
-          <td id="gliese_catalog_box">
-          </td>
-        </tr>
+    <tr class="child-row">
+      <td>
+        Gliese Catalog
+      </td>
+      <td id="gliese_catalog_box">
+      </td>
+    </tr>
 
-        <tr class="child-row">
-          <td>
-            Harvard Revised ID
-          </td>
-          <td id="harvard_revised_box">
-          </td>
-        </tr>
+    <tr class="child-row">
+      <td>
+        Harvard Revised ID
+      </td>
+      <td id="harvard_revised_box">
+      </td>
+    </tr>
 
-        <tr class="child-row">
-          <td>
-            Hipparcos ID
-          </td>
-          <td id="hipparcos_box">
-          </td>
-        </tr>
+    <tr class="child-row">
+      <td>
+        Hipparcos ID
+      </td>
+      <td id="hipparcos_box">
+      </td>
+    </tr>
 
-        <tr class="child-row">
-          <td>
-            Henry Draper
-          </td>
-          <td id="henry_draper_box">
-          </td>
-        </tr>
+    <tr class="child-row">
+      <td>
+        Henry Draper
+      </td>
+      <td id="henry_draper_box">
+      </td>
+    </tr>
 
-        <tr>
-          <td>&nbsp;</td>
-        </tr>
+    <tr>
+      <td>&nbsp;</td>
+    </tr>
 
-        <tr class="header-row">
-          <td>
-            <b>Details</b>
-          </td>
-        </tr>
+    <tr class="header-row">
+      <td>
+        <b>Details</b>
+      </td>
+    </tr>
 
-        <tr class="child-row">
-          <td>
-            Absolute Magnitude
-          </td>
-          <td id="abs-magnitude">
-          </td>
-        </tr>
+    <tr class="child-row">
+      <td>
+        Absolute Magnitude
+      </td>
+      <td id="abs-magnitude">
+      </td>
+    </tr>
 
-        <tr class="child-row">
-          <td>
-            Spectral Type
-          </td>
-          <td id="spectral-type">
-          </td>
-        </tr>
+    <tr class="child-row">
+      <td>
+        Spectral Type
+      </td>
+      <td id="spectral-type">
+      </td>
+    </tr>
 
-        <tr>
-          <td>&nbsp;</td>
-        </tr>
+    <tr>
+      <td>&nbsp;</td>
+    </tr>
 
-        <tr class="header-row">
-          <td>
-            <b>Relative Location</b>
-          </td>
-        </tr>
+    <tr class="header-row">
+      <td>
+        <b>Relative Location</b>
+      </td>
+    </tr>
 
-        <tr class="child-row">
-          <td>
-            Distance (lys)
-          </td>
-          <td id="distance_box">
-          </td>
-        </tr>
+    <tr class="child-row">
+      <td>
+        Distance (lys)
+      </td>
+      <td id="distance_box">
+      </td>
+    </tr>
 
-        <tr class="child-row">
-          <td>
-            Right Ascension (radians)
-          </td>
-          <td id="right_ascension_box">
-          </td>
-        </tr>
+    <tr class="child-row">
+      <td>
+        Right Ascension (radians)
+      </td>
+      <td id="right_ascension_box">
+      </td>
+    </tr>
 
-        <tr class="child-row">
-          <td>
-            Declination (radians)
-          </td>
-          <td id="declination_box">
-          </td>
-        </tr>
+    <tr class="child-row">
+      <td>
+        Declination (radians)
+      </td>
+      <td id="declination_box">
+      </td>
+    </tr>
 
-        <tr>
-          <td>&nbsp;</td>
-        </tr>
+    <tr>
+      <td>&nbsp;</td>
+    </tr>
 
-        <tr class="header-row">
-          <td>
-            <b>More Information</b>
-          </td>
-        </tr>
+    <tr class="header-row">
+      <td>
+        <b>More Information</b>
+      </td>
+    </tr>
 
-        <tr class="child-row">
-          <td>
-            <a id="wiki_box" class="external-link" href="" target="_blank">Wikipedia</a>
-          </td>
-        </tr>
+    <tr class="child-row">
+      <td>
+        <a id="wiki_box" class="external-link" href="" target="_blank">Wikipedia</a>
+      </td>
+    </tr>
 
-        </tbody>
-      </table>
-    </div>
+    </tbody>
+  </table>
+</div>
 
-    <div class="overlay-panel" id="selector">
+<div class="overlay-panel" id="selector">
 
-      <table>
-        <tbody>
+  <table>
+    <tbody>
 
-        <tr class="header-row">
-          <td>
-            <b>Render Radius (lys)</b>
-          </td>
-        </tr>
+    <tr class="header-row">
+      <td>
+        <b>Controls</b>
+      </td>
+    </tr>
 
-        <tr class="child-row">
-          <td>
-            <form id="render_radius" name="render_radius" action="#" method="POST">
-              <div>
-                <label>
-                  <input type="radio" name="render_radius" value="10">
-                </label> 10
-                <label>
-                  <input type="radio" name="render_radius" value="25">
-                </label> 25
-                <label>
-                  <input type="radio" name="render_radius" value="50" checked>
-                </label> 50
-                <label>
-                  <input type="radio" name="render_radius" value="75" checked>
-                </label> 75
-              </div>
-            </form>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
+    <tr class="child-row">
+      <td>
+        Star details
+      </td>
+      <td>
+        Mouse over
+      </td>
+    </tr>
 
-    <canvas id='webgl_canvas'></canvas>
-  </div>
+    <tr class="child-row">
+      <td>
+        Rotate view
+      </td>
+      <td>
+        Click and drag
+      </td>
+    </tr>
+
+    <tr class="child-row">
+      <td>
+        Move forward / back
+      </td>
+      <td>
+        Scroll
+      </td>
+    </tr>
+
+    <tr class="child-row">
+      <td>
+        Pan left
+      </td>
+      <td>
+        A
+      </td>
+    </tr>
+
+    <tr class="child-row">
+      <td>
+        Pan right
+      </td>
+      <td>
+        D
+      </td>
+    </tr>
+
+    <tr class="child-row">
+      <td>
+        Move Forwards
+      </td>
+      <td>
+        W
+      </td>
+    </tr>
+
+    <tr class="child-row">
+      <td>
+        Move Backwards
+      </td>
+      <td>
+        S
+      </td>
+    </tr>
+
+    <tr>
+      <td>&nbsp;</td>
+    </tr>
+
+    <tr class="header-row">
+      <td>
+        <b>Render Radius (lys)</b>
+      </td>
+    </tr>
+
+    <tr class="child-row">
+      <td>
+        <form id="render_radius" name="render_radius" action="#" method="POST">
+          <div>
+            <label>
+              <input type="radio" name="render_radius" value="10">
+            </label> 10
+            <label>
+              <input type="radio" name="render_radius" value="25">
+            </label> 25
+            <label>
+              <input type="radio" name="render_radius" value="50" checked>
+            </label> 50
+            <label>
+              <input type="radio" name="render_radius" value="75" checked>
+            </label> 75
+          </div>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="attribution-overlay">
+  <a href="https://github.com/bpodgursky/uncharted">Source and info</a><br>
+  <a href="http://bpodgursky.com/">Ben Podgursky</a>
+</div>
+
+<canvas id='webgl_canvas'></canvas>
+</div>
 </div>
 
 <script>
@@ -217,20 +295,7 @@ var CLASS_TO_APPARENT_COLOR_STR = {
   Y: "#60517"
 };
 
-var CLASS_TO_APPARENT_COLOR = {
-  O: 0x9db4ff,
-  B: 0xaabfff,
-  A: 0xcad8ff,
-  F: 0xfbf8ff,
-  G: 0xfff4e8,
-  K: 0xffddb4,
-  M: 0xffbd6f,
-  L: 0xf84235,
-  T: 0xba3059,
-  Y: 0x605170
-};
-
-var STAR_GEOMETRY = new THREE.SphereGeometry(.1, 16, 16);
+var STAR_GEOMETRY = new THREE.SphereGeometry(.05, 16, 16);
 
 //  webgl init
 
@@ -240,6 +305,7 @@ var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHei
 camera.position.set(-1.514, 2.100, 2.031);
 
 var ambientLight = new THREE.AmbientLight(0xcccccc);
+var light1 = new THREE.PointLight(0xffffff);
 
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
@@ -278,6 +344,7 @@ controls.lookSpeed = 0.1;
 
 scene.add(camera);
 scene.add(ambientLight);
+scene.add(light1);
 scene.add(solMarker);
 scene.add(selector);
 
@@ -285,6 +352,10 @@ scene.add(selector);
 
 var stars = [];
 var starsByID = {};
+
+$("#selector").keydown(function (e) {
+  e.preventDefault();
+});
 
 $("#render_radius").click(function (e) {
   loadStarData($('input[name=render_radius]:checked', '#render_radius').val(), renderOnLoad);
@@ -370,7 +441,7 @@ function renderStarData(starData) {
     var mesh = new THREE.Mesh(STAR_GEOMETRY, new THREE.MeshPhongMaterial({ ambient: rgb,
       color: rgb,
       specular: rgb,
-      shininess: 30
+      shininess: 20
     }));
 
     mesh.position.x = star.cartesianCoordsInLys.x;
@@ -390,7 +461,7 @@ function renderStarData(starData) {
     select(starsByID[70667]);
   }
   //  if we shrunk the render distance
-  else if(!starsByID[currentStarPrimaryId]){
+  else if (!starsByID[currentStarPrimaryId]) {
     select(starsByID[0]);
   }
 }
@@ -497,6 +568,8 @@ function render() {
   solMarker.rotation.x = camera.rotation.x;
   solMarker.rotation.y = camera.rotation.y;
   solMarker.rotation.z = solMarker.rotation.z + .5 * delta;
+
+  light1.position = controls.object.position;
 
   controls.update(delta);
   renderer.render(scene, camera);
