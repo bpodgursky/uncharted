@@ -12,7 +12,7 @@ I have no background in astronomy (I'm just a software engineer), so while I'd l
 
 There are a number of features and improvements which I'd like to make:
 
-- The HYG dataset is missing some newly-discovered stars (when compared against this [list](http://en.wikipedia.org/wiki/List_of_nearest_stars).  I'd like to find a fully up-to-date dataset to use.
+- The HYG dataset is missing some newly-discovered stars (when compared against this [list](http://en.wikipedia.org/wiki/List_of_nearest_stars)).  I'd like to find a fully up-to-date dataset to use.
 
 - Current star colors and magnitudes are both inaccurate and ugly.  Right now I'm mapping stellar class to apparent color from the mapping [here](http://en.wikipedia.org/wiki/Stellar_classification), and lightening / darkening the color based on apparent magnitude.  
 
