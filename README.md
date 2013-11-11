@@ -1,5 +1,4 @@
-Uncharted
-=====
+### Uncharted ###
 
 Uncharted is a work-in-progress visualization of our Sun's galactic neighborhood using [three.js](http://threejs.org/) and the [HYG star database](https://github.com/astronexus/HYG-Database).  The site is hosted here:
 
@@ -7,10 +6,9 @@ http://uncharted.bpodgursky.com/
 
 ![screenshot](http://i.imgur.com/1wcMYQ6.png)
 
-To-do List
-=====
+### To-do ###
 
-I have no background in astronomy (I'm just an interested software engineer), so while I'd like this tool to be informative and accurate, I can't make any promises currently.  There are a number of features and improvements which I'd like to make:
+I have no background in astronomy (I'm just a software engineer), so while I'd like this project to be useful and accurate, I can't make any promises.  There are a number of features and improvements which I'd like to make:
 
 - The HYG dataset is missing some newly-discovered stars (when compared against this [list](http://en.wikipedia.org/wiki/List_of_nearest_stars).  I'd like to find a fully up-to-date dataset to use.
 
