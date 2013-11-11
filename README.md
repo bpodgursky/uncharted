@@ -1,6 +1,6 @@
 ### Uncharted ###
 
-Uncharted is a work-in-progress visualization of our Sun's galactic neighborhood using [three.js](http://threejs.org/) and the [HYG star database](https://github.com/astronexus/HYG-Database).  The site is hosted here:
+Uncharted is a work-in-progress visualization of our solar neighborhood using [three.js](http://threejs.org/) and the [HYG star database](https://github.com/astronexus/HYG-Database).  The site is hosted here:
 
 http://uncharted.bpodgursky.com/
 
