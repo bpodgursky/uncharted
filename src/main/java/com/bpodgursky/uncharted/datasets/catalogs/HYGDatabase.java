@@ -95,7 +95,6 @@ public class HYGDatabase implements StarCatalog {
 
         String absMag = split[14];
 
-
         ExternalLinks links = new ExternalLinks();
 
         if(idToWikiLink.containsKey(mainId)){
