@@ -32,7 +32,6 @@ THREE.SelectorGeometry = function (scale, arrowWidth) {
     new THREE.Face3(9, 10, 11)
   ];
 
-  this.computeCentroids();
   this.computeFaceNormals();
   this.computeVertexNormals();
 
