@@ -20,11 +20,17 @@ THREE.FirstPersonControls = function (object, domElement) {
   this.mouseX = 0;
   this.mouseY = 0;
 
-  this.dragStartX = 0;
-  this.dragStartY = 0;
+  //this.dragStartX = 0;
+  //this.dragStartY = 0;
+  //
+  //this.dragStartLat = 0;
+  //this.dragStartLon = 0;
 
-  this.dragStartLat = 0;
-  this.dragStartLon = 0;
+  this.dragStartPhi = 0;
+  this.dragStarTheta = 0;
+
+  this.originalPhi = 0;
+  this.originalTheta = 0;
 
   this.lat = 0;
   this.lon = 0;
@@ -74,11 +80,17 @@ THREE.FirstPersonControls = function (object, domElement) {
     if (event.target.tagName == "CANVAS") {
 
       this.dragView = true;
-      this.dragStartX = event.pageX - this.viewHalfX;
-      this.dragStartY = event.pageY - this.viewHalfY;
+      //this.dragStartX = event.pageX - this.viewHalfX;
+      //this.dragStartY = event.pageY - this.viewHalfY;
+      //
+      //this.dragStartLat = this.lat;
+      //this.dragStartLon = this.lon;
 
-      this.dragStartLat = this.lat;
-      this.dragStartLon = this.lon;
+      this.dragStartPhi = THREE.Math.degToRad(90 - event.pageY + this.viewHalfY);
+      this.dragStarTheta = THREE.Math.degToRad(event.pageX - this.viewHalfX);
+
+      this.originalPhi = this.phi;
+      this.originalTheta = this.theta;
 
       event.preventDefault();
       event.stopPropagation();
@@ -238,24 +250,27 @@ THREE.FirstPersonControls = function (object, domElement) {
 
     //  invert
 
-    if(this.dragView) {
-      this.lon = this.dragStartLon + (this.mouseX - this.dragStartX);
-      this.lat = this.dragStartLat + (this.mouseY - this.dragStartY);
-      this.lat = Math.max(-85, Math.min(85, this.lat));
-    }
+    //if(this.dragView) {
+    //  this.lon = this.mouseX;
+    //  this.lat = this.mouseY;
+    //}
 
-    this.phi = THREE.Math.degToRad(90 - this.lat);
-    this.theta = THREE.Math.degToRad(this.lon);
+    this.lat = Math.max(-85, Math.min(85, this.lat));
+
+    var mousePhi = THREE.Math.degToRad(90 - this.mouseY);
+    var mouseTheta = THREE.Math.degToRad(this.mouseX);
+
+    var deltaPhi = this.dragStartPhi - mousePhi;
+    var deltaTheta = this.dragStarTheta - mouseTheta;
+
+    this.phi = this.originalPhi - deltaPhi;
+    this.theta = this.originalTheta + deltaTheta;
 
     var position = this.object.position;
 
     this.target.x = position.x + 100 * Math.sin(this.phi) * Math.cos(this.theta);
     this.target.y = position.y + 100 * Math.cos(this.phi);
     this.target.z = position.z + 100 * Math.sin(this.phi) * Math.sin(this.theta);
-
-    this.mouseLastX = this.mouseX;
-    this.mouseLastY = this.mouseY;
-
 
     //  look at drag start point offset from center
 
