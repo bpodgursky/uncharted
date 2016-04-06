@@ -14,12 +14,17 @@ THREE.FirstPersonControls = function (object, domElement) {
   this.domElement = ( domElement !== undefined ) ? domElement : document;
 
   this.MOVEMENT_SPEED = 15;
-  this.LOOK_SPEED = 0.1;
 
   //  dynamic
 
   this.mouseX = 0;
   this.mouseY = 0;
+
+  this.dragStartX = 0;
+  this.dragStartY = 0;
+
+  this.dragStartLat = 0;
+  this.dragStartLon = 0;
 
   this.lat = 0;
   this.lon = 0;
@@ -64,11 +69,16 @@ THREE.FirstPersonControls = function (object, domElement) {
       this.domElement.focus();
     }
 
-
     //  hacky?  yeah probably
 
     if (event.target.tagName == "CANVAS") {
+
       this.dragView = true;
+      this.dragStartX = event.pageX - this.viewHalfX;
+      this.dragStartY = event.pageY - this.viewHalfY;
+
+      this.dragStartLat = this.lat;
+      this.dragStartLon = this.lon;
 
       event.preventDefault();
       event.stopPropagation();
@@ -87,18 +97,19 @@ THREE.FirstPersonControls = function (object, domElement) {
 
   this.onMouseMove = function (event) {
 
-    if (this.domElement === document) {
+    if (this.dragView) {
+      if (this.domElement === document) {
 
-      this.mouseX = event.pageX - this.viewHalfX;
-      this.mouseY = event.pageY - this.viewHalfY;
+        this.mouseX = event.pageX - this.viewHalfX;
+        this.mouseY = event.pageY - this.viewHalfY;
 
-    } else {
+      } else {
 
-      this.mouseX = event.pageX - this.domElement.offsetLeft - this.viewHalfX;
-      this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
+        this.mouseX = event.pageX - this.domElement.offsetLeft - this.viewHalfX;
+        this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
 
+      }
     }
-
   };
 
   this.onMouseWheel = function (event) {
@@ -196,9 +207,6 @@ THREE.FirstPersonControls = function (object, domElement) {
 
   this.update = function (delta, lockPos) {
 
-
-    this.autoSpeedFactor = 0.0;
-
     var actualMoveSpeed = delta * this.MOVEMENT_SPEED;
 
     if (this.moveForward) {
@@ -228,21 +236,15 @@ THREE.FirstPersonControls = function (object, domElement) {
       this.object.translateY(-actualMoveSpeed);
     }
 
-    var actualLookSpeed = delta * this.LOOK_SPEED;
+    //  invert
 
-    if (!this.dragView) {
-      actualLookSpeed = 0;
+    if(this.dragView) {
+      this.lon = this.dragStartLon + (this.mouseX - this.dragStartX);
+      this.lat = this.dragStartLat + (this.mouseY - this.dragStartY);
+      this.lat = Math.max(-85, Math.min(85, this.lat));
     }
 
-    var verticalLookRatio = 1;
-
-    this.lon += this.mouseX * actualLookSpeed;
-
-    this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
-
-    this.lat = Math.max(-85, Math.min(85, this.lat));
     this.phi = THREE.Math.degToRad(90 - this.lat);
-
     this.theta = THREE.Math.degToRad(this.lon);
 
     var position = this.object.position;
@@ -250,6 +252,12 @@ THREE.FirstPersonControls = function (object, domElement) {
     this.target.x = position.x + 100 * Math.sin(this.phi) * Math.cos(this.theta);
     this.target.y = position.y + 100 * Math.cos(this.phi);
     this.target.z = position.z + 100 * Math.sin(this.phi) * Math.sin(this.theta);
+
+    this.mouseLastX = this.mouseX;
+    this.mouseLastY = this.mouseY;
+
+
+    //  look at drag start point offset from center
 
     this.object.lookAt(this.target);
 
