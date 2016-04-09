@@ -4,17 +4,15 @@
  * @author paulirish / http://paulirish.com/
  */
 
-THREE.FirstPersonControls = function (object, domElement) {
+THREE.FirstPersonControls = function (object, dragCamera, domElement) {
 
   //  static
 
   this.camera = object;
-  this.target = new THREE.Vector3(0, 0, 0);
+  this.dragCamera = dragCamera;
+  this.target = new THREE.Vector3(1, 0, 0);
   this.tmpVector = new THREE.Vector3(0, 0, 0);
-  this.tmpCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
-  this.tmpCamera .aspect = window.innerWidth / window.innerHeight;
-  this.tmpCamera.updateProjectionMatrix();
-
+  this.UP = new THREE.Vector3(0, 0, 1);
 
   this.domElement = ( domElement !== undefined ) ? domElement : document;
 
@@ -26,14 +24,11 @@ THREE.FirstPersonControls = function (object, domElement) {
   this.mouseX = 0;
   this.mouseY = 0;
 
-  this.dragFixPos;
-  this.origLookAt;
-  this.origPos;
+  this.dragFixTheta = 0;
+  this.dragFixPhi = 0;
 
-  this.lat = 0;
-  this.lon = 0;
-  this.phi = 0;
-  this.theta = 0;
+  this.origLookPhi = 0;
+  this.origLookTheta = 0;
 
   this.moveForward = false;
   this.moveBackward = false;
@@ -48,29 +43,16 @@ THREE.FirstPersonControls = function (object, domElement) {
 
   }
 
-  this.getProjectedPos = function (mouseX, mouseY, camera) {
+  this.getProjectedDir = function (mouseX, mouseY, camera) {
 
     var adjX = ( mouseX / window.innerWidth ) * 2 - 1;
     var adjY = -( mouseY / window.innerHeight ) * 2 + 1;
 
     this.tmpVector.set(adjX, adjY, 0.5);
-
-    console.log("asdfafadsfafads");
-    console.log(this.tmpVector);
-
     this.tmpVector.unproject(camera);
 
-    console.log(this.tmpVector);
-
-    var dir = this.tmpVector.sub(camera.position).normalize();
-    var distance = -camera.position.z / dir.z;
-
-    console.log(dir);
-    console.log(distance);
-
-    return camera.position.clone().add(dir.multiplyScalar(distance));
-
-  }
+    return this.tmpVector.sub(camera.position).normalize();
+  };
 
   this.onMouseDown = function (event) {
 
@@ -87,24 +69,59 @@ THREE.FirstPersonControls = function (object, domElement) {
       this.mouseX = event.pageX;
       this.mouseY = event.pageY;
 
-      this.dragFixPos = this.getProjectedPos(this.mouseX, this.mouseY, this.camera);
+      var currentDir = this.camera.getWorldDirection().normalize();
+      console.log(currentDir);
 
-      var cameraLookAt = this.camera.getWorldDirection();
-
-      this.origLookAt = new THREE.Vector3(
-        cameraLookAt.x,
-        cameraLookAt.y,
-        cameraLookAt.z
+      var cameraPos = this.camera.position;
+      this.dragCamera.position.set(
+          cameraPos.x,
+          cameraPos.y,
+          cameraPos.z
       );
 
-      this.origPos = new THREE.Vector3(
-        this.camera.position.x,
-        this.camera.position.y,
-        this.camera.position.z
+      //this.dragCamera.up = this.UP;
+      this.dragCamera.lookAt(
+          cameraPos.x + currentDir.x,
+          cameraPos.y + currentDir.y,
+          cameraPos.z + currentDir.z
       );
 
-      console.log("mouse click on location: ");
-      console.log(this.dragFixPos);
+      //this.dragCamera.rotation.set(
+      //    this.camera.rotation.x,
+      //    this.camera.rotation.y,
+      //    this.camera.rotation.z
+      //);
+
+      //var origLook = this.dragCamera.getWorldDirection().normalize();
+      //console.log(origLook);
+      this.origLookPhi = this.toPhi(currentDir.x, currentDir.y, currentDir.z);
+      this.origLookTheta = this.toTheta(currentDir.x, currentDir.y, currentDir.z);
+
+      var origDir = this.getProjectedDir(this.mouseX, this.mouseY, this.dragCamera);
+      this.dragFixTheta = this.toTheta(origDir.x, origDir.y, origDir.z);
+      this.dragFixPhi = this.toPhi(origDir.x, origDir.y, origDir.z);
+
+      console.log(this.origLookPhi);
+      console.log(this.origLookTheta);
+      console.log(this.dragFixPhi);
+      console.log(this.dragFixTheta);
+
+      //var cameraLookAt = this.camera.getWorldDirection();
+
+      //this.origLookAt = new THREE.Vector3(
+      //    cameraLookAt.x,
+      //    cameraLookAt.y,
+      //    cameraLookAt.z
+      //);
+      //
+      //this.origPos = new THREE.Vector3(
+      //    this.camera.position.x,
+      //    this.camera.position.y,
+      //    this.camera.position.z
+      //);
+      //
+      //console.log("mouse click on location: ");
+      //console.log(this.dragFixPos);
 
       event.preventDefault();
       event.stopPropagation();
@@ -258,32 +275,38 @@ THREE.FirstPersonControls = function (object, domElement) {
 
     if (this.dragView) {
 
-      console.log("WAAAAAAAA");
-      console.log(this.origPos);
-      console.log(this.origLookAt);
+      var newProjected = this.getProjectedDir(this.mouseX, this.mouseY, this.dragCamera);
 
-      //  TODO only set in orig drag
-      this.tmpCamera.position.set(this.origPos);
-      this.tmpCamera.lookAt(this.origLookAt);
+      var newPhi = this.toPhi(newProjected.x, newProjected.y, newProjected.z);
+      var newTheta = this.toTheta(newProjected.x, newProjected.y, newProjected.z);
 
-      var newProjected = this.getProjectedPos(this.mouseX, this.mouseY, this.tmpCamera);
+      var deltaPhi = newPhi - this.dragFixPhi;
+      var deltaTheta = newTheta - this.dragFixTheta;
 
-      console.log(newProjected);
+      var updatedPhi = this.origLookPhi + deltaPhi;
+      var updatedTheta = this.origLookTheta + deltaTheta;
 
-      var deltaX = newProjected.x - this.dragFixPos.x;
-      var deltaY = newProjected.y - this.dragFixPos.y;
-      var deltaZ = newProjected.z - this.dragFixPos.z;
-
-      this.target.x = this.origLookAt.x + deltaX;
-      this.target.y = this.origLookAt.y + deltaY;
-      this.target.z = this.origLookAt.z + deltaZ;
+      this.target.x = this.camera.position.x + 100 * Math.sin(updatedTheta) * Math.cos(updatedPhi);
+      this.target.y = this.camera.position.y + 100 * Math.sin(updatedTheta) * Math.sin(updatedPhi);
+      this.target.z = this.camera.position.z + 100 * Math.cos(updatedTheta);
 
     }
 
+    console.log(this.camera.rotation);
+    console.log(this.dragCamera.rotation);
+    //this.camera.up = this.UP;
     this.camera.lookAt(this.target);
+    //this.camera.rotation.z = 0;
 
   };
 
+  this.toPhi = function (x, y, z) {
+    return Math.atan(y / x);
+  };
+
+  this.toTheta = function (x, y, z) {
+    return Math.acos(z / Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2)));
+  };
 
   this.domElement.addEventListener('contextmenu', function (event) {
     event.preventDefault();
