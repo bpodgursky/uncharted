@@ -8,10 +8,16 @@ THREE.FirstPersonControls = function (object, domElement) {
 
   //  static
 
-  this.object = object;
+  this.camera = object;
   this.target = new THREE.Vector3(0, 0, 0);
+  this.tmpVector = new THREE.Vector3(0, 0, 0);
+  this.tmpCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+  this.tmpCamera .aspect = window.innerWidth / window.innerHeight;
+  this.tmpCamera.updateProjectionMatrix();
+
 
   this.domElement = ( domElement !== undefined ) ? domElement : document;
+
 
   this.MOVEMENT_SPEED = 15;
 
@@ -20,17 +26,9 @@ THREE.FirstPersonControls = function (object, domElement) {
   this.mouseX = 0;
   this.mouseY = 0;
 
-  //this.dragStartX = 0;
-  //this.dragStartY = 0;
-  //
-  //this.dragStartLat = 0;
-  //this.dragStartLon = 0;
-
-  this.dragStartPhi = 0;
-  this.dragStarTheta = 0;
-
-  this.originalPhi = 0;
-  this.originalTheta = 0;
+  this.dragFixPos;
+  this.origLookAt;
+  this.origPos;
 
   this.lat = 0;
   this.lon = 0;
@@ -42,9 +40,6 @@ THREE.FirstPersonControls = function (object, domElement) {
   this.moveLeft = false;
   this.moveRight = false;
 
-  this.viewHalfX = 0;
-  this.viewHalfY = 0;
-
   this.dragView = false;
 
   if (this.domElement !== document) {
@@ -53,21 +48,29 @@ THREE.FirstPersonControls = function (object, domElement) {
 
   }
 
-  this.handleResize = function () {
+  this.getProjectedPos = function (mouseX, mouseY, camera) {
 
-    if (this.domElement === document) {
+    var adjX = ( mouseX / window.innerWidth ) * 2 - 1;
+    var adjY = -( mouseY / window.innerHeight ) * 2 + 1;
 
-      this.viewHalfX = window.innerWidth / 2;
-      this.viewHalfY = window.innerHeight / 2;
+    this.tmpVector.set(adjX, adjY, 0.5);
 
-    } else {
+    console.log("asdfafadsfafads");
+    console.log(this.tmpVector);
 
-      this.viewHalfX = this.domElement.offsetWidth / 2;
-      this.viewHalfY = this.domElement.offsetHeight / 2;
+    this.tmpVector.unproject(camera);
 
-    }
+    console.log(this.tmpVector);
 
-  };
+    var dir = this.tmpVector.sub(camera.position).normalize();
+    var distance = -camera.position.z / dir.z;
+
+    console.log(dir);
+    console.log(distance);
+
+    return camera.position.clone().add(dir.multiplyScalar(distance));
+
+  }
 
   this.onMouseDown = function (event) {
 
@@ -80,17 +83,28 @@ THREE.FirstPersonControls = function (object, domElement) {
     if (event.target.tagName == "CANVAS") {
 
       this.dragView = true;
-      //this.dragStartX = event.pageX - this.viewHalfX;
-      //this.dragStartY = event.pageY - this.viewHalfY;
-      //
-      //this.dragStartLat = this.lat;
-      //this.dragStartLon = this.lon;
 
-      this.dragStartPhi = THREE.Math.degToRad(90 - event.pageY + this.viewHalfY);
-      this.dragStarTheta = THREE.Math.degToRad(event.pageX - this.viewHalfX);
+      this.mouseX = event.pageX;
+      this.mouseY = event.pageY;
 
-      this.originalPhi = this.phi;
-      this.originalTheta = this.theta;
+      this.dragFixPos = this.getProjectedPos(this.mouseX, this.mouseY, this.camera);
+
+      var cameraLookAt = this.camera.getWorldDirection();
+
+      this.origLookAt = new THREE.Vector3(
+        cameraLookAt.x,
+        cameraLookAt.y,
+        cameraLookAt.z
+      );
+
+      this.origPos = new THREE.Vector3(
+        this.camera.position.x,
+        this.camera.position.y,
+        this.camera.position.z
+      );
+
+      console.log("mouse click on location: ");
+      console.log(this.dragFixPos);
 
       event.preventDefault();
       event.stopPropagation();
@@ -110,17 +124,8 @@ THREE.FirstPersonControls = function (object, domElement) {
   this.onMouseMove = function (event) {
 
     if (this.dragView) {
-      if (this.domElement === document) {
-
-        this.mouseX = event.pageX - this.viewHalfX;
-        this.mouseY = event.pageY - this.viewHalfY;
-
-      } else {
-
-        this.mouseX = event.pageX - this.domElement.offsetLeft - this.viewHalfX;
-        this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
-
-      }
+      this.mouseX = event.pageX;
+      this.mouseY = event.pageY;
     }
   };
 
@@ -222,59 +227,60 @@ THREE.FirstPersonControls = function (object, domElement) {
     var actualMoveSpeed = delta * this.MOVEMENT_SPEED;
 
     if (this.moveForward) {
-      this.object.translateZ(-( actualMoveSpeed ));
+      this.camera.translateZ(-( actualMoveSpeed ));
     }
 
     if (this.moveBackward) {
-      this.object.translateZ(actualMoveSpeed);
+      this.camera.translateZ(actualMoveSpeed);
     }
 
     this.moveForward = false;
     this.moveBackward = false;
 
     if (this.moveLeft) {
-      this.object.translateX(-actualMoveSpeed);
+      this.camera.translateX(-actualMoveSpeed);
     }
 
     if (this.moveRight) {
-      this.object.translateX(actualMoveSpeed);
+      this.camera.translateX(actualMoveSpeed);
     }
 
     if (this.moveUp) {
-      this.object.translateY(actualMoveSpeed);
+      this.camera.translateY(actualMoveSpeed);
     }
 
     if (this.moveDown) {
-      this.object.translateY(-actualMoveSpeed);
+      this.camera.translateY(-actualMoveSpeed);
     }
 
     //  invert
 
-    //if(this.dragView) {
-    //  this.lon = this.mouseX;
-    //  this.lat = this.mouseY;
-    //}
 
-    this.lat = Math.max(-85, Math.min(85, this.lat));
+    if (this.dragView) {
 
-    var mousePhi = THREE.Math.degToRad(90 - this.mouseY);
-    var mouseTheta = THREE.Math.degToRad(this.mouseX);
+      console.log("WAAAAAAAA");
+      console.log(this.origPos);
+      console.log(this.origLookAt);
 
-    var deltaPhi = this.dragStartPhi - mousePhi;
-    var deltaTheta = this.dragStarTheta - mouseTheta;
+      //  TODO only set in orig drag
+      this.tmpCamera.position.set(this.origPos);
+      this.tmpCamera.lookAt(this.origLookAt);
 
-    this.phi = this.originalPhi - deltaPhi;
-    this.theta = this.originalTheta + deltaTheta;
+      var newProjected = this.getProjectedPos(this.mouseX, this.mouseY, this.tmpCamera);
 
-    var position = this.object.position;
+      console.log(newProjected);
 
-    this.target.x = position.x + 100 * Math.sin(this.phi) * Math.cos(this.theta);
-    this.target.y = position.y + 100 * Math.cos(this.phi);
-    this.target.z = position.z + 100 * Math.sin(this.phi) * Math.sin(this.theta);
+      var deltaX = newProjected.x - this.dragFixPos.x;
+      var deltaY = newProjected.y - this.dragFixPos.y;
+      var deltaZ = newProjected.z - this.dragFixPos.z;
 
-    //  look at drag start point offset from center
+      this.target.x = this.origLookAt.x + deltaX;
+      this.target.y = this.origLookAt.y + deltaY;
+      this.target.z = this.origLookAt.z + deltaZ;
 
-    this.object.lookAt(this.target);
+    }
+
+    this.camera.lookAt(this.target);
 
   };
 
@@ -301,7 +307,5 @@ THREE.FirstPersonControls = function (object, domElement) {
     };
 
   };
-
-  this.handleResize();
 
 };

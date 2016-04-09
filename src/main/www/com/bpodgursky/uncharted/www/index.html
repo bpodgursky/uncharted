@@ -545,7 +545,7 @@
     var intersects = raycaster.intersectObjects(stars, false);
 
     if (intersects.length > 0) {
-      return intersects[0].object;
+      return intersects[0].camera;
     }
 
     return null;
@@ -631,7 +631,6 @@
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    controls.handleResize();
     render();
   }
 
@@ -659,11 +658,11 @@
     solMarker.rotation.y = camera.rotation.y;
     solMarker.rotation.z = solMarker.rotation.z + .5 * delta;
 
-    light1.position = controls.object.position;
+    light1.position = controls.camera.position;
     light1.position.set(
-        controls.object.position.x,
-        controls.object.position.y,
-        controls.object.position.z
+        controls.camera.position.x,
+        controls.camera.position.y,
+        controls.camera.position.z
     );
 
     controls.update(delta, selector.position);
