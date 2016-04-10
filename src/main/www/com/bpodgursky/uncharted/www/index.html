@@ -304,8 +304,26 @@
   var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
   camera.position.set(-1.514, 2.100, 2.031);
 
+  camera.rotateZ(Math.PI);
+
   var dragCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
   dragCamera.position.set(-1.514, 2.100, 2.031);
+
+  dragCamera.rotateZ(Math.PI);
+
+
+  var compass = new THREE.Mesh(
+      new THREE.TorusGeometry(10, 3, 16, 100),
+      new THREE.MeshBasicMaterial({color: 0xffff00})
+  );
+  compass.position.x = 0;
+  compass.position.y = 0;
+  compass.position.z = 0;
+
+  compass.rotateX(0);
+  compass.rotateY(0);
+  compass.rotateZ(Math.PI / 2);
+
 
   var ambientLight = new THREE.AmbientLight(0xcccccc);
   var light1 = new THREE.PointLight(0xffffff);
@@ -354,6 +372,8 @@
   scene.add(light1);
   scene.add(solMarker);
   scene.add(selector);
+  scene.add(compass);
+
 
   //  other data
 
