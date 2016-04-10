@@ -299,31 +299,15 @@
 
   //  webgl init
 
+
+  var canvas = $("#webgl_canvas").get(0);
+
   var scene = new THREE.Scene();
 
   var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
-  camera.position.set(-1.514, 2.100, 2.031);
+  camera.position.set(0, 0, 0);
 
   camera.rotateZ(Math.PI);
-
-  var dragCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
-  dragCamera.position.set(-1.514, 2.100, 2.031);
-
-  dragCamera.rotateZ(Math.PI);
-
-
-  var compass = new THREE.Mesh(
-      new THREE.TorusGeometry(10, 3, 16, 100),
-      new THREE.MeshBasicMaterial({color: 0xffff00})
-  );
-  compass.position.x = 0;
-  compass.position.y = 0;
-  compass.position.z = 0;
-
-  compass.rotateX(0);
-  compass.rotateY(0);
-  compass.rotateZ(Math.PI / 2);
-
 
   var ambientLight = new THREE.AmbientLight(0xcccccc);
   var light1 = new THREE.PointLight(0xffffff);
@@ -351,10 +335,11 @@
   selector.rotation.z = .5;
 
   var tooltip;
+  var tooltipMesh;
   var font;
 
   var renderer = new THREE.WebGLRenderer({
-    canvas: $("#webgl_canvas").get(0)
+    canvas: canvas
   });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.autoClear = true;
@@ -362,17 +347,15 @@
   var raycaster = new THREE.Raycaster();
   var mouse = new THREE.Vector2();
 
-  var controls = new THREE.FirstPersonControls(camera, dragCamera);
+  var controls = new THREE.FreeLookControls(camera, canvas);
   controls.lat = -35.38;
   controls.lon = -83.44;
 
   scene.add(camera);
-  scene.add(dragCamera);
   scene.add(ambientLight);
   scene.add(light1);
   scene.add(solMarker);
   scene.add(selector);
-  scene.add(compass);
 
 
   //  other data
@@ -441,40 +424,46 @@
 
     if (targetMesh) {
 
-      scene.remove(tooltip);
+      if (!tooltipMesh || tooltipMesh.starData.identifiers.primaryId != targetMesh.starData.identifiers.primaryId) {
+        tooltipMesh = targetMesh;
 
-      var tipgeo = new THREE.TextGeometry(getLabelText(targetMesh.starData.identifiers), {
-            font: font,
-            size: .5,
-            height: 0,
-            curveSegments: 0,
-            bevelThickness: 0,
-            bevelSize: 0,
-            bevelEnabled: true,
-            material: 0,
-            extrudeMaterial: 0
-          }
-      );
+        scene.remove(tooltip);
 
-      tipgeo.computeBoundingBox();
-      tipgeo.computeVertexNormals();
+        var distance = camera.position.distanceTo(targetMesh.position);
 
-      tooltip = new THREE.Mesh(tipgeo,
-          new THREE.MultiMaterial([
-            new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
-            new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
-          ])
-      );
+        var tipgeo = new THREE.TextGeometry(" " + getLabelText(targetMesh.starData.identifiers), {
+              font: font,
+              size: .02 * distance,
+              height: 0,
+              curveSegments: 0,
+              bevelThickness: 0,
+              bevelSize: 0,
+              bevelEnabled: true,
+              material: 0,
+              extrudeMaterial: 0
+            }
+        );
 
-      tooltip.position.set(
-          targetMesh.position.x,
-          targetMesh.position.y,
-          targetMesh.position.z
-      );
+        tipgeo.computeBoundingBox();
+        tipgeo.computeVertexNormals();
 
-      updateTooltipRotation();
+        tooltip = new THREE.Mesh(tipgeo,
+            new THREE.MultiMaterial([
+              new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
+              new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
+            ])
+        );
 
-      scene.add(tooltip);
+        tooltip.position.set(
+            targetMesh.position.x,
+            targetMesh.position.y,
+            targetMesh.position.z
+        );
+
+        updateTooltipRotation();
+
+        scene.add(tooltip);
+      }
     }
 
   }
@@ -569,7 +558,7 @@
     var intersects = raycaster.intersectObjects(stars, false);
 
     if (intersects.length > 0) {
-      return intersects[0].camera;
+      return intersects[0].object;
     }
 
     return null;
@@ -589,10 +578,12 @@
   function select(mesh) {
 
     if (mesh) {
+
       //  TODO flesh out with more fields
       //     # planets (display them?)
 
       var newStar = mesh.starData;
+
 
       if (newStar != null) {
         var newStarPrimaryId = newStar.identifiers.primaryId;
@@ -627,7 +618,6 @@
 
         }
       }
-
     }
   }
 
@@ -654,10 +644,6 @@
     windowHalfY = window.innerHeight / 2;
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
-    dragCamera.aspect = camera.aspect;
-    dragCamera.updateProjectionMatrix();
-
     renderer.setSize(window.innerWidth, window.innerHeight);
     render();
   }
@@ -693,7 +679,7 @@
         controls.camera.position.z
     );
 
-    controls.update(delta, selector.position);
+    controls.update(delta);
     renderer.render(scene, camera);
 
     if (tooltip) {

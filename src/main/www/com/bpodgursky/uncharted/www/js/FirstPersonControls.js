@@ -4,20 +4,15 @@
  * @author paulirish / http://paulirish.com/
  */
 
-THREE.FirstPersonControls = function (object, dragCamera, domElement) {
+THREE.FreeLookControls = function (object, domElement) {
 
   //  static
 
   this.camera = object;
-  this.dragCamera = dragCamera;
   this.target = new THREE.Vector3(1, 0, 0);
-  this.tmpVector = new THREE.Vector3(0, 0, 0);
-  this.UP = new THREE.Vector3(0, 0, 1);
+  this.domElement = domElement;
 
-  this.domElement = ( domElement !== undefined ) ? domElement : document;
-
-
-  this.MOVEMENT_SPEED = 15;
+  this.MOVEMENT_SPEED = 30;
 
   //  dynamic
 
@@ -26,9 +21,6 @@ THREE.FirstPersonControls = function (object, dragCamera, domElement) {
 
   this.lastUpdateMouseX = 0;
   this.lastUpdateMouseY = 0;
-
-  this.origLookPhi = 0;
-  this.origLookTheta = 0;
 
   this.moveForward = false;
   this.moveBackward = false;
@@ -44,19 +36,8 @@ THREE.FirstPersonControls = function (object, dragCamera, domElement) {
   this.dragView = false;
 
   if (this.domElement !== document) {
-
     this.domElement.setAttribute('tabindex', -1);
-
   }
-
-  this.getProjectedDir = function (mouseX, mouseY, camera) {
-
-    var adjX = ( mouseX / window.innerWidth ) * 2 - 1;
-    var adjY = -( mouseY / window.innerHeight ) * 2 + 1;
-
-    var vector = new THREE.Vector3(adjX, adjY, 0.5);
-    return vector.unproject(camera).normalize();
-  };
 
   this.onMouseDown = function (event) {
 
@@ -73,53 +54,8 @@ THREE.FirstPersonControls = function (object, dragCamera, domElement) {
       this.mouseX = event.pageX;
       this.mouseY = event.pageY;
 
-      //var cameraPos = this.camera.position;
-      //this.dragCamera.position.set(
-      //    cameraPos.x,
-      //    cameraPos.y,
-      //    cameraPos.z
-      //);
-
-      //this.dragCamera.up = this.UP;
-      //this.dragCamera.rotation.x = this.camera.rotation.x;
-      //this.dragCamera.rotation.y = this.camera.rotation.y;
-      //this.dragCamera.rotation.z = this.camera.rotation.z;
-      //
-      //this.dragCamera.rotation.set(
-      //    this.camera.rotation.x,
-      //    this.camera.rotation.y,
-      //    this.camera.rotation.z
-      //);
-
-      //var origLook = this.dragCamera.getWorldDirection().normalize();
-      //console.log(origLook);
-      //var currentDir = this.camera.getWorldDirection().normalize();
-      //this.origLookPhi = this.toPhi(currentDir.x, currentDir.y, currentDir.z);
-      //this.origLookTheta = this.toTheta(currentDir.x, currentDir.y, currentDir.z);
-      //
-      //var origDir = this.getProjectedDir(this.mouseX, this.mouseY, this.camera);
-      //this.lastUpdateTheta = this.toTheta(origDir.x, origDir.y, origDir.z);
-      //this.lastUpdatePhi = this.toPhi(origDir.x, origDir.y, origDir.z);
-
       this.lastUpdateMouseX = this.mouseX;
       this.lastUpdateMouseY = this.mouseY;
-
-      //var cameraLookAt = this.camera.getWorldDirection();
-
-      //this.origLookAt = new THREE.Vector3(
-      //    cameraLookAt.x,
-      //    cameraLookAt.y,
-      //    cameraLookAt.z
-      //);
-      //
-      //this.origPos = new THREE.Vector3(
-      //    this.camera.position.x,
-      //    this.camera.position.y,
-      //    this.camera.position.z
-      //);
-      //
-      //console.log("mouse click on location: ");
-      //console.log(this.dragFixPos);
 
       event.preventDefault();
       event.stopPropagation();
@@ -166,116 +102,65 @@ THREE.FirstPersonControls = function (object, dragCamera, domElement) {
   };
 
   this.onKeyDown = function (event) {
-
-    //event.preventDefault();
-
-    switch (event.keyCode) {
-
-      case 38: /*up*/
-      case 87: /*W*/
-        this.moveForward = true;
-        break;
-
-      case 37: /*left*/
-      case 65: /*A*/
-        this.moveLeft = true;
-        break;
-
-      case 40: /*down*/
-      case 83: /*S*/
-        this.moveBackward = true;
-        break;
-
-      case 39: /*right*/
-      case 68: /*D*/
-        this.moveRight = true;
-        break;
-
-      case 82: /*R*/
-        this.moveUp = true;
-        break;
-      case 70: /*F*/
-        this.moveDown = true;
-        break;
-
-
-      case 74:
-        this.rotateYU = true;
-        break;
-      case 76:
-        this.rotateYD = true;
-        break;
-      case 73:
-        this.rotateXL = true;
-        break;
-      case 75:
-        this.rotateXR = true;
-        break;
-      case 85:
-        this.rotateZL = true;
-        break;
-      case 79:
-        this.rotateZR = true;
-        break;
-    }
-
+    this.onKey(event, true);
   };
 
   this.onKeyUp = function (event) {
+    this.onKey(event, false);
+  };
+
+  this.onKey = function (event, trigger) {
 
     switch (event.keyCode) {
 
       case 38: /*up*/
       case 87: /*W    */
-        this.moveForward = false;
+        this.moveForward = trigger;
         break;
-
       case 37: /*left*/
       case 65: /*A*/
-        this.moveLeft = false;
+        this.moveLeft = trigger;
         break;
-
       case 40: /*down*/
       case 83: /*S*/
-        this.moveBackward = false;
+        this.moveBackward = trigger;
         break;
-
       case 39: /*right*/
       case 68: /*D*/
-        this.moveRight = false;
+        this.moveRight = trigger;
         break;
 
       case 82: /*R*/
-        this.moveUp = false;
+        this.moveUp = trigger;
         break;
       case 70: /*F*/
-        this.moveDown = false;
+        this.moveDown = trigger;
         break;
 
       case 74:
-        this.rotateYU = false;
+        this.rotateYU = trigger;
         break;
       case 76:
-        this.rotateYD = false;
+        this.rotateYD = trigger;
         break;
       case 73:
-        this.rotateXL = false;
+        this.rotateXL = trigger;
         break;
       case 75:
-        this.rotateXR = false;
+        this.rotateXR = trigger;
         break;
       case 85:
-        this.rotateZL = false;
+        this.rotateZL = trigger;
         break;
       case 79:
-        this.rotateZR = false;
+        this.rotateZR = trigger;
         break;
 
     }
 
   };
 
-  this.update = function (delta, lockPos) {
+  this.update = function (delta) {
 
     var actualMoveSpeed = delta * this.MOVEMENT_SPEED;
 
@@ -325,64 +210,18 @@ THREE.FirstPersonControls = function (object, dragCamera, domElement) {
       this.camera.rotateZ(-.01);
     }
 
-    //  invert
-
-
     if (this.dragView) {
 
-      console.log("asdfsadfdfdasf");
+      var diffX = (this.mouseX - this.lastUpdateMouseX) / window.innerWidth;
+      var diffY = (this.mouseY - this.lastUpdateMouseY) / window.innerHeight;
 
-      console.log(this.lastUpdateMouseX);
-      console.log(this.mouseX);
-
-      var oldProjected = this.getProjectedDir(this.lastUpdateMouseX, this.lastUpdateMouseY, this.camera);
-      var newProjected = this.getProjectedDir(this.mouseX, this.mouseY, this.camera);
-
-      console.log(oldProjected);
-      console.log(newProjected);
-
-      var newPhi = this.toPhi(newProjected.x, newProjected.y, newProjected.z);
-      var newTheta = this.toTheta(newProjected.x, newProjected.y, newProjected.z);
-
-      var oldPhi = this.toPhi(oldProjected.x, oldProjected.y, oldProjected.z);
-      var oldTheta = this.toTheta(oldProjected.x, oldProjected.y, oldProjected.z);
-
-      //console.log(newPhi);
-      //console.log(newTheta);
-      //
-      //console.log(newPhi - oldPhi);oldPhi
-      //console.log(newTheta - oldTheta);
-
-      this.camera.rotateY(newPhi - oldPhi);
-      this.camera.rotateX(newTheta - oldTheta);
-      //
-      //console.log();
-      //console.log(this.lastUpdateMouseX);
-      //console.log(this.lastUpdateMouseY);
-      //console.log(this.mouseX);
-      //console.log(this.mouseY);
+      this.camera.rotateY(.8 * diffX);
+      this.camera.rotateX(.8 * diffY);
 
       this.lastUpdateMouseX = this.mouseX;
       this.lastUpdateMouseY = this.mouseY;
 
-      //var currentDir = this.camera.getWorldDirection().normalize();
-      //this.lastUpdatePhi = this.toPhi(currentDir.x, currentDir.y, currentDir.z);
-      //this.lastUpdateTheta = this.toTheta(currentDir.x, currentDir.y, currentDir.z);
-
     }
-
-    //this.camera.up = this.UP;
-    // this.camera.lookAt(this.target);
-    //this.camera.rotation.z = 0;
-
-  };
-
-  this.toPhi = function (x, y, z) {
-    return Math.atan(y / x);
-  };
-
-  this.toTheta = function (x, y, z) {
-    return Math.acos(z / Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2)));
   };
 
   this.domElement.addEventListener('contextmenu', function (event) {
@@ -399,13 +238,9 @@ THREE.FirstPersonControls = function (object, dragCamera, domElement) {
   this.domElement.addEventListener('keyup', bind(this, this.onKeyUp), false);
 
   function bind(scope, fn) {
-
     return function () {
-
       fn.apply(scope, arguments);
-
     };
-
   };
 
 };
