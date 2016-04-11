@@ -9,7 +9,6 @@ THREE.FreeLookControls = function (object, domElement) {
   //  static
 
   this.camera = object;
-  this.target = new THREE.Vector3(1, 0, 0);
   this.domElement = domElement;
 
   this.MOVEMENT_SPEED = 30;

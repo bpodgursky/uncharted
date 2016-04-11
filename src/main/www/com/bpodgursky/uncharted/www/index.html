@@ -10,7 +10,8 @@
   <script type="text/javascript" src="resources/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="resources/tinycolor-min.js"></script>
   <script src="resources/three.min.js"></script>
-  <script src="js/FirstPersonControls.js"></script>
+  <script src="js/FreeLookControls.js"></script>
+  <script src="js/OrbitControls.js"></script>
   <script src="js/SelectorGeometry.js"></script>
   <script src="resources/Detector.js"></script>
 
@@ -305,7 +306,7 @@
   var scene = new THREE.Scene();
 
   var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
-  camera.position.set(0, 0, 0);
+  camera.position.set(0, 0, -1);
 
   camera.rotateZ(Math.PI);
 
@@ -347,9 +348,8 @@
   var raycaster = new THREE.Raycaster();
   var mouse = new THREE.Vector2();
 
-  var controls = new THREE.FreeLookControls(camera, canvas);
-  controls.lat = -35.38;
-  controls.lon = -83.44;
+  var freeLookControls = new THREE.FreeLookControls(camera, canvas);
+  var orbitControls = new THREE.OrbitControls(camera, canvas, new THREE.Vector3(0, 0, 0));
 
   scene.add(camera);
   scene.add(ambientLight);
@@ -566,7 +566,7 @@
 
 
   function dragOnMouseMove(event) {
-    if (!controls.dragView) {
+    if (!freeLookControls.dragView) {
       reassignLabel(getStarForPoint(event.clientX, event.clientY));
     }
   }
@@ -615,6 +615,10 @@
 
           currentStarMesh = mesh;
           currentStarPrimaryId = newStarPrimaryId;
+
+          //  TODO smooth
+          orbitControls.target = mesh.position;
+          camera.lookAt(mesh.position);
 
         }
       }
@@ -672,14 +676,14 @@
     solMarker.rotation.y = camera.rotation.y;
     solMarker.rotation.z = solMarker.rotation.z + .5 * delta;
 
-    light1.position = controls.camera.position;
+    light1.position = camera.position;
     light1.position.set(
-        controls.camera.position.x,
-        controls.camera.position.y,
-        controls.camera.position.z
+        camera.position.x,
+        camera.position.y,
+        camera.position.z
     );
 
-    controls.update(delta);
+    orbitControls.update(delta);
     renderer.render(scene, camera);
 
     if (tooltip) {
