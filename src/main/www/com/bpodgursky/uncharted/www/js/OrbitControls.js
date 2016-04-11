@@ -179,19 +179,15 @@ THREE.OrbitControls = function (object, domElement, target) {
       var diffX = (this.mouseX - this.lastUpdateMouseX) / window.innerWidth;
       var diffY = - (this.mouseY - this.lastUpdateMouseY) / window.innerHeight;
 
-      translateX += 10 * diffX;
-      translateY += 10 * diffY;
+      translateX -= 10 * diffX;
+      translateY -= 10 * diffY;
 
       this.lastUpdateMouseX = this.mouseX;
       this.lastUpdateMouseY = this.mouseY;
 
     }
 
-    translateX += .002 * dO;
-
-    console.log(dO);
-    console.log(translateX);
-    console.log(translateY);
+    translateX += .008;
 
     this.camera.translateX(translateX);
     this.camera.rotateY(Math.atan(translateX / dO));

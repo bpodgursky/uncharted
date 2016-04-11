@@ -166,75 +166,23 @@
 
         <tr class="header-row">
           <td>
-            <b>Controls</b>
+            <b>Control Mode</b>
           </td>
         </tr>
 
         <tr class="child-row">
           <td>
-            Star details
+            <form id="control_mode" name="control_mode" action="#" method="POST">
+              <div>
+                <label>
+                  <input type="radio" name="control_mode" value="orbit">
+                </label> Orbit
+                <label>
+                  <input type="radio" name="control_mode" value="free">
+                </label> Free Look
+              </div>
+            </form>
           </td>
-          <td>
-            Mouse over
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Rotate view
-          </td>
-          <td>
-            Click and drag
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Move forward / back
-          </td>
-          <td>
-            Scroll
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Pan left
-          </td>
-          <td>
-            A / Left arrow
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Pan right
-          </td>
-          <td>
-            D / Right arrow
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Move Forwards
-          </td>
-          <td>
-            W / Up arrow
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Move Backwards
-          </td>
-          <td>
-            S / Down arrow
-          </td>
-        </tr>
-
-        <tr>
-          <td>&nbsp;</td>
         </tr>
 
         <tr class="header-row">
@@ -333,11 +281,19 @@
     wireframe: false
   }));
 
+  var lineMaterial = new THREE.LineBasicMaterial({
+    color: 0x0000ff
+  });
+
+  var lineSegment;
+
   selector.rotation.z = .5;
 
   var tooltip;
   var tooltipMesh;
   var font;
+
+  var distanceTip;
 
   var renderer = new THREE.WebGLRenderer({
     canvas: canvas
@@ -427,7 +383,17 @@
       if (!tooltipMesh || tooltipMesh.starData.identifiers.primaryId != targetMesh.starData.identifiers.primaryId) {
         tooltipMesh = targetMesh;
 
+        scene.remove(distanceTip);
         scene.remove(tooltip);
+        scene.remove(lineSegment);
+
+        var geometry = new THREE.Geometry();
+        geometry.vertices.push(currentStarMesh.position);
+        geometry.vertices.push(targetMesh.position);
+
+        lineSegment = new THREE.Line(geometry, lineMaterial);
+
+        var lineDistance = currentStarMesh.position.distanceTo(targetMesh.position);
 
         var distance = camera.position.distanceTo(targetMesh.position);
 
@@ -443,7 +409,6 @@
               extrudeMaterial: 0
             }
         );
-
         tipgeo.computeBoundingBox();
         tipgeo.computeVertexNormals();
 
@@ -460,9 +425,45 @@
             targetMesh.position.z
         );
 
+        var distPos = new THREE.Vector3(
+            (targetMesh.position.x + currentStarMesh.position.x) / 2,
+            (targetMesh.position.y + currentStarMesh.position.y) / 2,
+            (targetMesh.position.z + currentStarMesh.position.z) / 2
+        );
+
+        var distanceDistance = camera.position.distanceTo(distPos);
+
+
+        var distanceGeo = new THREE.TextGeometry(lineDistance.toFixed(1) + " LY", {
+              font: font,
+              size: .02 * distanceDistance,
+              height: 0,
+              curveSegments: 0,
+              bevelThickness: 0,
+              bevelSize: 0,
+              bevelEnabled: true,
+              material: 0,
+              extrudeMaterial: 0
+            }
+        );
+        distanceGeo.computeBoundingBox();
+        distanceGeo.computeVertexNormals();
+
+        distanceTip = new THREE.Mesh(distanceGeo,
+            new THREE.MultiMaterial([
+              new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
+              new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
+            ])
+        );
+
+        distanceTip.position.copy(distPos);
+
         updateTooltipRotation();
 
         scene.add(tooltip);
+        scene.add(distanceTip);
+        scene.add(lineSegment)
+
       }
     }
 
@@ -662,6 +663,11 @@
     tooltip.rotation.x = camera.rotation.x;
     tooltip.rotation.y = camera.rotation.y;
     tooltip.rotation.z = camera.rotation.z;
+
+    distanceTip.rotation.x = camera.rotation.x;
+    distanceTip.rotation.y = camera.rotation.y
+    distanceTip.rotation.z = camera.rotation.z;
+
   }
 
   function render() {
