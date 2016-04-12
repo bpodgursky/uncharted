@@ -78,6 +78,8 @@ THREE.OrbitControls = function (object, domElement, target) {
 
   this.onMouseWheel = function (event) {
 
+    console.log(this);
+
     event.preventDefault();
     event.stopPropagation();
 
@@ -93,7 +95,9 @@ THREE.OrbitControls = function (object, domElement, target) {
       this.moveForward = true;
     } else if (delta < 0) {
       this.moveBackward = true;
-    }
+      console.log("moving backwards");
+      console.log(this.moveBackward);
+      }
 
   };
 
@@ -158,7 +162,6 @@ THREE.OrbitControls = function (object, domElement, target) {
       this.camera.translateZ(actualMoveSpeed);
     }
 
-
     this.moveForward = false;
     this.moveBackward = false;
 
@@ -201,23 +204,5 @@ THREE.OrbitControls = function (object, domElement, target) {
 
   };
 
-  this.domElement.addEventListener('contextmenu', function (event) {
-    event.preventDefault();
-  }, false);
-
-  this.domElement.addEventListener('mousemove', bind(this, this.onMouseMove), false);
-  this.domElement.addEventListener('mousedown', bind(this, this.onMouseDown), false);
-  this.domElement.addEventListener('mousewheel', bind(this, this.onMouseWheel), false);
-  this.domElement.addEventListener('DOMMouseScroll', bind(this, this.onMouseWheel), false); // firefox
-
-  this.domElement.addEventListener('mouseup', bind(this, this.onMouseUp), false);
-  this.domElement.addEventListener('keydown', bind(this, this.onKeyDown), false);
-  this.domElement.addEventListener('keyup', bind(this, this.onKeyUp), false);
-
-  function bind(scope, fn) {
-    return function () {
-      fn.apply(scope, arguments);
-    };
-  };
 
 };

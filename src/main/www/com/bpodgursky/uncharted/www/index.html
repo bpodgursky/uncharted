@@ -175,7 +175,7 @@
             <form id="control_mode" name="control_mode" action="#" method="POST">
               <div>
                 <label>
-                  <input type="radio" name="control_mode" value="orbit">
+                  <input type="radio" name="control_mode" value="orbit" checked>
                 </label> Orbit
                 <label>
                   <input type="radio" name="control_mode" value="free">
@@ -295,6 +295,8 @@
 
   var distanceTip;
 
+  var controlMode = 'orbit';
+
   var renderer = new THREE.WebGLRenderer({
     canvas: canvas
   });
@@ -325,6 +327,10 @@
 
   $("#render_radius").click(function (e) {
     loadStarData($('input[name=render_radius]:checked', '#render_radius').val(), renderOnLoad);
+  });
+
+  $('#control_mode').click(function (e) {
+    controlMode = $('input[name=control_mode]:checked', '#control_mode').val();
   });
 
   $("#info").click(function (e) {
@@ -689,7 +695,12 @@
         camera.position.z
     );
 
-    orbitControls.update(delta);
+    if(controlMode == 'orbit') {
+      orbitControls.update(delta);
+    }else if(controlMode == 'free'){
+      freeLookControls.update(delta);
+    }
+
     renderer.render(scene, camera);
 
     if (tooltip) {
@@ -697,6 +708,55 @@
     }
 
   }
+
+  canvas.addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+  }, false);
+
+  canvas.addEventListener('mousemove',
+      bind(orbitControls.onMouseMove, freeLookControls.onMouseMove),
+      false
+  );
+
+  canvas.addEventListener('mousedown',
+      bind(orbitControls.onMouseDown, freeLookControls.onMouseDown),
+      false
+  );
+
+  canvas.addEventListener('mousewheel',
+      bind(orbitControls.onMouseWheel, freeLookControls.onMouseWheel),
+      false
+  );
+
+  canvas.addEventListener('DOMMouseScroll',
+      bind(orbitControls.onMouseWheel, freeLookControls.onMouseWheel),
+      false
+  ); // firefox
+
+  canvas.addEventListener('mouseup',
+      bind(orbitControls.onMouseUp, freeLookControls.onMouseUp),
+      false
+  );
+
+  canvas.addEventListener('keydown',
+      bind(orbitControls.onKeyDown, freeLookControls.onKeyDown),
+      false
+  );
+
+  canvas.addEventListener('keyup',
+      bind(orbitControls.onKeyUp, freeLookControls.onKeyUp),
+      false
+  );
+
+  function bind(orbitFn, freeFn) {
+    return function () {
+      if(controlMode === 'free'){
+        freeFn.apply(freeLookControls, arguments);
+      }else if(controlMode === 'orbit'){
+        orbitFn.apply(orbitControls, arguments);
+      }
+    };
+  };
 
   window.addEventListener('resize', onWindowResize, false);
   document.addEventListener('mousemove', dragOnMouseMove, false);
