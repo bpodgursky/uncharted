@@ -14,6 +14,7 @@
   <script src="js/OrbitControls.js"></script>
   <script src="js/SelectorGeometry.js"></script>
   <script src="resources/Detector.js"></script>
+  <script src="resources/tween.min.js"></script>
 
 </head>
 
@@ -331,11 +332,28 @@
 
   $('#control_mode').click(function (e) {
     controlMode = $('input[name=control_mode]:checked', '#control_mode').val();
+    updateTarget();
   });
 
   $("#info").click(function (e) {
     e.preventDefault();
   });
+
+  function updateTarget() {
+    if (controlMode == 'orbit') {
+      //  TODO smooth - tweenjs?
+      orbitControls.target = currentStarMesh.position;
+      camera.lookAt(currentStarMesh.position);
+
+//      var startRotation = new THREE.Euler().copy(camera.rotation);
+//
+//      camera.lookAt(currentStarMesh.position);
+//      var endRotation = new THREE.Euler().copy(camera.rotation);
+//
+//      camera.rotation.copy(startRotation);
+//      new createjs.Tween(camera).to({rotation: endRotation}, 600).start();
+    }
+  }
 
   var currentStarPrimaryId = "";
   var currentStarMesh;
@@ -623,10 +641,7 @@
           currentStarMesh = mesh;
           currentStarPrimaryId = newStarPrimaryId;
 
-          //  TODO smooth
-          orbitControls.target = mesh.position;
-          camera.lookAt(mesh.position);
-
+          updateTarget();
         }
       }
     }
@@ -695,9 +710,9 @@
         camera.position.z
     );
 
-    if(controlMode == 'orbit') {
+    if (controlMode == 'orbit') {
       orbitControls.update(delta);
-    }else if(controlMode == 'free'){
+    } else if (controlMode == 'free') {
       freeLookControls.update(delta);
     }
 
@@ -750,13 +765,14 @@
 
   function bind(orbitFn, freeFn) {
     return function () {
-      if(controlMode === 'free'){
+      if (controlMode === 'free') {
         freeFn.apply(freeLookControls, arguments);
-      }else if(controlMode === 'orbit'){
+      } else if (controlMode === 'orbit') {
         orbitFn.apply(orbitControls, arguments);
       }
     };
-  };
+  }
+  ;
 
   window.addEventListener('resize', onWindowResize, false);
   document.addEventListener('mousemove', dragOnMouseMove, false);
