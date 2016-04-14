@@ -10,8 +10,10 @@
   <script type="text/javascript" src="resources/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="resources/tinycolor-min.js"></script>
   <script src="resources/three.min.js"></script>
-  <script src="js/FirstPersonControls.js"></script>
+  <script src="js/FreeLookControls.js"></script>
+  <script src="js/OrbitControls.js"></script>
   <script src="js/SelectorGeometry.js"></script>
+  <script src="js/TweenControls.js"></script>
   <script src="resources/Detector.js"></script>
 
 </head>
@@ -19,574 +21,820 @@
 <body>
 
 <div>
-<div>
-<div class="overlay-panel" id="info">
-  <table>
-    <tbody>
+  <div>
+    <div class="overlay-panel" id="info">
+      <table>
+        <tbody>
 
-    <tr class="header-row">
-      <td>
-        <b>Names</b>
-      </td>
-    </tr>
+        <tr class="header-row">
+          <td>
+            <b>Names</b>
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Proper Name
-      </td>
-      <td id="proper_name_box">
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            Proper Name
+          </td>
+          <td id="proper_name_box">
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Bayer Flamsteed
-      </td>
-      <td id="bayer_flamsteed_box">
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            Bayer Flamsteed
+          </td>
+          <td id="bayer_flamsteed_box">
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Gliese Catalog
-      </td>
-      <td id="gliese_catalog_box">
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            Gliese Catalog
+          </td>
+          <td id="gliese_catalog_box">
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Harvard Revised ID
-      </td>
-      <td id="harvard_revised_box">
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            Harvard Revised ID
+          </td>
+          <td id="harvard_revised_box">
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Hipparcos ID
-      </td>
-      <td id="hipparcos_box">
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            Hipparcos ID
+          </td>
+          <td id="hipparcos_box">
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Henry Draper
-      </td>
-      <td id="henry_draper_box">
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            Henry Draper
+          </td>
+          <td id="henry_draper_box">
+          </td>
+        </tr>
 
-    <tr>
-      <td>&nbsp;</td>
-    </tr>
+        <tr>
+          <td>&nbsp;</td>
+        </tr>
 
-    <tr class="header-row">
-      <td>
-        <b>Details</b>
-      </td>
-    </tr>
+        <tr class="header-row">
+          <td>
+            <b>Details</b>
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Absolute Magnitude
-      </td>
-      <td id="abs-magnitude">
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            Absolute Magnitude
+          </td>
+          <td id="abs-magnitude">
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Spectral Type
-      </td>
-      <td id="spectral-type">
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            Spectral Type
+          </td>
+          <td id="spectral-type">
+          </td>
+        </tr>
 
-    <tr>
-      <td>&nbsp;</td>
-    </tr>
+        <tr>
+          <td>&nbsp;</td>
+        </tr>
 
-    <tr class="header-row">
-      <td>
-        <b>Relative Location</b>
-      </td>
-    </tr>
+        <tr class="header-row">
+          <td>
+            <b>Relative Location</b>
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Distance (lys)
-      </td>
-      <td id="distance_box">
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            Distance (lys)
+          </td>
+          <td id="distance_box">
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Right Ascension (radians)
-      </td>
-      <td id="right_ascension_box">
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            Right Ascension (radians)
+          </td>
+          <td id="right_ascension_box">
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Declination (radians)
-      </td>
-      <td id="declination_box">
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            Declination (radians)
+          </td>
+          <td id="declination_box">
+          </td>
+        </tr>
 
-    <tr>
-      <td>&nbsp;</td>
-    </tr>
+        <tr>
+          <td>&nbsp;</td>
+        </tr>
 
-    <tr class="header-row">
-      <td>
-        <b>More Information</b>
-      </td>
-    </tr>
+        <tr class="header-row">
+          <td>
+            <b>More Information</b>
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        <a id="wiki_box" class="external-link" href="" target="_blank">Wikipedia</a>
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            <a id="wiki_box" class="external-link" href="" target="_blank">Wikipedia</a>
+          </td>
+        </tr>
 
-    </tbody>
-  </table>
-</div>
+        </tbody>
+      </table>
+    </div>
 
-<div class="overlay-panel" id="selector">
+    <div class="overlay-panel" id="selector">
 
-  <table>
-    <tbody>
+      <table>
+        <tbody>
 
-    <tr class="header-row">
-      <td>
-        <b>Controls</b>
-      </td>
-    </tr>
+        <tr class="header-row">
+          <td>
+            <b>Control Mode</b>
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Star details
-      </td>
-      <td>
-        Mouse over
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            <form id="control_mode" name="control_mode" action="#" method="POST">
+              <div>
+                <label>
+                  <input type="radio" name="control_mode" value="orbit" checked>
+                </label> Orbit
+                <label>
+                  <input type="radio" name="control_mode" value="free">
+                </label> Free Look
+              </div>
+            </form>
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Rotate view
-      </td>
-      <td>
-        Click and drag
-      </td>
-    </tr>
+        <tr class="header-row">
+          <td>
+            <b>Render Radius (lys)</b>
+          </td>
+        </tr>
 
-    <tr class="child-row">
-      <td>
-        Move forward / back
-      </td>
-      <td>
-        Scroll
-      </td>
-    </tr>
+        <tr class="child-row">
+          <td>
+            <form id="render_radius" name="render_radius" action="#" method="POST">
+              <div>
+                <label>
+                  <input type="radio" name="render_radius" value="10">
+                </label> 10
+                <label>
+                  <input type="radio" name="render_radius" value="25">
+                </label> 25
+                <label>
+                  <input type="radio" name="render_radius" value="50" checked>
+                </label> 50
+                <label>
+                  <input type="radio" name="render_radius" value="75" checked>
+                </label> 75
+              </div>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <tr class="child-row">
-      <td>
-        Pan left
-      </td>
-      <td>
-        A / Left arrow
-      </td>
-    </tr>
+    <div id="attribution-overlay">
+      <a href="https://github.com/bpodgursky/uncharted">Source and project info</a><br>
+      <a href="http://bpodgursky.com/">Ben Podgursky</a>
+    </div>
 
-    <tr class="child-row">
-      <td>
-        Pan right
-      </td>
-      <td>
-        D / Right arrow
-      </td>
-    </tr>
-
-    <tr class="child-row">
-      <td>
-        Move Forwards
-      </td>
-      <td>
-        W / Up arrow
-      </td>
-    </tr>
-
-    <tr class="child-row">
-      <td>
-        Move Backwards
-      </td>
-      <td>
-        S / Down arrow
-      </td>
-    </tr>
-
-    <tr>
-      <td>&nbsp;</td>
-    </tr>
-
-    <tr class="header-row">
-      <td>
-        <b>Render Radius (lys)</b>
-      </td>
-    </tr>
-
-    <tr class="child-row">
-      <td>
-        <form id="render_radius" name="render_radius" action="#" method="POST">
-          <div>
-            <label>
-              <input type="radio" name="render_radius" value="10">
-            </label> 10
-            <label>
-              <input type="radio" name="render_radius" value="25">
-            </label> 25
-            <label>
-              <input type="radio" name="render_radius" value="50" checked>
-            </label> 50
-            <label>
-              <input type="radio" name="render_radius" value="75" checked>
-            </label> 75
-          </div>
-        </form>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-</div>
-
-<div id="attribution-overlay">
-  <a href="https://github.com/bpodgursky/uncharted">Source and project info</a><br>
-  <a href="http://bpodgursky.com/">Ben Podgursky</a>
-</div>
-
-<canvas id='webgl_canvas'></canvas>
-</div>
+    <canvas id='webgl_canvas'></canvas>
+  </div>
 </div>
 
 <script>
-//  TODO use size of star
+  //  TODO use size of star
 
-if (!Detector.webgl) Detector.addGetWebGLMessage();
+  if (!Detector.webgl) Detector.addGetWebGLMessage();
 
-//  constant stuff
+  //  constant stuff
 
-var CLASS_TO_APPARENT_COLOR_STR = {
-  O: "#9db4ff",
-  B: "#aabfff",
-  A: "#cad8ff",
-  F: "#fbf8ff",
-  G: "#fff4e8",
-  K: "#ffddb4",
-  M: "#ffbd6f",
-  L: "#f84235",
-  T: "#ba3059",
-  Y: "#60517"
-};
+  var CLASS_TO_APPARENT_COLOR_STR = {
+    O: "#9db4ff",
+    B: "#aabfff",
+    A: "#cad8ff",
+    F: "#fbf8ff",
+    G: "#fff4e8",
+    K: "#ffddb4",
+    M: "#ffbd6f",
+    L: "#f84235",
+    T: "#ba3059",
+    Y: "#60517"
+  };
 
-var STAR_GEOMETRY = new THREE.SphereGeometry(.05, 16, 16);
+  var STAR_GEOMETRY = new THREE.SphereGeometry(.05, 16, 16);
 
-//  webgl init
+  //  webgl init
 
-var scene = new THREE.Scene();
 
-var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, .1, 10000);
-camera.position.set(-1.514, 2.100, 2.031);
+  var canvas = $("#webgl_canvas").get(0);
 
-var ambientLight = new THREE.AmbientLight(0xcccccc);
-var light1 = new THREE.PointLight(0xffffff);
+  var scene = new THREE.Scene();
 
-var windowHalfX = window.innerWidth / 2;
-var windowHalfY = window.innerHeight / 2;
+  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+  camera.position.set(0, 0, -15);
 
-var clock = new THREE.Clock();
+  camera.rotateZ(Math.PI);
 
-var solMarker = new THREE.Mesh(new THREE.SelectorGeometry(.5, .1), new THREE.MeshBasicMaterial({ color: 0x0000FF,
-  side: THREE.DoubleSide,
-  wireframe: false
-}));
-solMarker.position.x = 0;
-solMarker.position.y = 0;
-solMarker.position.z = 0;
+  var ambientLight = new THREE.AmbientLight(0xcccccc);
+  var light1 = new THREE.PointLight(0xffffff);
 
-var selector = new THREE.Mesh(new THREE.SelectorGeometry(.5, .1), new THREE.MeshBasicMaterial({ color: 0xFF0000,
-  side: THREE.DoubleSide,
-  wireframe: false
-}));
-selector.rotation.z = .5;
+  var windowHalfX = window.innerWidth / 2;
+  var windowHalfY = window.innerHeight / 2;
 
-var projector = new THREE.Projector();
+  var clock = new THREE.Clock();
 
-var renderer = new THREE.WebGLRenderer({
-  canvas: $("#webgl_canvas").get(0)
-});
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.autoClear = true;
+  var solMarker = new THREE.Mesh(new THREE.SelectorGeometry(.25, .1), new THREE.MeshBasicMaterial({
+    color: 0x0000FF,
+    side: THREE.DoubleSide,
+    wireframe: false
+  }));
+  solMarker.position.x = 0;
+  solMarker.position.y = 0;
+  solMarker.position.z = 0;
 
-var raycaster = new THREE.Raycaster();
+  var selector = new THREE.Mesh(new THREE.SelectorGeometry(.5, .1), new THREE.MeshBasicMaterial({
+    color: 0xFF0000,
+    side: THREE.DoubleSide,
+    wireframe: false
+  }));
 
-var controls = new THREE.FirstPersonControls(camera);
-controls.lat = -35.38;
-controls.lon = -83.44;
-controls.movementSpeed = 15;
-controls.lookSpeed = 0.1;
+  var lineMaterial = new THREE.LineBasicMaterial({
+    color: 0x0000ff
+  });
 
-scene.add(camera);
-scene.add(ambientLight);
-scene.add(light1);
-scene.add(solMarker);
-scene.add(selector);
+  var lineSegment;
 
-//  other data
+  selector.rotation.z = .5;
 
-var stars = [];
-var starsByID = {};
+  var tooltip;
+  var tooltipMesh;
+  var font;
 
-$("#selector").keydown(function (e) {
-  e.preventDefault();
-});
+  var distanceTip;
 
-$("#render_radius").click(function (e) {
-  loadStarData($('input[name=render_radius]:checked', '#render_radius').val(), renderOnLoad);
-});
+  var controlMode = 'orbit';
 
-$("#info").click(function (e) {
-  e.preventDefault();
-});
+  var renderer = new THREE.WebGLRenderer({
+    canvas: canvas
+  });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.autoClear = true;
 
-var currentStarPrimaryId = "";
-var currentStarMesh;
+  var raycaster = new THREE.Raycaster();
+  var mouse = new THREE.Vector2();
 
-//  infobox stuff
-var infoProperName = $("#proper_name_box");
-var infoBayerFlamteed = $("#bayer_flamsteed_box");
-var infoGliese = $("#gliese_catalog_box");
-var infoHarvard = $("#harvard_revised_box");
-var infoHipparcos = $("#hipparcos_box");
-var infoHenryDraper = $("#henry_draper_box");
-var infoSpectralType = $("#spectral-type");
-var infoAbsMagnitude = $("#abs-magnitude");
-var infoDistance = $("#distance_box");
-var infoRightAscension = $("#right_ascension_box");
-var infoDeclination = $("#declination_box");
-var infoWiki = $("#wiki_box");
+  var freeLookControls = new THREE.FreeLookControls(camera, canvas);
+  var orbitControls = new THREE.OrbitControls(camera, canvas, new THREE.Vector3(0, 0, 0));
+  var tweenControls = new THREE.TweenControls(camera);
 
-infoWiki.click(function (e) {
-  window.open(infoWiki.attr('href'), '_blank');
-});
+  scene.add(camera);
+  scene.add(ambientLight);
+  scene.add(light1);
+  scene.add(solMarker);
+  scene.add(selector);
 
-function loadStarDatas(distances) {
-  if (distances.length > 0) {
-    var distance = distances.splice(0, 1)[0];
-    loadStarData(distance, function (data) {
-      renderOnLoad(data);
-      loadStarDatas(distances);
+
+  //  other data
+
+  var stars = [];
+  var starsByID = {};
+
+  $("#selector").keydown(function (e) {
+    e.preventDefault();
+  });
+
+  $("#render_radius").click(function (e) {
+    loadStarData($('input[name=render_radius]:checked', '#render_radius').val(), renderOnLoad);
+  });
+
+  $('#control_mode').click(function (e) {
+    controlMode = $('input[name=control_mode]:checked', '#control_mode').val();
+    updateTarget();
+  });
+
+  $("#info").click(function (e) {
+    e.preventDefault();
+  });
+
+  function updateTarget() {
+    if (controlMode == 'orbit') {
+
+      controlMode = 'tween';
+
+      var startRotation = new THREE.Euler().copy(camera.rotation);
+      camera.lookAt(currentStarMesh.position);
+      var endRotation = new THREE.Euler().copy(camera.rotation);
+
+      camera.rotation.copy(startRotation);
+
+      tweenControls.lookAt(endRotation, function(){
+        controlMode = 'orbit';
+        orbitControls.target = currentStarMesh.position;
+      }, 2);
+
+    }
+  }
+
+  var currentStarPrimaryId = "";
+  var currentStarMesh;
+
+  //  infobox stuff
+  var infoProperName = $("#proper_name_box");
+  var infoBayerFlamteed = $("#bayer_flamsteed_box");
+  var infoGliese = $("#gliese_catalog_box");
+  var infoHarvard = $("#harvard_revised_box");
+  var infoHipparcos = $("#hipparcos_box");
+  var infoHenryDraper = $("#henry_draper_box");
+  var infoSpectralType = $("#spectral-type");
+  var infoAbsMagnitude = $("#abs-magnitude");
+  var infoDistance = $("#distance_box");
+  var infoRightAscension = $("#right_ascension_box");
+  var infoDeclination = $("#declination_box");
+  var infoWiki = $("#wiki_box");
+
+  infoWiki.click(function (e) {
+    window.open(infoWiki.attr('href'), '_blank');
+  });
+
+  function getLabelText(identifiers) {
+
+    if (identifiers.properName) {
+      return identifiers.properName;
+    }
+
+    if (identifiers.glieseId) {
+      return identifiers.glieseId;
+    }
+
+    if (identifiers.harvardRevisedId) {
+      return identifiers.harvardRevisedId;
+    }
+
+    if (identifiers.henryDraperId) {
+      return identifiers.henryDraperId;
+    }
+
+    if (identifiers.hipparcosId) {
+      return identifiers.hipparcosId;
+    }
+
+  }
+
+  function reassignLabel(targetMesh) {
+
+    if (!targetMesh) {
+      return;
+    }
+
+    if (!tooltipMesh) {
+      doReassign(targetMesh);
+    }
+
+    if (tooltipMesh.starData.identifiers.primaryId == targetMesh.starData.identifiers.primaryId) {
+      return;
+    }
+
+    if (targetMesh.starData.identifiers.primaryId === currentStarMesh.starData.identifiers.primaryId) {
+      return;
+    }
+
+    doReassign(targetMesh);
+
+  }
+
+  function doReassign(targetMesh) {
+
+    tooltipMesh = targetMesh;
+
+    scene.remove(distanceTip);
+    scene.remove(tooltip);
+    scene.remove(lineSegment);
+
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(currentStarMesh.position);
+    geometry.vertices.push(targetMesh.position);
+
+    lineSegment = new THREE.Line(geometry, lineMaterial);
+
+    var lineDistance = currentStarMesh.position.distanceTo(targetMesh.position);
+
+    var distance = camera.position.distanceTo(targetMesh.position);
+
+    var tipgeo = new THREE.TextGeometry(" " + getLabelText(targetMesh.starData.identifiers), {
+          font: font,
+          size: .02 * distance,
+          height: 0,
+          curveSegments: 0,
+          bevelThickness: 0,
+          bevelSize: 0,
+          bevelEnabled: true,
+          material: 0,
+          extrudeMaterial: 0
+        }
+    );
+    tipgeo.computeBoundingBox();
+    tipgeo.computeVertexNormals();
+
+    tooltip = new THREE.Mesh(tipgeo,
+        new THREE.MultiMaterial([
+          new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
+          new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
+        ])
+    );
+
+    tooltip.position.set(
+        targetMesh.position.x,
+        targetMesh.position.y,
+        targetMesh.position.z
+    );
+
+    var distPos = new THREE.Vector3(
+        (targetMesh.position.x + currentStarMesh.position.x) / 2,
+        (targetMesh.position.y + currentStarMesh.position.y) / 2,
+        (targetMesh.position.z + currentStarMesh.position.z) / 2
+    );
+
+    var distanceDistance = camera.position.distanceTo(distPos);
+
+
+    var distanceGeo = new THREE.TextGeometry(lineDistance.toFixed(1) + " LY", {
+          font: font,
+          size: .02 * distanceDistance,
+          height: 0,
+          curveSegments: 0,
+          bevelThickness: 0,
+          bevelSize: 0,
+          bevelEnabled: true,
+          material: 0,
+          extrudeMaterial: 0
+        }
+    );
+    distanceGeo.computeBoundingBox();
+    distanceGeo.computeVertexNormals();
+
+    distanceTip = new THREE.Mesh(distanceGeo,
+        new THREE.MultiMaterial([
+          new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
+          new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
+        ])
+    );
+
+    distanceTip.position.copy(distPos);
+
+    updateTooltipRotation();
+
+    scene.add(tooltip);
+    scene.add(distanceTip);
+    scene.add(lineSegment)
+
+  }
+
+  function loadStarDatas(distances) {
+    if (distances.length > 0) {
+      var distance = distances.splice(0, 1)[0];
+      loadStarData(distance, function (data) {
+        renderOnLoad(data);
+        loadStarDatas(distances);
+      });
+    }
+  }
+
+  function renderOnLoad(data) {
+    renderStarData(JSON.parse(data));
+  }
+
+  function loadStarData(distance, onLoad) {
+    $.ajax({
+      type: 'GET',
+      dataType: 'html',
+      url: "star_catalog",
+      data: {
+        "max_lys": distance
+      },
+      success: onLoad
     });
   }
-}
 
-function renderOnLoad(data) {
-  renderStarData(JSON.parse(data));
-}
+  function renderStarData(starData) {
 
-function loadStarData(distance, onLoad) {
-  $.ajax({
-    type: 'GET',
-    dataType: 'html',
-    url: "star_catalog",
-    data: {
-      "max_lys": distance
-    },
-    success: onLoad
-  });
-}
+    //  clear previous data
+    stars.forEach(function (star) {
+      scene.remove(star);
 
-function renderStarData(starData) {
+      star.material.dispose();
+    });
+    stars = [];
+    starsByID = {};
 
-  //  clear previous data
-  stars.forEach(function (star) {
-    scene.remove(star);
+    starData.forEach(function (star) {
 
-    star.material.dispose();
-  });
-  stars = [];
-  starsByID = {};
-
-  starData.forEach(function (star) {
-
-    //  TODO white dwarfs
-    //  TODO use range to scale
-    var pureColor = CLASS_TO_APPARENT_COLOR_STR[star.parsedStellarClassification.mainClass];
-    if (pureColor == null) {
-      pureColor = CLASS_TO_APPARENT_COLOR_STR["M"];
-    }
-
-    //  TODO requires no explanation why this is hacky...
-    var hsv = tinycolor(pureColor).toHsv();
-    hsv.v = (20 - star.absoluteMagnitude) / 21;
-
-    var rgb = tinycolor("hsv " + hsv.h + " " + hsv.s + " " + hsv.v).toHexString();
-
-    var mesh = new THREE.Mesh(STAR_GEOMETRY, new THREE.MeshPhongMaterial({ ambient: rgb,
-      color: rgb,
-      specular: rgb,
-      shininess: 20
-    }));
-
-    mesh.position.x = star.cartesianCoordsInLys.x;
-    mesh.position.y = star.cartesianCoordsInLys.y;
-    mesh.position.z = star.cartesianCoordsInLys.z;
-
-    mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
-    mesh.starData = star;
-
-    scene.add(mesh);
-    stars.push(mesh);
-
-    starsByID[star.identifiers.primaryId] = mesh;
-  });
-
-  if (currentStarPrimaryId == "") {
-    select(starsByID[70667]);
-  }
-  //  if we shrunk the render distance
-  else if (!starsByID[currentStarPrimaryId]) {
-    select(starsByID[0]);
-  }
-}
-
-
-function dragOnMouseMove(event) {
-  if (!controls.dragView) {
-    var vector = new THREE.Vector3(( event.clientX / window.innerWidth ) * 2 - 1, -( event.clientY / window.innerHeight ) * 2 + 1, 1.0);
-    projector.unprojectVector(vector, camera);
-
-    raycaster.set(camera.position, vector.sub(camera.position).normalize());
-
-    var intersects = raycaster.intersectObjects(stars);
-
-    if (intersects.length > 0) {
-      select(intersects[0].object);
-    }
-  }
-}
-
-function select(mesh) {
-
-  //  TODO flesh out with more fields
-  //     # planets (display them?)
-
-  var newStar = mesh.starData;
-  if (newStar != null) {
-    var newStarPrimaryId = newStar.identifiers.primaryId;
-
-    if (newStarPrimaryId != currentStarPrimaryId) {
-
-      var bf = null;
-      if (newStar.identifiers.bayerFlamsteed) {
-        bf = newStar.identifiers.bayerFlamsteed.prettyName;
+      //  TODO white dwarfs
+      //  TODO use range to scale
+      var pureColor = CLASS_TO_APPARENT_COLOR_STR[star.parsedStellarClassification.mainClass];
+      if (pureColor == null) {
+        pureColor = CLASS_TO_APPARENT_COLOR_STR["M"];
       }
 
-      setInfoData(bf, infoBayerFlamteed);
-      setInfoData(newStar.identifiers.glieseId, infoGliese);
-      setInfoData(newStar.identifiers.harvardRevisedId, infoHarvard);
-      setInfoData(newStar.identifiers.henryDraperId, infoHenryDraper);
-      setInfoData(newStar.identifiers.hipparcosId, infoHipparcos);
-      setInfoData(newStar.identifiers.properName, infoProperName);
+      //  TODO requires no explanation why this is hacky...
+      var hsv = tinycolor(pureColor).toHsv();
+      hsv.v = (20 - star.absoluteMagnitude) / 21;
 
-      setInfoData(newStar.rawStellarClassification, infoSpectralType);
-      setInfoData(newStar.absoluteMagnitude.toFixed(2), infoAbsMagnitude);
+      var rgb = tinycolor("hsv " + hsv.h + " " + hsv.s + " " + hsv.v).toHexString();
 
-      setInfoData(newStar.lightYearDistance.toFixed(2), infoDistance);
-      setInfoData(newStar.declinationRadians.toFixed(5), infoDeclination);
-      setInfoData(newStar.rightAscensionRadians.toFixed(5), infoRightAscension);
+      var mesh = new THREE.Mesh(STAR_GEOMETRY, new THREE.MeshPhongMaterial({
+        color: rgb,
+        specular: rgb,
+        shininess: 20
+      }));
 
-      setLink(newStar.links.wikipedia, infoWiki);
+      mesh.position.x = star.cartesianCoordsInLys.x;
+      mesh.position.y = star.cartesianCoordsInLys.y;
+      mesh.position.z = star.cartesianCoordsInLys.z;
 
-      selector.position = mesh.position;
+      mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
+      mesh.starData = star;
 
-      currentStarMesh = mesh;
-      currentStarPrimaryId = newStarPrimaryId;
+      scene.add(mesh);
+      stars.push(mesh);
+
+      starsByID[star.identifiers.primaryId] = mesh;
+    });
+
+    if (currentStarPrimaryId == "") {
+      select(starsByID[0]);
+      reassignLabel(starsByID[70667]);
+    }
+    //  if we shrunk the render distance
+    else if (!starsByID[currentStarPrimaryId]) {
+      select(starsByID[0]);
     }
   }
-}
 
-function setLink(data, element) {
-  if (data != null) {
-    element.parent().parent().show();
-    element.attr('href', data);
-  } else {
-    element.parent().parent().hide();
+  function getStarForPoint(x, y) {
+
+    mouse.x = ( x / window.innerWidth ) * 2 - 1;
+    mouse.y = -( y / window.innerHeight ) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+
+    var intersects = raycaster.intersectObjects(stars, false);
+
+    if (intersects.length > 0) {
+      return intersects[0].object;
+    }
+
+    return null;
   }
-}
 
-function setInfoData(data, element) {
-  if (data != null) {
-    element.parent().show();
-    element.text(data);
-  } else {
-    element.parent().hide();
+
+  function dragOnMouseMove(event) {
+    if (!freeLookControls.dragView) {
+      var star = getStarForPoint(event.clientX, event.clientY);
+
+      if (star) {
+        canvas.style.cursor = 'pointer';
+      } else {
+        canvas.style.cursor = 'auto';
+      }
+
+      reassignLabel(star);
+    }
   }
-}
 
-function onWindowResize() {
-  windowHalfX = window.innerWidth / 2;
-  windowHalfY = window.innerHeight / 2;
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  controls.handleResize();
-  render();
-}
+  function onMouseClick(event) {
+    select(getStarForPoint(event.clientX, event.clientY));
+  }
 
-function animate() {
-  requestAnimationFrame(animate);
-  render();
-}
+  function select(mesh) {
 
-function render() {
+    if (mesh) {
 
-  var delta = clock.getDelta();
+      //  TODO flesh out with more fields
+      //     # planets (display them?)
 
-  selector.rotation.x = camera.rotation.x;
-  selector.rotation.y = camera.rotation.y;
-  selector.rotation.z = selector.rotation.z + .5 * delta;
+      var newStar = mesh.starData;
 
-  solMarker.rotation.x = camera.rotation.x;
-  solMarker.rotation.y = camera.rotation.y;
-  solMarker.rotation.z = solMarker.rotation.z + .5 * delta;
 
-  light1.position = controls.object.position;
+      if (newStar != null) {
+        var newStarPrimaryId = newStar.identifiers.primaryId;
 
-  controls.update(delta);
-  renderer.render(scene, camera);
-}
+        if (newStarPrimaryId != currentStarPrimaryId) {
 
-window.addEventListener('resize', onWindowResize, false);
-document.addEventListener('mousemove', dragOnMouseMove, false);
+          var bf = null;
+          if (newStar.identifiers.bayerFlamsteed) {
+            bf = newStar.identifiers.bayerFlamsteed.prettyName;
+          }
 
-animate();
+          setInfoData(bf, infoBayerFlamteed);
+          setInfoData(newStar.identifiers.glieseId, infoGliese);
+          setInfoData(newStar.identifiers.harvardRevisedId, infoHarvard);
+          setInfoData(newStar.identifiers.henryDraperId, infoHenryDraper);
+          setInfoData(newStar.identifiers.hipparcosId, infoHipparcos);
+          setInfoData(newStar.identifiers.properName, infoProperName);
 
-loadStarDatas([25, 75]);
+          setInfoData(newStar.rawStellarClassification, infoSpectralType);
+          setInfoData(newStar.absoluteMagnitude.toFixed(2), infoAbsMagnitude);
+
+          setInfoData(newStar.lightYearDistance.toFixed(2), infoDistance);
+          setInfoData(newStar.declinationRadians.toFixed(5), infoDeclination);
+          setInfoData(newStar.rightAscensionRadians.toFixed(5), infoRightAscension);
+
+          setLink(newStar.links.wikipedia, infoWiki);
+
+          selector.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+
+          currentStarMesh = mesh;
+          currentStarPrimaryId = newStarPrimaryId;
+
+          updateTarget();
+        }
+      }
+    }
+  }
+
+  function setLink(data, element) {
+    if (data != null) {
+      element.parent().parent().show();
+      element.attr('href', data);
+    } else {
+      element.parent().parent().hide();
+    }
+  }
+
+  function setInfoData(data, element) {
+    if (data != null) {
+      element.parent().show();
+      element.text(data);
+    } else {
+      element.parent().hide();
+    }
+  }
+
+  function onWindowResize() {
+    windowHalfX = window.innerWidth / 2;
+    windowHalfY = window.innerHeight / 2;
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    render();
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    render();
+  }
+
+  function updateTooltipRotation() {
+
+    tooltip.rotation.x = camera.rotation.x;
+    tooltip.rotation.y = camera.rotation.y;
+    tooltip.rotation.z = camera.rotation.z;
+
+    distanceTip.rotation.x = camera.rotation.x;
+    distanceTip.rotation.y = camera.rotation.y
+    distanceTip.rotation.z = camera.rotation.z;
+
+  }
+
+  function render() {
+
+    var delta = clock.getDelta();
+
+    selector.rotation.x = camera.rotation.x;
+    selector.rotation.y = camera.rotation.y;
+    selector.rotation.z = selector.rotation.z + .5 * delta;
+
+    solMarker.rotation.x = camera.rotation.x;
+    solMarker.rotation.y = camera.rotation.y;
+    solMarker.rotation.z = solMarker.rotation.z + .5 * delta;
+
+    light1.position = camera.position;
+    light1.position.set(
+        camera.position.x,
+        camera.position.y,
+        camera.position.z
+    );
+
+    if (controlMode == 'orbit') {
+      orbitControls.update(delta);
+    } else if (controlMode == 'free') {
+      freeLookControls.update(delta);
+    }else if(controlMode == 'tween'){
+      tweenControls.update(delta);
+    }
+
+    renderer.render(scene, camera);
+
+    if (tooltip) {
+      updateTooltipRotation();
+    }
+
+  }
+
+  canvas.addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+  }, false);
+
+  canvas.addEventListener('mousemove',
+      bind(orbitControls.onMouseMove, freeLookControls.onMouseMove),
+      false
+  );
+
+  canvas.addEventListener('mousedown',
+      bind(orbitControls.onMouseDown, freeLookControls.onMouseDown),
+      false
+  );
+
+  canvas.addEventListener('mousewheel',
+      bind(orbitControls.onMouseWheel, freeLookControls.onMouseWheel),
+      false
+  );
+
+  canvas.addEventListener('DOMMouseScroll',
+      bind(orbitControls.onMouseWheel, freeLookControls.onMouseWheel),
+      false
+  ); // firefox
+
+  canvas.addEventListener('mouseup',
+      bind(orbitControls.onMouseUp, freeLookControls.onMouseUp),
+      false
+  );
+
+  canvas.addEventListener('keydown',
+      bind(orbitControls.onKeyDown, freeLookControls.onKeyDown),
+      false
+  );
+
+  canvas.addEventListener('keyup',
+      bind(orbitControls.onKeyUp, freeLookControls.onKeyUp),
+      false
+  );
+
+  function bind(orbitFn, freeFn) {
+    return function () {
+      if (controlMode === 'free') {
+        freeFn.apply(freeLookControls, arguments);
+      } else if (controlMode === 'orbit') {
+        orbitFn.apply(orbitControls, arguments);
+      }
+    };
+  }
+  ;
+
+  window.addEventListener('resize', onWindowResize, false);
+  document.addEventListener('mousemove', dragOnMouseMove, false);
+  document.addEventListener('click', onMouseClick, false);
+
+  var loader = new THREE.FontLoader();
+
+  loader.load('js/font.js', function (response) {
+        font = response;
+        animate();
+        loadStarDatas([25, 75]);
+      }
+  );
+
 
 </script>
 
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+
+  (function (i, s, o, g, r, a, m) {
+    i['GoogleAnalyticsObject'] = r;
+    i[r] = i[r] || function () {
+          (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+    a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0];
+    a.async = 1;
+    a.src = g;
+    m.parentNode.insertBefore(a, m)
+  })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
   ga('create', 'UA-42483033-4', 'bpodgursky.com');
   ga('send', 'pageview');
