@@ -13,8 +13,8 @@
   <script src="js/FreeLookControls.js"></script>
   <script src="js/OrbitControls.js"></script>
   <script src="js/SelectorGeometry.js"></script>
+  <script src="js/TweenControls.js"></script>
   <script src="resources/Detector.js"></script>
-  <script src="resources/tween.min.js"></script>
 
 </head>
 
@@ -255,7 +255,7 @@
   var scene = new THREE.Scene();
 
   var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
-  camera.position.set(0, 0, -1);
+  camera.position.set(0, 0, -15);
 
   camera.rotateZ(Math.PI);
 
@@ -267,7 +267,7 @@
 
   var clock = new THREE.Clock();
 
-  var solMarker = new THREE.Mesh(new THREE.SelectorGeometry(.5, .1), new THREE.MeshBasicMaterial({
+  var solMarker = new THREE.Mesh(new THREE.SelectorGeometry(.25, .1), new THREE.MeshBasicMaterial({
     color: 0x0000FF,
     side: THREE.DoubleSide,
     wireframe: false
@@ -309,6 +309,7 @@
 
   var freeLookControls = new THREE.FreeLookControls(camera, canvas);
   var orbitControls = new THREE.OrbitControls(camera, canvas, new THREE.Vector3(0, 0, 0));
+  var tweenControls = new THREE.TweenControls(camera);
 
   scene.add(camera);
   scene.add(ambientLight);
@@ -341,17 +342,20 @@
 
   function updateTarget() {
     if (controlMode == 'orbit') {
-      //  TODO smooth - tweenjs?
-      orbitControls.target = currentStarMesh.position;
-      camera.lookAt(currentStarMesh.position);
 
-//      var startRotation = new THREE.Euler().copy(camera.rotation);
-//
-//      camera.lookAt(currentStarMesh.position);
-//      var endRotation = new THREE.Euler().copy(camera.rotation);
-//
-//      camera.rotation.copy(startRotation);
-//      new createjs.Tween(camera).to({rotation: endRotation}, 600).start();
+      controlMode = 'tween';
+
+      var startRotation = new THREE.Euler().copy(camera.rotation);
+      camera.lookAt(currentStarMesh.position);
+      var endRotation = new THREE.Euler().copy(camera.rotation);
+
+      camera.rotation.copy(startRotation);
+
+      tweenControls.lookAt(endRotation, function(){
+        controlMode = 'orbit';
+        orbitControls.target = currentStarMesh.position;
+      }, 2);
+
     }
   }
 
@@ -402,94 +406,110 @@
 
   function reassignLabel(targetMesh) {
 
-    if (targetMesh) {
-
-      if (!tooltipMesh || tooltipMesh.starData.identifiers.primaryId != targetMesh.starData.identifiers.primaryId) {
-        tooltipMesh = targetMesh;
-
-        scene.remove(distanceTip);
-        scene.remove(tooltip);
-        scene.remove(lineSegment);
-
-        var geometry = new THREE.Geometry();
-        geometry.vertices.push(currentStarMesh.position);
-        geometry.vertices.push(targetMesh.position);
-
-        lineSegment = new THREE.Line(geometry, lineMaterial);
-
-        var lineDistance = currentStarMesh.position.distanceTo(targetMesh.position);
-
-        var distance = camera.position.distanceTo(targetMesh.position);
-
-        var tipgeo = new THREE.TextGeometry(" " + getLabelText(targetMesh.starData.identifiers), {
-              font: font,
-              size: .02 * distance,
-              height: 0,
-              curveSegments: 0,
-              bevelThickness: 0,
-              bevelSize: 0,
-              bevelEnabled: true,
-              material: 0,
-              extrudeMaterial: 0
-            }
-        );
-        tipgeo.computeBoundingBox();
-        tipgeo.computeVertexNormals();
-
-        tooltip = new THREE.Mesh(tipgeo,
-            new THREE.MultiMaterial([
-              new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
-              new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
-            ])
-        );
-
-        tooltip.position.set(
-            targetMesh.position.x,
-            targetMesh.position.y,
-            targetMesh.position.z
-        );
-
-        var distPos = new THREE.Vector3(
-            (targetMesh.position.x + currentStarMesh.position.x) / 2,
-            (targetMesh.position.y + currentStarMesh.position.y) / 2,
-            (targetMesh.position.z + currentStarMesh.position.z) / 2
-        );
-
-        var distanceDistance = camera.position.distanceTo(distPos);
-
-
-        var distanceGeo = new THREE.TextGeometry(lineDistance.toFixed(1) + " LY", {
-              font: font,
-              size: .02 * distanceDistance,
-              height: 0,
-              curveSegments: 0,
-              bevelThickness: 0,
-              bevelSize: 0,
-              bevelEnabled: true,
-              material: 0,
-              extrudeMaterial: 0
-            }
-        );
-        distanceGeo.computeBoundingBox();
-        distanceGeo.computeVertexNormals();
-
-        distanceTip = new THREE.Mesh(distanceGeo,
-            new THREE.MultiMaterial([
-              new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
-              new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
-            ])
-        );
-
-        distanceTip.position.copy(distPos);
-
-        updateTooltipRotation();
-
-        scene.add(tooltip);
-        scene.add(distanceTip);
-        scene.add(lineSegment)
-
-      }
+    if (!targetMesh) {
+      return;
     }
+
+    if (!tooltipMesh) {
+      doReassign(targetMesh);
+    }
+
+    if (tooltipMesh.starData.identifiers.primaryId == targetMesh.starData.identifiers.primaryId) {
+      return;
+    }
+
+    if (targetMesh.starData.identifiers.primaryId === currentStarMesh.starData.identifiers.primaryId) {
+      return;
+    }
+
+    doReassign(targetMesh);
+
+  }
+
+  function doReassign(targetMesh) {
+
+    tooltipMesh = targetMesh;
+
+    scene.remove(distanceTip);
+    scene.remove(tooltip);
+    scene.remove(lineSegment);
+
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(currentStarMesh.position);
+    geometry.vertices.push(targetMesh.position);
+
+    lineSegment = new THREE.Line(geometry, lineMaterial);
+
+    var lineDistance = currentStarMesh.position.distanceTo(targetMesh.position);
+
+    var distance = camera.position.distanceTo(targetMesh.position);
+
+    var tipgeo = new THREE.TextGeometry(" " + getLabelText(targetMesh.starData.identifiers), {
+          font: font,
+          size: .02 * distance,
+          height: 0,
+          curveSegments: 0,
+          bevelThickness: 0,
+          bevelSize: 0,
+          bevelEnabled: true,
+          material: 0,
+          extrudeMaterial: 0
+        }
+    );
+    tipgeo.computeBoundingBox();
+    tipgeo.computeVertexNormals();
+
+    tooltip = new THREE.Mesh(tipgeo,
+        new THREE.MultiMaterial([
+          new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
+          new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
+        ])
+    );
+
+    tooltip.position.set(
+        targetMesh.position.x,
+        targetMesh.position.y,
+        targetMesh.position.z
+    );
+
+    var distPos = new THREE.Vector3(
+        (targetMesh.position.x + currentStarMesh.position.x) / 2,
+        (targetMesh.position.y + currentStarMesh.position.y) / 2,
+        (targetMesh.position.z + currentStarMesh.position.z) / 2
+    );
+
+    var distanceDistance = camera.position.distanceTo(distPos);
+
+
+    var distanceGeo = new THREE.TextGeometry(lineDistance.toFixed(1) + " LY", {
+          font: font,
+          size: .02 * distanceDistance,
+          height: 0,
+          curveSegments: 0,
+          bevelThickness: 0,
+          bevelSize: 0,
+          bevelEnabled: true,
+          material: 0,
+          extrudeMaterial: 0
+        }
+    );
+    distanceGeo.computeBoundingBox();
+    distanceGeo.computeVertexNormals();
+
+    distanceTip = new THREE.Mesh(distanceGeo,
+        new THREE.MultiMaterial([
+          new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
+          new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
+        ])
+    );
+
+    distanceTip.position.copy(distPos);
+
+    updateTooltipRotation();
+
+    scene.add(tooltip);
+    scene.add(distanceTip);
+    scene.add(lineSegment)
 
   }
 
@@ -565,7 +585,8 @@
     });
 
     if (currentStarPrimaryId == "") {
-      select(starsByID[70667]);
+      select(starsByID[0]);
+      reassignLabel(starsByID[70667]);
     }
     //  if we shrunk the render distance
     else if (!starsByID[currentStarPrimaryId]) {
@@ -592,7 +613,15 @@
 
   function dragOnMouseMove(event) {
     if (!freeLookControls.dragView) {
-      reassignLabel(getStarForPoint(event.clientX, event.clientY));
+      var star = getStarForPoint(event.clientX, event.clientY);
+
+      if (star) {
+        canvas.style.cursor = 'pointer';
+      } else {
+        canvas.style.cursor = 'auto';
+      }
+
+      reassignLabel(star);
     }
   }
 
@@ -714,6 +743,8 @@
       orbitControls.update(delta);
     } else if (controlMode == 'free') {
       freeLookControls.update(delta);
+    }else if(controlMode == 'tween'){
+      tweenControls.update(delta);
     }
 
     renderer.render(scene, camera);
