@@ -78,8 +78,6 @@ THREE.OrbitControls = function (object, domElement, target) {
 
   this.onMouseWheel = function (event) {
 
-    console.log(this);
-
     event.preventDefault();
     event.stopPropagation();
 
@@ -95,8 +93,6 @@ THREE.OrbitControls = function (object, domElement, target) {
       this.moveForward = true;
     } else if (delta < 0) {
       this.moveBackward = true;
-      console.log("moving backwards");
-      console.log(this.moveBackward);
       }
 
   };

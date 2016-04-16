@@ -291,8 +291,11 @@
   selector.rotation.z = .5;
 
   var tooltip;
-  var tooltipMesh;
+  var tooltipStar;
   var font;
+
+  var mouseX;
+  var mouseY;
 
   var distanceTip;
 
@@ -351,7 +354,7 @@
 
       camera.rotation.copy(startRotation);
 
-      tweenControls.lookAt(endRotation, function(){
+      tweenControls.lookAt(endRotation, function () {
         controlMode = 'orbit';
         orbitControls.target = currentStarMesh.position;
       }, 2);
@@ -410,11 +413,11 @@
       return;
     }
 
-    if (!tooltipMesh) {
+    if (!tooltipStar) {
       doReassign(targetMesh);
     }
 
-    if (tooltipMesh.starData.identifiers.primaryId == targetMesh.starData.identifiers.primaryId) {
+    if (tooltipStar.starData.identifiers.primaryId == targetMesh.starData.identifiers.primaryId) {
       return;
     }
 
@@ -428,7 +431,7 @@
 
   function doReassign(targetMesh) {
 
-    tooltipMesh = targetMesh;
+    tooltipStar = targetMesh;
 
     scene.remove(distanceTip);
     scene.remove(tooltip);
@@ -442,11 +445,9 @@
 
     var lineDistance = currentStarMesh.position.distanceTo(targetMesh.position);
 
-    var distance = camera.position.distanceTo(targetMesh.position);
-
     var tipgeo = new THREE.TextGeometry(" " + getLabelText(targetMesh.starData.identifiers), {
           font: font,
-          size: .02 * distance,
+          size: 1,
           height: 0,
           curveSegments: 0,
           bevelThickness: 0,
@@ -478,12 +479,9 @@
         (targetMesh.position.z + currentStarMesh.position.z) / 2
     );
 
-    var distanceDistance = camera.position.distanceTo(distPos);
-
-
-    var distanceGeo = new THREE.TextGeometry(lineDistance.toFixed(1) + " LY", {
+    var distanceGeo = new THREE.TextGeometry(lineDistance.toFixed(1) + "ly", {
           font: font,
-          size: .02 * distanceDistance,
+          size: 1,
           height: 0,
           curveSegments: 0,
           bevelThickness: 0,
@@ -596,24 +594,53 @@
 
   function getStarForPoint(x, y) {
 
-    mouse.x = ( x / window.innerWidth ) * 2 - 1;
-    mouse.y = -( y / window.innerHeight ) * 2 + 1;
+    if (x && y) {
 
-    raycaster.setFromCamera(mouse, camera);
+      mouse.x = ( x / window.innerWidth ) * 2 - 1;
+      mouse.y = -( y / window.innerHeight ) * 2 + 1;
 
-    var intersects = raycaster.intersectObjects(stars, false);
+      raycaster.setFromCamera(mouse, camera);
 
-    if (intersects.length > 0) {
-      return intersects[0].object;
+      var intersects = raycaster.intersectObjects(stars, false);
+
+      if (tooltip) {
+        var text = raycaster.intersectObjects([tooltip], false);
+        if (text.length > 0) {
+          return tooltipStar;
+        }
+      }
+
+      if (intersects.length > 0) {
+        return intersects[0].object;
+      }
     }
 
     return null;
   }
 
+  function setMouseXY(event) {
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+  }
 
-  function dragOnMouseMove(event) {
+  function resizeTipText() {
+
+    var tooltipDistance = tooltip.position.distanceTo(camera.position);
+
+    tooltip.scale.x = .02 * tooltipDistance;
+    tooltip.scale.y = .02 * tooltipDistance;
+    tooltip.scale.z = .02 * tooltipDistance;
+
+    var distanceDistance = distanceTip.position.distanceTo(camera.position);
+    distanceTip.scale.x = .02 * distanceDistance;
+    distanceTip.scale.y = .02 * distanceDistance;
+    distanceTip.scale.z = .02 * distanceDistance;
+
+  }
+
+  function getMouseoverStar(event) {
     if (!freeLookControls.dragView) {
-      var star = getStarForPoint(event.clientX, event.clientY);
+      var star = getStarForPoint(mouseX, mouseY);
 
       if (star) {
         canvas.style.cursor = 'pointer';
@@ -743,14 +770,17 @@
       orbitControls.update(delta);
     } else if (controlMode == 'free') {
       freeLookControls.update(delta);
-    }else if(controlMode == 'tween'){
+    } else if (controlMode == 'tween') {
       tweenControls.update(delta);
     }
 
     renderer.render(scene, camera);
 
+    getMouseoverStar();
+
     if (tooltip) {
       updateTooltipRotation();
+      resizeTipText();
     }
 
   }
@@ -803,11 +833,12 @@
       }
     };
   }
-  ;
 
   window.addEventListener('resize', onWindowResize, false);
-  document.addEventListener('mousemove', dragOnMouseMove, false);
+  document.addEventListener('mousemove', setMouseXY, false);
   document.addEventListener('click', onMouseClick, false);
+  canvas.addEventListener('mousewheel', resizeTipText, false);
+  canvas.addEventListener('DOMMouseScroll', resizeTipText, false);
 
   var loader = new THREE.FontLoader();
 
