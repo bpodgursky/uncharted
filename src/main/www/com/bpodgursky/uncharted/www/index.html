@@ -333,6 +333,9 @@
   var visibleStars = [];
   var renderRadius = 75;
 
+  var fragmentShader;
+  var vertexShader;
+
   $("#selector").keydown(function (e) {
     e.preventDefault();
   });
@@ -437,6 +440,9 @@
 
   }
 
+  var distanceCache = {};
+  var labelCache = {};
+
   function doReassign(targetMesh) {
 
     tooltipStar = targetMesh;
@@ -453,27 +459,29 @@
 
     var lineDistance = currentStarMesh.position.distanceTo(targetMesh.position);
 
-    var tipgeo = new THREE.TextGeometry(" " + getLabelText(targetMesh.starData.identifiers), {
-          font: font,
-          size: 1,
-          height: 0,
-          curveSegments: 0,
-          bevelThickness: 0,
-          bevelSize: 0,
-          bevelEnabled: true,
-          material: 0,
-          extrudeMaterial: 0
-        }
-    );
-    tipgeo.computeBoundingBox();
-    tipgeo.computeVertexNormals();
+    var label = "  " + getLabelText(targetMesh.starData.identifiers);
 
-    tooltip = new THREE.Mesh(tipgeo,
-        new THREE.MultiMaterial([
-          new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
-          new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
-        ])
-    );
+
+    if (!labelCache[label]) {
+      labelCache[label] = new THREE.Mesh(new THREE.TextGeometry(label, {
+            font: font,
+            size: 1,
+            height: 0,
+            curveSegments: 0,
+            bevelThickness: 0,
+            bevelSize: 0,
+            bevelEnabled: true,
+            material: 0,
+            extrudeMaterial: 0
+          }
+          ),
+          new THREE.MultiMaterial([
+            new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
+            new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
+          ])
+      )
+    }
+    tooltip = labelCache[label];
 
     tooltip.position.set(
         targetMesh.position.x,
@@ -487,27 +495,29 @@
         (targetMesh.position.z + currentStarMesh.position.z) / 2
     );
 
-    var distanceGeo = new THREE.TextGeometry(lineDistance.toFixed(1) + "ly", {
-          font: font,
-          size: 1,
-          height: 0,
-          curveSegments: 0,
-          bevelThickness: 0,
-          bevelSize: 0,
-          bevelEnabled: true,
-          material: 0,
-          extrudeMaterial: 0
-        }
-    );
-    distanceGeo.computeBoundingBox();
-    distanceGeo.computeVertexNormals();
+    var distance = lineDistance.toFixed(1) + "ly";
 
-    distanceTip = new THREE.Mesh(distanceGeo,
-        new THREE.MultiMaterial([
-          new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
-          new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
-        ])
-    );
+
+    if(!distanceCache[distance]){
+      distanceCache[distance] = new THREE.Mesh(new THREE.TextGeometry(distance, {
+            font: font,
+            size: 1,
+            height: 0,
+            curveSegments: 0,
+            bevelThickness: 0,
+            bevelSize: 0,
+            bevelEnabled: true,
+            material: 0,
+            extrudeMaterial: 0
+          }
+          ),
+          new THREE.MultiMaterial([
+            new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
+            new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
+          ])
+      );
+    }
+    distanceTip = distanceCache[distance];
 
     distanceTip.position.copy(distPos);
 
@@ -850,26 +860,42 @@
 
   var loader = new THREE.FontLoader();
 
-
-  $.ajax({
-    type: 'GET',
-    dataType: 'html',
-    url: "star_catalog",
-    data: {
-      "max_lys": 75
-    },
-    success: function (data) {
-
-      initializeStarData(JSON.parse(data));
-      loader.load('js/font.js', function (response) {
-            font = response;
-            animate();
-            updateStarData();
-          }
-      );
-    }
+  $.when(
+      $.ajax({
+        type: 'GET',
+        dataType: 'html',
+        url: "resources/noise/noise3d-fragment.glsl",
+        success: function (frag) {
+          fragmentShader = frag;
+        }
+      }),
+      $.ajax({
+        type: 'GET',
+        dataType: 'html',
+        url: "resources/noise/vertex-shader.glsl",
+        success: function (vert) {
+          vertexShader = vert;
+        }
+      }),
+      $.ajax({
+        type: 'GET',
+        dataType: 'html',
+        url: "star_catalog",
+        data: {
+          "max_lys": 75
+        },
+        success: function (data) {
+          initializeStarData(JSON.parse(data));
+        }
+      })
+  ).then(function () {
+    loader.load('js/font.js', function (response) {
+          font = response;
+          animate();
+          updateStarData();
+        }
+    );
   });
-
 
 </script>
 
