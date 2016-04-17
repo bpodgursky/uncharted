@@ -10,6 +10,7 @@
   <script type="text/javascript" src="resources/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="resources/tinycolor-min.js"></script>
   <script src="resources/three.min.js"></script>
+  <script src="resources/stats.js"></script>
   <script src="js/FreeLookControls.js"></script>
   <script src="js/OrbitControls.js"></script>
   <script src="js/SelectorGeometry.js"></script>
@@ -230,6 +231,10 @@
 
   if (!Detector.webgl) Detector.addGetWebGLMessage();
 
+  var stats = new Stats();
+  stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+  $("#selector").append(stats.dom);
+
   //  constant stuff
 
   var CLASS_TO_APPARENT_COLOR_STR = {
@@ -325,13 +330,16 @@
 
   var stars = [];
   var starsByID = {};
+  var visibleStars = [];
+  var renderRadius = 75;
 
   $("#selector").keydown(function (e) {
     e.preventDefault();
   });
 
   $("#render_radius").click(function (e) {
-    loadStarData($('input[name=render_radius]:checked', '#render_radius').val(), renderOnLoad);
+    renderRadius = $('input[name=render_radius]:checked', '#render_radius').val();
+    updateStarData();
   });
 
   $('#control_mode').click(function (e) {
@@ -511,75 +519,36 @@
 
   }
 
-  function loadStarDatas(distances) {
-    if (distances.length > 0) {
-      var distance = distances.splice(0, 1)[0];
-      loadStarData(distance, function (data) {
-        renderOnLoad(data);
-        loadStarDatas(distances);
-      });
+  function isRender(starData) {
+
+    if (starData.lightYearDistance < renderRadius) {
+      return true;
     }
+    return false;
   }
 
-  function renderOnLoad(data) {
-    renderStarData(JSON.parse(data));
-  }
+  function updateStarData() {
 
-  function loadStarData(distance, onLoad) {
-    $.ajax({
-      type: 'GET',
-      dataType: 'html',
-      url: "star_catalog",
-      data: {
-        "max_lys": distance
-      },
-      success: onLoad
+    var renderedStars = {};
+    visibleStars.forEach(function (e) {
+      renderedStars[e.starData.identifiers.primaryId] = true;
     });
-  }
+    visibleStars = [];
 
-  function renderStarData(starData) {
+    stars.forEach(function (starMesh) {
+      var data = starMesh.starData;
+      var starID = data.identifiers.primaryId;
 
-    //  clear previous data
-    stars.forEach(function (star) {
-      scene.remove(star);
-
-      star.material.dispose();
-    });
-    stars = [];
-    starsByID = {};
-
-    starData.forEach(function (star) {
-
-      //  TODO white dwarfs
-      //  TODO use range to scale
-      var pureColor = CLASS_TO_APPARENT_COLOR_STR[star.parsedStellarClassification.mainClass];
-      if (pureColor == null) {
-        pureColor = CLASS_TO_APPARENT_COLOR_STR["M"];
+      if (isRender(data)) {
+        if (!renderedStars[starID]) {
+          scene.add(starMesh);
+          visibleStars.push(starMesh);
+        }
+      } else {
+        if (renderedStars[starID]) {
+          scene.remove(starMesh);
+        }
       }
-
-      //  TODO requires no explanation why this is hacky...
-      var hsv = tinycolor(pureColor).toHsv();
-      hsv.v = (20 - star.absoluteMagnitude) / 21;
-
-      var rgb = tinycolor("hsv " + hsv.h + " " + hsv.s + " " + hsv.v).toHexString();
-
-      var mesh = new THREE.Mesh(STAR_GEOMETRY, new THREE.MeshPhongMaterial({
-        color: rgb,
-        specular: rgb,
-        shininess: 20
-      }));
-
-      mesh.position.x = star.cartesianCoordsInLys.x;
-      mesh.position.y = star.cartesianCoordsInLys.y;
-      mesh.position.z = star.cartesianCoordsInLys.z;
-
-      mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
-      mesh.starData = star;
-
-      scene.add(mesh);
-      stars.push(mesh);
-
-      starsByID[star.identifiers.primaryId] = mesh;
     });
 
     if (currentStarPrimaryId == "") {
@@ -587,7 +556,7 @@
       reassignLabel(starsByID[70667]);
     }
     //  if we shrunk the render distance
-    else if (!starsByID[currentStarPrimaryId]) {
+    else if (!renderedStars[currentStarPrimaryId]) {
       select(starsByID[0]);
     }
   }
@@ -654,6 +623,41 @@
 
   function onMouseClick(event) {
     select(getStarForPoint(event.clientX, event.clientY));
+  }
+
+  function initializeStarData(data) {
+
+    data.forEach(function (star) {
+
+      //  TODO white dwarfs
+      //  TODO use range to scale
+      var pureColor = CLASS_TO_APPARENT_COLOR_STR[star.parsedStellarClassification.mainClass];
+      if (pureColor == null) {
+        pureColor = CLASS_TO_APPARENT_COLOR_STR["M"];
+      }
+
+      //  TODO requires no explanation why this is hacky...
+      var hsv = tinycolor(pureColor).toHsv();
+      hsv.v = (20 - star.absoluteMagnitude) / 21;
+
+      var rgb = tinycolor("hsv " + hsv.h + " " + hsv.s + " " + hsv.v).toHexString();
+
+      var mesh = new THREE.Mesh(STAR_GEOMETRY, new THREE.MeshPhongMaterial({
+        color: rgb,
+        specular: rgb,
+        shininess: 20
+      }));
+
+      mesh.position.x = star.cartesianCoordsInLys.x;
+      mesh.position.y = star.cartesianCoordsInLys.y;
+      mesh.position.z = star.cartesianCoordsInLys.z;
+
+      mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
+      mesh.starData = star;
+
+      starsByID[star.identifiers.primaryId] = mesh;
+      stars.push(mesh);
+    });
   }
 
   function select(mesh) {
@@ -731,8 +735,12 @@
   }
 
   function animate() {
-    requestAnimationFrame(animate);
+    stats.begin();
     render();
+    stats.end();
+
+    requestAnimationFrame(animate);
+
   }
 
   function updateTooltipRotation() {
@@ -842,12 +850,25 @@
 
   var loader = new THREE.FontLoader();
 
-  loader.load('js/font.js', function (response) {
-        font = response;
-        animate();
-        loadStarDatas([25, 75]);
-      }
-  );
+
+  $.ajax({
+    type: 'GET',
+    dataType: 'html',
+    url: "star_catalog",
+    data: {
+      "max_lys": 75
+    },
+    success: function (data) {
+
+      initializeStarData(JSON.parse(data));
+      loader.load('js/font.js', function (response) {
+            font = response;
+            animate();
+            updateStarData();
+          }
+      );
+    }
+  });
 
 
 </script>

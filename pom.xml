@@ -260,6 +260,7 @@
           <include>**/*.html</include>
           <include>**/*.png</include>
           <include>**/*.gif</include>
+          <include>**/*.glsl</include>
         </includes>
       </resource>
     </resources>

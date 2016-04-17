@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <title>three.js webgl - materials - shaders [noise]</title>
+  <meta charset="utf-8">
+  <style type="text/css">
+    body {
+      color: #ffffff;
+      font-family: Monospace;
+      font-size: 13px;
+      text-align: center;
+      font-weight: bold;
+
+      background-color: #000000;
+      margin: 0px;
+      overflow: hidden;
+
+      /*
+      background: -webkit-radial-gradient(circle, #a64a00, #000000);
+      background: -moz-radial-gradient(circle, #a64a00, #000000);
+      */
+
+    }
+
+    #info {
+      position: absolute;
+      top: 0px;
+      width: 100%;
+      padding: 5px;
+    }
+
+    a {
+
+      color: #ffffff;
+    }
+
+  </style>
+</head>
+<body>
+
+<div id="container"></div>
+<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - shader material demo -
+  animated procedural texture using <a href="https://github.com/ashima/webgl-noise" target="_blank">3d simplex noise</a>
+</div>
+
+<script type="text/javascript" src="resources/three.min.js"></script>
+<script id="noise3d" type="x-shader/x-fragment" src="resources/noise/noise3d.glsl"></script>
+<script type="text/javascript" src="resources/jquery-2.0.0.min.js"></script>
+
+<!--<script id="fragmentShader" type="x-shader/x-fragment">-->
+
+
+<script type="text/javascript">
+
+  var container;
+
+  var camera, scene, renderer;
+
+  var uniforms, mesh;
+
+  var clock = new THREE.Clock();
+
+  var fragmentShader;
+  var vertexShader;
+
+  $.when(
+      $.ajax({
+        type: 'GET',
+        dataType: 'html',
+        url: "resources/noise/noise3d-fragment.glsl",
+        success: function(frag){
+          fragmentShader = frag;
+        }
+      }),
+      $.ajax({
+        type: 'GET',
+        dataType: 'html',
+        url: "resources/noise/vertex-shader.glsl",
+        success: function(vert){
+          vertexShader = vert;
+        }
+      })
+  ).then(function(){
+    init();
+    animate();
+  });
+
+      function init() {
+
+        container = document.getElementById('container');
+
+        camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+        camera.position.z = 2;
+
+        scene = new THREE.Scene();
+
+        uniforms = {
+          time: {type: "f", value: 1.0},
+          scale: {type: "f", value: 20}
+        };
+
+        console.log(document.getElementById('noise3d').textContent);
+
+        var material = new THREE.ShaderMaterial({
+          uniforms: uniforms,
+          vertexShader: vertexShader,
+          fragmentShader: fragmentShader
+        });
+
+        var size = 0.75;
+
+        mesh = new THREE.Mesh(new THREE.SphereGeometry(size, 64, 32), material);
+        scene.add(mesh);
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setClearColor(0x050505, 0);
+
+        container.appendChild(renderer.domElement);
+
+        onWindowResize();
+
+        window.addEventListener('resize', onWindowResize, false);
+
+      }
+
+  function onWindowResize(event) {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.updateProjectionMatrix();
+  }
+
+  //
+
+  function animate() {
+
+    requestAnimationFrame(animate);
+
+    render();
+
+  }
+
+  function render() {
+
+    var delta = clock.getDelta();
+
+    uniforms.time.value += 0.01 * delta;
+
+    renderer.render(scene, camera);
+
+  }
+
+</script>
+
+</body>
+</html>
