@@ -9,6 +9,7 @@ public class StarRecord {
   private final Double rightAscensionRadians;
   private final Double declinationRadians;
   private final Double absoluteMagnitude;
+  private final Double temperatureEstimate;
 
   private final String rawStellarClassification;
   private final StellarClassification parsedStellarClassification;
@@ -30,6 +31,7 @@ public class StarRecord {
     this.absoluteMagnitude = absoluteMagnitude;
     this.rawStellarClassification = stellarClass;
     this.parsedStellarClassification = StarClassHelper.parseClass(stellarClass);
+    this.temperatureEstimate = StarClassHelper.getTemperatureEstimate(parsedStellarClassification);
     this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(rightAscensionRadians, declinationRadians, lightYearDistance);
   }
 

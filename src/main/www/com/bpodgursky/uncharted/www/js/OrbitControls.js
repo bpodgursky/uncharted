@@ -93,7 +93,7 @@ THREE.OrbitControls = function (object, domElement, target) {
       this.moveForward = true;
     } else if (delta < 0) {
       this.moveBackward = true;
-      }
+    }
 
   };
 
@@ -143,20 +143,25 @@ THREE.OrbitControls = function (object, domElement, target) {
 
   this.update = function (delta) {
 
-    var actualMoveSpeed = delta * this.MOVEMENT_SPEED;
-
     var dO = this.target.distanceTo(this.camera.position);
+    var actualMoveSpeed = delta * dO;
 
     //  don't zoom forwards if we're too close (or you'll zoom past it
-    if (dO > 2) {
-      if (this.moveForward) {
-        this.camera.translateZ(-( actualMoveSpeed ));
+    if (this.moveForward) {
+      if (actualMoveSpeed > dO) {
+        var advance = dO - .08;
+        camera.translateZ(-advance);
+      } else {
+        camera.translateZ(-actualMoveSpeed);
       }
     }
 
     if (this.moveBackward) {
       this.camera.translateZ(actualMoveSpeed);
     }
+
+    //  reset z
+    dO = this.target.distanceTo(this.camera.position);
 
     this.moveForward = false;
     this.moveBackward = false;
@@ -176,7 +181,7 @@ THREE.OrbitControls = function (object, domElement, target) {
     if (this.dragView) {
 
       var diffX = (this.mouseX - this.lastUpdateMouseX) / window.innerWidth;
-      var diffY = - (this.mouseY - this.lastUpdateMouseY) / window.innerHeight;
+      var diffY = -(this.mouseY - this.lastUpdateMouseY) / window.innerHeight;
 
       translateX -= 10 * diffX;
       translateY -= 10 * diffY;
@@ -186,7 +191,7 @@ THREE.OrbitControls = function (object, domElement, target) {
 
     }
 
-    translateX += .008;
+    translateX += .001 * dO;
 
     this.camera.translateX(translateX);
     this.camera.rotateY(Math.atan(translateX / dO));

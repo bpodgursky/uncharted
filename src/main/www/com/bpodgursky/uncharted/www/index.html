@@ -222,6 +222,8 @@
       <a href="http://bpodgursky.com/">Ben Podgursky</a>
     </div>
 
+    <img id="spectrum_ref" src="resources/star_spectrum_3.png" style="display: none">
+
     <canvas id='webgl_canvas'></canvas>
   </div>
 </div>
@@ -237,18 +239,18 @@
 
   //  constant stuff
 
-  var CLASS_TO_APPARENT_COLOR_STR = {
-    O: "#9db4ff",
-    B: "#aabfff",
-    A: "#cad8ff",
-    F: "#fbf8ff",
-    G: "#fff4e8",
-    K: "#ffddb4",
-    M: "#ffbd6f",
-    L: "#f84235",
-    T: "#ba3059",
-    Y: "#60517"
-  };
+  //  var CLASS_TO_APPARENT_COLOR_STR = {
+  //    O: "#9db4ff",
+  //    B: "#aabfff",
+  //    A: "#cad8ff",
+  //    F: "#fbf8ff",
+  //    G: "#fff4e8",
+  //    K: "#ffddb4",
+  //    M: "#ffbd6f",
+  //    L: "#f84235",
+  //    T: "#ba3059",
+  //    Y: "#60517"
+  //  };
 
   var STAR_GEOMETRY = new THREE.SphereGeometry(.05, 16, 16);
 
@@ -259,7 +261,7 @@
 
   var scene = new THREE.Scene();
 
-  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000);
   camera.position.set(0, 0, -15);
 
   camera.rotateZ(Math.PI);
@@ -498,7 +500,7 @@
     var distance = lineDistance.toFixed(1) + "ly";
 
 
-    if(!distanceCache[distance]){
+    if (!distanceCache[distance]) {
       distanceCache[distance] = new THREE.Mesh(new THREE.TextGeometry(distance, {
             font: font,
             size: 1,
@@ -635,28 +637,59 @@
     select(getStarForPoint(event.clientX, event.clientY));
   }
 
+  function getBase64Image() {
+    var img = document.getElementById('spectrum_ref');
+    var canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+    return canvas;
+  }
+
+
   function initializeStarData(data) {
+
+    uniforms = {
+      time: {type: "f", value: 1.0},
+      scale: {type: "f", value: 80}
+    };
+
+    var spectrumData = getBase64Image();
+    var pixelData = spectrumData.getContext('2d').getImageData(0, 0, spectrumData.width, spectrumData.height).data;
 
     data.forEach(function (star) {
 
-      //  TODO white dwarfs
-      //  TODO use range to scale
-      var pureColor = CLASS_TO_APPARENT_COLOR_STR[star.parsedStellarClassification.mainClass];
-      if (pureColor == null) {
-        pureColor = CLASS_TO_APPARENT_COLOR_STR["M"];
-      }
+      var indexHigh = Math.round((star.temperatureEstimate - 800.0) * spectrumData.width / 29200.0) * 4;
+      var indexLow = Math.round((star.temperatureEstimate/2 - 800.0) * spectrumData.width / 29200.0) * 4;
 
-      //  TODO requires no explanation why this is hacky...
-      var hsv = tinycolor(pureColor).toHsv();
-      hsv.v = (20 - star.absoluteMagnitude) / 21;
+      var rHigh = pixelData[indexHigh];
+      var gHigh = pixelData[indexHigh + 1];
+      var bHigh = pixelData[indexHigh + 2];
 
-      var rgb = tinycolor("hsv " + hsv.h + " " + hsv.s + " " + hsv.v).toHexString();
+      var rLow = pixelData[indexLow];
+      var gLow = pixelData[indexLow + 1];
+      var bLow = pixelData[indexLow + 2];
 
-      var mesh = new THREE.Mesh(STAR_GEOMETRY, new THREE.MeshPhongMaterial({
-        color: rgb,
-        specular: rgb,
-        shininess: 20
-      }));
+      console.log(" ");
+      console.log(rHigh);
+      console.log(rLow);
+
+      var material = new THREE.ShaderMaterial({
+        uniforms: {
+          time: uniforms.time,
+          scale: uniforms.scale,
+          rHigh: {type: "f", value: rHigh},
+          gHigh: {type: "f", value: gHigh},
+          bHigh: {type: "f", value: bHigh},
+          rLow: {type: "f", value: rLow},
+          gLow: {type: "f", value: gLow},
+          bLow: {type: "f", value: bLow}
+        },
+        vertexShader: vertexShader,
+        fragmentShader: fragmentShader
+      });
+
+      var mesh = new THREE.Mesh(STAR_GEOMETRY, material);
 
       mesh.position.x = star.cartesianCoordsInLys.x;
       mesh.position.y = star.cartesianCoordsInLys.y;
@@ -768,6 +801,7 @@
   function render() {
 
     var delta = clock.getDelta();
+    uniforms.time.value += 0.001 * delta;
 
     selector.rotation.x = camera.rotation.x;
     selector.rotation.y = camera.rotation.y;
@@ -864,7 +898,7 @@
       $.ajax({
         type: 'GET',
         dataType: 'html',
-        url: "resources/noise/noise3d-fragment.glsl",
+        url: "resources/noise/noise-grainy-fragment.glsl",
         success: function (frag) {
           fragmentShader = frag;
         }
