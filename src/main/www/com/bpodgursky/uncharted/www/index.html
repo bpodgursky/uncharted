@@ -686,33 +686,35 @@
 
     data.forEach(function (star) {
 
-      var indexHigh = Math.floor((star.temperatureEstimate - 800.0) * spectrumData.width / 29200.0) * 4+8;
-      var indexLow = Math.floor((star.temperatureEstimate/4 - 800.0) * spectrumData.width / 29200.0) * 4+8;
 
-      var rHigh = pixelData[indexHigh];
-      var gHigh = pixelData[indexHigh + 1];
-      var bHigh = pixelData[indexHigh + 2];
-      var aHigh = pixelData[indexHigh + 3];
-
-      var rLow = pixelData[indexLow];
-      var gLow = pixelData[indexLow + 1];
-      var bLow = pixelData[indexLow + 2];
-      var aLow = pixelData[indexLow + 3];
+//      var rHigh = pixelData[indexHigh];
+//      var gHigh = pixelData[indexHigh + 1];
+//      var bHigh = pixelData[indexHigh + 2];
+//      var aHigh = pixelData[indexHigh + 3];
+//
+//      var rLow = pixelData[indexLow];
+//      var gLow = pixelData[indexLow + 1];
+//      var bLow = pixelData[indexLow + 2];
+//      var aLow = pixelData[indexLow + 3];
 
 //      console.log(aHigh+" "+indexHigh);
+
+      console.log(star.temperatureEstimate);
 
       var material = new THREE.ShaderMaterial({
         uniforms: {
           time: uniforms.time,
           scale: uniforms.scale,
-          rHigh: {type: "f", value: rHigh},
-          gHigh: {type: "f", value: gHigh},
-          bHigh: {type: "f", value: bHigh},
-          aHigh: {type: 'f', value:aHigh},
-          rLow: {type: "f", value: rLow},
-          gLow: {type: "f", value: gLow},
-          bLow: {type: "f", value: bLow},
-          aLow: {type: "f", value: aLow}
+          highTemp: {type: "f", value: star.temperatureEstimate},
+          lowTemp: {type: "f", value:star.temperatureEstimate/4}
+//          rHigh: {type: "f", value: rHigh},
+//          gHigh: {type: "f", value: gHigh},
+//          bHigh: {type: "f", value: bHigh},
+//          aHigh: {type: 'f', value:aHigh},
+//          rLow: {type: "f", value: rLow},
+//          gLow: {type: "f", value: gLow},
+//          bLow: {type: "f", value: bLow},
+//          aLow: {type: "f", value: aLow}
         },
         vertexShader: vertexShader,
         fragmentShader: fragmentShader
