@@ -362,12 +362,20 @@
       controlMode = 'tween';
 
       var startRotation = new THREE.Euler().copy(camera.rotation);
+      var startPosition = new THREE.Vector3().copy(camera.position);
+
       camera.lookAt(currentStarMesh.position);
+
+      var distance = camera.position.distanceTo(currentStarMesh.position);
+      camera.translateZ(- distance +.3);
+
       var endRotation = new THREE.Euler().copy(camera.rotation);
+      var endPosition = new THREE.Vector3().copy(camera.position);
 
       camera.rotation.copy(startRotation);
+      camera.position.copy(startPosition);
 
-      tweenControls.lookAt(endRotation, function () {
+      tweenControls.lookAt(endRotation, endPosition, function () {
         controlMode = 'orbit';
         orbitControls.target = currentStarMesh.position;
       }, 2);
@@ -661,7 +669,7 @@
           time: uniforms.time,
           scale: uniforms.scale,
           highTemp: {type: "f", value: star.temperatureEstimate},
-          lowTemp: {type: "f", value:star.temperatureEstimate/4}
+          lowTemp: {type: "f", value: star.temperatureEstimate / 4}
         },
         vertexShader: vertexShader,
         fragmentShader: fragmentShader
