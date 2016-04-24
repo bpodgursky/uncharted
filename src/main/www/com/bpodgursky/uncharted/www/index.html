@@ -649,59 +649,12 @@
 
   function initializeStarData(data) {
 
-    var spectrumData = getBase64Image();
-    var pixelData = spectrumData.getContext('2d').getImageData(0, 0, spectrumData.width, spectrumData.height).data;
-
-//    console.log(pixelData.join(","));
-
     uniforms = {
       time: {type: "f", value: 1.0},
       scale: {type: "f", value: 80}
-//      ,
-//      tempColors: {type : "v4v", value: pixelData}
     };
 
-    var spectrumData = getBase64Image();
-    var pixelData = spectrumData.getContext('2d').getImageData(0, 0, spectrumData.width, spectrumData.height).data;
-
-    var rs = [];
-    for(var i = 0; i < pixelData.length; i = i+4){
-      rs.push(pixelData[i]);
-    }
-
-    var gs = [];
-    for(var i = 1; i < pixelData.length; i = i+4){
-      gs.push(pixelData[i]);
-    }
-
-
-    var bs = [];
-    for(var i = 2; i < pixelData.length; i = i+4){
-      bs.push(pixelData[i]);
-    }
-
-    for(var i = 3; i < pixelData.length; i = i+4){
-      console.log(pixelData[i]);
-    }
-
-    console.log(rs.join(","));
-    console.log(gs.join(","));
-    console.log(bs.join(","));
-
     data.forEach(function (star) {
-
-
-//      var rHigh = pixelData[indexHigh];
-//      var gHigh = pixelData[indexHigh + 1];
-//      var bHigh = pixelData[indexHigh + 2];
-//      var aHigh = pixelData[indexHigh + 3];
-//
-//      var rLow = pixelData[indexLow];
-//      var gLow = pixelData[indexLow + 1];
-//      var bLow = pixelData[indexLow + 2];
-//      var aLow = pixelData[indexLow + 3];
-
-//      console.log(aHigh+" "+indexHigh);
 
       var material = new THREE.ShaderMaterial({
         uniforms: {
@@ -709,14 +662,6 @@
           scale: uniforms.scale,
           highTemp: {type: "f", value: star.temperatureEstimate},
           lowTemp: {type: "f", value:star.temperatureEstimate/4}
-//          rHigh: {type: "f", value: rHigh},
-//          gHigh: {type: "f", value: gHigh},
-//          bHigh: {type: "f", value: bHigh},
-//          aHigh: {type: 'f', value:aHigh},
-//          rLow: {type: "f", value: rLow},
-//          gLow: {type: "f", value: gLow},
-//          bLow: {type: "f", value: bLow},
-//          aLow: {type: "f", value: aLow}
         },
         vertexShader: vertexShader,
         fragmentShader: fragmentShader
@@ -834,7 +779,7 @@
   function render() {
 
     var delta = clock.getDelta();
-    uniforms.time.value += 0.0003 * delta;
+    uniforms.time.value += 0.0005 * delta;
 
     selector.rotation.x = camera.rotation.x;
     selector.rotation.y = camera.rotation.y;
