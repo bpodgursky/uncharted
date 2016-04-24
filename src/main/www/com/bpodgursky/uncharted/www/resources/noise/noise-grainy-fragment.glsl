@@ -124,9 +124,11 @@ const int octaves = 4;
        // Sunspots
       float frequency = 0.6;
       float t1 = snoise(vTexCoord3D * frequency)*1.2 - .6;
+      float brightNoise= snoise(vTexCoord3D * .2)*1.4- .9;
 
       float ss = max(0.0, t1);
-      float total = noiseBase - ss;
+      float brightSpot = max(0.0, brightNoise);
+      float total = noiseBase - ss + brightSpot;
 
       float temp = (highTemp * (total)  +(1.0-total) * lowTemp);
 
