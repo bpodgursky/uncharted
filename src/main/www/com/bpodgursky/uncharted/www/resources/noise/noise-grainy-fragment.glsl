@@ -119,11 +119,11 @@ const int octaves = 4;
 
     void main( void ) {
 
-      float noiseBase = (noise(vTexCoord3D , 4.0, 0.7)+1.0)/2.0;
+      float noiseBase = (noise(vTexCoord3D , 6.0, 0.7)+1.0)/2.0;
 
        // Sunspots
-      float frequency = 0.5;
-      float t1 = snoise(vTexCoord3D * frequency) - .4;
+      float frequency = 0.6;
+      float t1 = snoise(vTexCoord3D * frequency)*1.2 - .6;
 
       float ss = max(0.0, t1);
       float total = noiseBase - ss;
