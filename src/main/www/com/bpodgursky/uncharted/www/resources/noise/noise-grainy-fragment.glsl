@@ -123,8 +123,6 @@ const int octaves = 4;
 
       float noiseBase = (noise(vTexCoord3D , 4.0, 0.7)+1.0)/2.0;
 
-      float tempDiff = highTemp - lowTemp;
-
        // Sunspots
       float frequency = 0.5;
       float t1 = snoise(vTexCoord3D * frequency) - .4;
@@ -132,50 +130,66 @@ const int octaves = 4;
       float ss = max(0.0, t1);
       float total = noiseBase - ss;
 
-      float temp = lowTemp + total * tempDiff;
+      float temp = (highTemp * (total)  +(1.0-total) * lowTemp);
 
       //     var indexHigh = Math.floor((star.temperatureEstimate - 800.0) * spectrumData.width / 29200.0) * 4+8;
-      float i = ceil((temp - 800.0)*1024.0/29200.0);
+      float i =(temp - 800.0)*1024.0/29200.0;
 
-//            if(i < 100.0){
-//            gl_FragColor = vec4(vec3(1.0, 0.0, 0.0), 255);
-//            }else{
-//            gl_FragColor = vec4(vec3(0.0, 0.0, 1.0), 255);
-//            }
 
       //  for R
-      bool rbucket1 = float(i) < 60.0;   //  0, 255 in 60
-      bool rbucket2 = float(i) >= 60.0 && float(i) < 236.0;  //   255,255
-      bool rbucket3 = float(i) >= 236.0 && float(i) < 288.0; //  255,128
-      bool rbucket4 = float(i) >= 288.0 && float(i) < 377.0; //  128,60
-      bool rbucket5 = float(i) >= 377.0 && float(i) < 511.0; //  60,0
-      bool rbucket6 = float(i) >= 511.0;  //  0,0
+      bool rbucket1 = (i) < 60.0;   //  0, 255 in 60
+      bool rbucket2 = (i) >= 60.0 && (i) < 236.0;  //   255,255
+      bool rbucket3 = (i) >= 236.0 && (i) < 288.0; //  255,128
+      bool rbucket4 = (i) >= 288.0 && (i) < 377.0; //  128,60
+      bool rbucket5 = (i) >= 377.0 && (i) < 511.0; //  60,0
+      bool rbucket6 = (i) >= 511.0;  //  0,0
 
-      float r =
-        float(rbucket1) * (0.0 + i * (255.0-0.0)/60.0) +
-        float(rbucket2) * (255.0) +
-        float(rbucket3) * (255.0 + i * (128.0 - 255.0)/(288.0-236.0)) +
-        float(rbucket4) * (128.0 + i * (60.0 - 128.0)/(377.0 - 288.0)) +
-        float(rbucket5) * (60.0 + i * (0.0 - 60.0)/(511.0-377.0))+
-        float(rbucket6) * 0.0;
+      bool gbucket1 = float(i) <60.0;
+      bool gbucket2 = float(i) >= 60.0 && float(i) < 103.0; //  0,100
+      bool gbucket3 = float(i) >= 103.0 && float(i) < 133.0; // 100,233
+      bool gbucket4 = float(i) >= 133.0 && float(i) < 174.0; // 233, 255
+      bool gbucket5 = float(i) >= 174.0 && float(i) < 236.0; // 255,255
+      bool gbucket6 = float(i) >= 236.0 && float(i) < 286.0; //255,193
+      bool gbucket7 = float(i) >= 286.0 && float(i) < 367.0; //193,129
+      bool gbucket8 = float(i) >= 367.0 && float(i) < 511.0; //129,64
+      bool gbucket9 = float(i) >= 511.0; // 64,32
 
      // for B
-      bool gbucket1 = float(i) < 103.0;
-      bool gbucket2 = float(i) >= 103.0 && float(i) < 133.0; // 0,211
-      bool gbucket3 = float(i) >= 133.0 && float(i) < 173.0; // 211,247
-      bool gbucket4 = float(i) >= 173.0 && float(i) < 231.0;  //  247,255
-      bool gbucket5 = float(i )>= 231.0;
+      bool bbucket1 = float(i) < 103.0;
+      bool bbucket2 = float(i) >= 103.0 && float(i) < 133.0; // 0,211
+      bool bbucket3 = float(i) >= 133.0 && float(i) < 173.0; // 211,247
+      bool bbucket4 = float(i) >= 173.0 && float(i) < 231.0;  //  247,255
+      bool bbucket5 = float(i )>= 231.0;
+
+//      i = 0.0;
+
+      float r =
+        float(rbucket1) * (0.0 + (i) * (255.0-0.0)/60.0) +
+        float(rbucket2) * (255.0) +
+        float(rbucket3) * (255.0 + (i - 236.0) * (128.0 - 255.0)/(288.0-236.0)) +
+        float(rbucket4) * (128.0 + (i - 288.0) * (60.0 - 128.0)/(377.0 - 288.0)) +
+        float(rbucket5) * (60.0 + (i - 377.0) * (0.0 - 60.0)/(511.0-377.0))+
+        float(rbucket6) * 0.0;
+
+      float g =
+         float(gbucket1) * (0.0) +
+         float(gbucket2) * (0.0 + (i - 60.0) *(100.0-0.0)/(103.0-60.0)) +
+         float(gbucket3) * (100.0 + (i - 103.0) *(233.0- 100.0)/(133.0-103.0))+
+         float(gbucket4) * (233.0 + (i - 133.0) *(255.0 - 233.0)/(174.0 - 133.0))+
+         float(gbucket5) * (255.0) +
+         float(gbucket6) * (255.0 +(i - 236.0) *(193.0 - 255.0)/(286.0 - 236.0)) +
+         float(gbucket7) * (193.0 + (i - 286.0) * (129.0 - 193.0)/(367.0 - 286.0)) +
+         float(gbucket8) * (129.0 + (i - 367.0) * (64.0 - 129.0)/(511.0 - 367.0))+
+         float(gbucket9) * (64.0 + (i - 511.0) * (32.0-64.0)/(1024.0 - 511.0));
 
       float b =
-        float(gbucket1) * 0.0+
-        float(gbucket2) * (0.0 + i * (211.0 - 0.0)/(133.0-103.0)) +
-        float(gbucket3) * (211.0 + i * (247.0-211.0)/(173.0-133.0))+
-        float(gbucket4) * (247.0 + i*(255.0-247.0)/(231.0-173.0))+
-        float(gbucket5) * 255.0;
+        float(bbucket1) * 0.0+
+        float(bbucket2) * (0.0 + (i - 103.0) * (211.0 - 0.0)/(133.0-103.0)) +
+        float(bbucket3) * (211.0 + (i - 133.0) * (247.0-211.0)/(173.0-133.0))+
+        float(bbucket4) * (247.0 + (i - 173.0)*(255.0-247.0)/(231.0-173.0))+
+        float(bbucket5) * 255.0;
 
-
-
-      gl_FragColor = vec4(vec3(r, 0.0, b), 255);
+      gl_FragColor = vec4(vec3(r/255.0, g/255.0, b/255.0), 1.0);
 
 
 

@@ -649,8 +649,8 @@
 
   function initializeStarData(data) {
 
-//    var spectrumData = getBase64Image();
-//    var pixelData = spectrumData.getContext('2d').getImageData(0, 0, spectrumData.width, spectrumData.height).data;
+    var spectrumData = getBase64Image();
+    var pixelData = spectrumData.getContext('2d').getImageData(0, 0, spectrumData.width, spectrumData.height).data;
 
 //    console.log(pixelData.join(","));
 
@@ -680,6 +680,10 @@
       bs.push(pixelData[i]);
     }
 
+    for(var i = 3; i < pixelData.length; i = i+4){
+      console.log(pixelData[i]);
+    }
+
     console.log(rs.join(","));
     console.log(gs.join(","));
     console.log(bs.join(","));
@@ -698,8 +702,6 @@
 //      var aLow = pixelData[indexLow + 3];
 
 //      console.log(aHigh+" "+indexHigh);
-
-      console.log(star.temperatureEstimate);
 
       var material = new THREE.ShaderMaterial({
         uniforms: {
@@ -832,7 +834,7 @@
   function render() {
 
     var delta = clock.getDelta();
-    uniforms.time.value += 0.001 * delta;
+    uniforms.time.value += 0.0003 * delta;
 
     selector.rotation.x = camera.rotation.x;
     selector.rotation.y = camera.rotation.y;
