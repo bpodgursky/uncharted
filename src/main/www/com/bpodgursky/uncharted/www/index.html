@@ -535,9 +535,9 @@
       var starID = data.identifiers.primaryId;
 
       if (isRender(data)) {
+        visibleStars.push(starMesh);
         if (!renderedStars[starID]) {
           scene.add(starMesh);
-          visibleStars.push(starMesh);
         }
       } else {
         if (renderedStars[starID]) {
@@ -565,7 +565,7 @@
 
       raycaster.setFromCamera(mouse, camera);
 
-      var intersects = raycaster.intersectObjects(stars, false);
+      var intersects = raycaster.intersectObjects(visibleStars, false);
 
       if (tooltip) {
         var text = raycaster.intersectObjects([tooltip], false);
