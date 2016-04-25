@@ -367,7 +367,7 @@
       camera.lookAt(currentStarMesh.position);
 
       var distance = camera.position.distanceTo(currentStarMesh.position);
-      camera.translateZ(- distance +.3);
+      camera.translateZ(-distance + .3);
 
       var endRotation = new THREE.Euler().copy(camera.rotation);
       var endPosition = new THREE.Vector3().copy(camera.position);
@@ -473,23 +473,10 @@
 
 
     if (!labelCache[label]) {
-      labelCache[label] = new THREE.Mesh(new THREE.TextGeometry(label, {
-            font: font,
-            size: 1,
-            height: 0,
-            curveSegments: 0,
-            bevelThickness: 0,
-            bevelSize: 0,
-            bevelEnabled: true,
-            material: 0,
-            extrudeMaterial: 0
-          }
-          ),
-          new THREE.MultiMaterial([
-            new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
-            new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
-          ])
-      )
+      labelCache[label] =new THREE.Mesh(
+          new THREE.ShapeGeometry( font.generateShapes( label, 1, 0 ) ),
+          new THREE.MeshBasicMaterial()
+      );
     }
     tooltip = labelCache[label];
 
@@ -500,32 +487,20 @@
     );
 
     var distPos = new THREE.Vector3(
-        (targetMesh.position.x + currentStarMesh.position.x) / 2,
-        (targetMesh.position.y + currentStarMesh.position.y) / 2,
-        (targetMesh.position.z + currentStarMesh.position.z) / 2
+        (.3333 * targetMesh.position.x + .6666 * currentStarMesh.position.x),
+        (.3333 * targetMesh.position.y + .6666 * currentStarMesh.position.y),
+        (.3333 * targetMesh.position.z + .6666 * currentStarMesh.position.z)
     );
 
     var distance = lineDistance.toFixed(1) + "ly";
 
 
     if (!distanceCache[distance]) {
-      distanceCache[distance] = new THREE.Mesh(new THREE.TextGeometry(distance, {
-            font: font,
-            size: 1,
-            height: 0,
-            curveSegments: 0,
-            bevelThickness: 0,
-            bevelSize: 0,
-            bevelEnabled: true,
-            material: 0,
-            extrudeMaterial: 0
-          }
-          ),
-          new THREE.MultiMaterial([
-            new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.FlatShading}), // front
-            new THREE.MeshPhongMaterial({color: 0xffffff, shading: THREE.SmoothShading}) // side
-          ])
+      distanceCache[distance] =new THREE.Mesh(
+          new THREE.ShapeGeometry( font.generateShapes( distance, 1, 0 ) ),
+          new THREE.MeshBasicMaterial()
       );
+
     }
     distanceTip = distanceCache[distance];
 
