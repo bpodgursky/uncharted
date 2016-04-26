@@ -304,8 +304,6 @@
   var mouseX;
   var mouseY;
 
-  var distanceTip;
-
   var controlMode = 'orbit';
 
   var renderer = new THREE.WebGLRenderer({
@@ -436,6 +434,7 @@
 
     if (!tooltipStar) {
       doReassign(targetMesh);
+      return;
     }
 
     if (tooltipStar.starData.identifiers.primaryId == targetMesh.starData.identifiers.primaryId) {
@@ -457,7 +456,6 @@
 
     tooltipStar = targetMesh;
 
-    scene.remove(distanceTip);
     scene.remove(tooltip);
     scene.remove(lineSegment);
 
@@ -471,13 +469,47 @@
 
     var label = "  " + getLabelText(targetMesh.starData.identifiers);
 
-
     if (!labelCache[label]) {
-      labelCache[label] =new THREE.Mesh(
-          new THREE.ShapeGeometry( font.generateShapes( label, 1, 0 ) ),
+
+      var distance = "  "+lineDistance.toFixed(1) + "ly";
+
+      var distanceLabel = new THREE.Mesh(
+          new THREE.ShapeGeometry(font.generateShapes(distance, 1, 0)),
           new THREE.MeshBasicMaterial()
       );
+      distanceLabel.position.y = -1.5;
+
+      var labelMesh = new THREE.Mesh(
+          new THREE.ShapeGeometry(font.generateShapes(label, 1, 0)),
+          new THREE.MeshBasicMaterial()
+      );
+
+      var parent = new THREE.Group();
+      parent.add(distanceLabel);
+      parent.add(labelMesh);
+
+      var box = new THREE.Box3().setFromObject(parent);
+      console.log(box);
+
+      var rectShape = new THREE.Shape();
+      rectShape.moveTo(0, 0);
+      rectShape.lineTo(box.min.x, box.min.y);
+      rectShape.lineTo(box.max.x, box.min.y);
+      rectShape.lineTo(box.max.x, box.max.y);
+      rectShape.lineTo(box.min.x, box.max.y);
+
+      var rectGeom = new THREE.ShapeGeometry(rectShape);
+      var rectMesh = new THREE.Mesh(rectGeom, new THREE.MeshBasicMaterial({
+        color: 0x000066,
+        transparent: true,
+        opacity: 0.5
+      }));
+      rectMesh.position.z = -.05;
+      parent.add(rectMesh);
+
+      labelCache[label] = parent;
     }
+
     tooltip = labelCache[label];
 
     tooltip.position.set(
@@ -486,30 +518,9 @@
         targetMesh.position.z
     );
 
-    var distPos = new THREE.Vector3(
-        (.3333 * targetMesh.position.x + .6666 * currentStarMesh.position.x),
-        (.3333 * targetMesh.position.y + .6666 * currentStarMesh.position.y),
-        (.3333 * targetMesh.position.z + .6666 * currentStarMesh.position.z)
-    );
-
-    var distance = lineDistance.toFixed(1) + "ly";
-
-
-    if (!distanceCache[distance]) {
-      distanceCache[distance] =new THREE.Mesh(
-          new THREE.ShapeGeometry( font.generateShapes( distance, 1, 0 ) ),
-          new THREE.MeshBasicMaterial()
-      );
-
-    }
-    distanceTip = distanceCache[distance];
-
-    distanceTip.position.copy(distPos);
-
     updateTooltipRotation();
 
     scene.add(tooltip);
-    scene.add(distanceTip);
     scene.add(lineSegment)
 
   }
@@ -568,7 +579,7 @@
       var intersects = raycaster.intersectObjects(visibleStars, false);
 
       if (tooltip) {
-        var text = raycaster.intersectObjects([tooltip], false);
+        var text = raycaster.intersectObjects(tooltip.children, false);
         if (text.length > 0) {
           return tooltipStar;
         }
@@ -594,11 +605,6 @@
     tooltip.scale.x = .02 * tooltipDistance;
     tooltip.scale.y = .02 * tooltipDistance;
     tooltip.scale.z = .02 * tooltipDistance;
-
-    var distanceDistance = distanceTip.position.distanceTo(camera.position);
-    distanceTip.scale.x = .02 * distanceDistance;
-    distanceTip.scale.y = .02 * distanceDistance;
-    distanceTip.scale.z = .02 * distanceDistance;
 
   }
 
@@ -752,10 +758,6 @@
     tooltip.rotation.x = camera.rotation.x;
     tooltip.rotation.y = camera.rotation.y;
     tooltip.rotation.z = camera.rotation.z;
-
-    distanceTip.rotation.x = camera.rotation.x;
-    distanceTip.rotation.y = camera.rotation.y
-    distanceTip.rotation.z = camera.rotation.z;
 
   }
 
