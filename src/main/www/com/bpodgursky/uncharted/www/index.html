@@ -13,7 +13,7 @@
   <script src="resources/stats.js"></script>
   <script src="js/FreeLookControls.js"></script>
   <script src="js/OrbitControls.js"></script>
-  <script src="js/SelectorGeometry.js"></script>
+  <script src="js/DynamicMarker.js"></script>
   <script src="js/TweenControls.js"></script>
   <script src="resources/Detector.js"></script>
 
@@ -274,28 +274,26 @@
 
   var clock = new THREE.Clock();
 
-  var solMarker = new THREE.Mesh(new THREE.SelectorGeometry(.25, .1), new THREE.MeshBasicMaterial({
-    color: 0x0000FF,
-    side: THREE.DoubleSide,
-    wireframe: false
-  }));
-  solMarker.position.x = 0;
-  solMarker.position.y = 0;
-  solMarker.position.z = 0;
+  //  kind of cheating since we know the sun is here
+  var solMarker = new DynamicMarker(
+      new THREE.Vector3(0, 0, 0),
+      .3,
+      0x0000FF,
+      0
+  );
 
-  var selector = new THREE.Mesh(new THREE.SelectorGeometry(.5, .1), new THREE.MeshBasicMaterial({
-    color: 0xFF0000,
-    side: THREE.DoubleSide,
-    wireframe: false
-  }));
+  var selector = new DynamicMarker(
+      new THREE.Vector3(0, 0, 0),
+      .15,
+      0x00b33c,
+      Math.PI/4
+  );
 
   var lineMaterial = new THREE.LineBasicMaterial({
     color: 0x0000ff
   });
 
   var lineSegment;
-
-  selector.rotation.z = .5;
 
   var tooltip;
   var tooltipStar;
@@ -322,9 +320,8 @@
   scene.add(camera);
   scene.add(ambientLight);
   scene.add(light1);
-  scene.add(solMarker);
-  scene.add(selector);
-
+  scene.add(solMarker.mesh);
+  scene.add(selector.mesh);
 
   //  other data
 
@@ -471,7 +468,7 @@
 
     if (!labelCache[label]) {
 
-      var distance = "  "+lineDistance.toFixed(1) + "ly";
+      var distance = "  " + lineDistance.toFixed(1) + "ly";
 
       var distanceLabel = new THREE.Mesh(
           new THREE.ShapeGeometry(font.generateShapes(distance, 1, 0)),
@@ -706,7 +703,7 @@
 
           setLink(newStar.links.wikipedia, infoWiki);
 
-          selector.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+          selector.target(mesh.position);
 
           currentStarMesh = mesh;
           currentStarPrimaryId = newStarPrimaryId;
@@ -766,13 +763,8 @@
     var delta = clock.getDelta();
     uniforms.time.value += 0.0005 * delta;
 
-    selector.rotation.x = camera.rotation.x;
-    selector.rotation.y = camera.rotation.y;
-    selector.rotation.z = selector.rotation.z + .5 * delta;
-
-    solMarker.rotation.x = camera.rotation.x;
-    solMarker.rotation.y = camera.rotation.y;
-    solMarker.rotation.z = solMarker.rotation.z + .5 * delta;
+    selector.updateTo(camera, delta);
+    solMarker.updateTo(camera, delta);
 
     light1.position = camera.position;
     light1.position.set(
@@ -789,14 +781,14 @@
       tweenControls.update(delta);
     }
 
-    renderer.render(scene, camera);
-
     getMouseoverStar();
 
     if (tooltip) {
       updateTooltipRotation();
       resizeTipText();
     }
+
+    renderer.render(scene, camera);
 
   }
 
