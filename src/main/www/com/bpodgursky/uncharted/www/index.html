@@ -438,9 +438,6 @@
       return;
     }
 
-    if (targetMesh.starData.identifiers.primaryId === currentStarMesh.starData.identifiers.primaryId) {
-      return;
-    }
 
     doReassign(targetMesh);
 
@@ -459,7 +456,6 @@
     var geometry = new THREE.Geometry();
     geometry.vertices.push(currentStarMesh.position);
     geometry.vertices.push(targetMesh.position);
-
     lineSegment = new THREE.Line(geometry, lineMaterial);
 
     var lineDistance = currentStarMesh.position.distanceTo(targetMesh.position);
@@ -486,7 +482,6 @@
       parent.add(labelMesh);
 
       var box = new THREE.Box3().setFromObject(parent);
-      console.log(box);
 
       var rectShape = new THREE.Shape();
       rectShape.moveTo(0, 0);
@@ -709,9 +704,18 @@
           currentStarPrimaryId = newStarPrimaryId;
 
           updateTarget();
+
+          if(mesh == tooltipStar){
+            doReassign(tooltipStar);
+          }
+
         }
       }
+
+
     }
+
+
   }
 
   function setLink(data, element) {
