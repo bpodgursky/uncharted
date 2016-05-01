@@ -44,7 +44,7 @@ public class StarClassHelper {
       .put(SpectralClass.T, 1000)
       .put(SpectralClass.Y, 1000)
 
-      //  TODO most of this white dwarf temperature is made up.  get real numbers
+      //  mostly guessing  for most of these, in absence of numbers
       .put(SpectralClass.DA, 15000)
       .put(SpectralClass.DAV, 15000)
       .put(SpectralClass.DZ, 15000)
@@ -61,6 +61,10 @@ public class StarClassHelper {
 
   //  this is a fallback if we have no bv index
   public static double getTemperatureEstimate(StellarClassification classification) {
+
+    if(classification.getWhiteDwarfTemp() != null){
+      return classification.getWhiteDwarfTemp();
+    }
 
     //  TODO lolidk
     if(classification.getMainClass() == null){
@@ -173,7 +177,8 @@ public class StarClassHelper {
       star.setMainClass(SpectralClass.valueOf(type));
 
       if (temp != null) {
-        star.setWhiteDwarfTemp(Double.parseDouble(temp.split("[\\-/]")[0]));
+        //  https://en.wikipedia.org/wiki/White_dwarf
+        star.setWhiteDwarfTemp(50400.0/Double.parseDouble(temp.split("[\\-/]")[0]));
       }
 
       return star;
