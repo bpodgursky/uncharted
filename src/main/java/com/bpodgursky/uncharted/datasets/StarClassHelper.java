@@ -59,6 +59,7 @@ public class StarClassHelper {
 
       .get();
 
+  //  this is a fallback if we have no bv index
   public static double getTemperatureEstimate(StellarClassification classification) {
 
     //  TODO lolidk

@@ -1,5 +1,12 @@
 package com.bpodgursky.uncharted.datasets.catalogs;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.zip.GZIPInputStream;
+
 import com.bpodgursky.uncharted.datasets.AstroConvert;
 import com.bpodgursky.uncharted.datasets.DatasetName;
 import com.bpodgursky.uncharted.datasets.ExternalLinks;
@@ -8,13 +15,6 @@ import com.bpodgursky.uncharted.datasets.StarRecord;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.zip.GZIPInputStream;
 
 /**
  * super hacky text dump of the Gliese 3 catalog
@@ -54,7 +54,8 @@ public class GlieseCatalog implements StarCatalog {
             0.0,
             0.0,
             4.83,
-            "G2V"
+            "G2V",
+            0.65
         ));
 
     while (scan.hasNext()) {
@@ -82,7 +83,8 @@ public class GlieseCatalog implements StarCatalog {
             AstroConvert.parseDegreeMinSec(split[2]),
             AstroConvert.parseDegreeMinSec(split[3]),
             parseOrNull(split[32]),
-            safeTrim(split[5])
+            safeTrim(split[5]),
+            parseOrNull(split[21])
         );
 
         starsByName.put(glieseName, record);

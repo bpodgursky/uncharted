@@ -1,5 +1,13 @@
 package com.bpodgursky.uncharted.datasets.catalogs;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.zip.GZIPInputStream;
+
 import com.bpodgursky.uncharted.datasets.AstroConvert;
 import com.bpodgursky.uncharted.datasets.ExternalLinks;
 import com.bpodgursky.uncharted.datasets.StarIdentifiers;
@@ -12,14 +20,6 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.zip.GZIPInputStream;
-
 public class HYGDatabase implements StarCatalog {
   private static final Logger LOG = LoggerFactory.getLogger(HYGDatabase.class);
 
@@ -29,7 +29,7 @@ public class HYGDatabase implements StarCatalog {
 
     stars = Sets.newHashSet();
 
-    Scanner wikiLinks = new Scanner(new GZIPInputStream(GlieseCatalog.class.getClassLoader()
+    Scanner wikiLinks = new Scanner(new GZIPInputStream(HYGDatabase.class.getClassLoader()
         .getResourceAsStream("com/bpodgursky/uncharted/datasets/hyg_wikipedia_links.txt.gz")));
 
     Map<String, String> idToWikiLink = Maps.newHashMap();
@@ -40,7 +40,7 @@ public class HYGDatabase implements StarCatalog {
       idToWikiLink.put(split[0], split[1]);
     }
 
-    InputStream resourceAsStream = GlieseCatalog.class.getClassLoader().getResourceAsStream("com/bpodgursky/uncharted/datasets/hygxyz.csv.gz");
+    InputStream resourceAsStream = HYGDatabase.class.getClassLoader().getResourceAsStream("com/bpodgursky/uncharted/datasets/hygxyz.csv.gz");
 
     GZIPInputStream gzis = new GZIPInputStream(resourceAsStream);
     Scanner scan = new Scanner(gzis);
@@ -108,7 +108,8 @@ public class HYGDatabase implements StarCatalog {
             AstroConvert.hoursToRadians(Double.parseDouble(rightAscension)),
             AstroConvert.degreesToRadians(Double.parseDouble(declination)),
             Double.parseDouble(absMag),
-            split[15]
+            split[15],
+            parseOrNull(split[16])
         );
 
         stars.add(record);
@@ -117,6 +118,21 @@ public class HYGDatabase implements StarCatalog {
     }
 
   }
+
+  private static Double parseOrNull(String s) {
+    if (s == null) {
+      return null;
+    }
+
+    String trimmed = s.trim();
+
+    if (trimmed.isEmpty()) {
+      return null;
+    }
+
+    return Double.parseDouble(s);
+  }
+
 
   @Override
   public Collection<StarRecord> getAllStars(final double maxLyDistance) {

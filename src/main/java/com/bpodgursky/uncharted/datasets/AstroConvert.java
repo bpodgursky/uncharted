@@ -10,6 +10,16 @@ public class AstroConvert {
 
   private static final double LIGHTYEARS_PER_PARSEC = 3.26163344;
 
+  //  from https://en.wikipedia.org/wiki/Color_index
+  public static Double bvToTemperature(Double bvIndex){
+
+    double p1 = 1.0 / (.92 * bvIndex + 1.7);
+    double p2 = 1.0 / (.92 * bvIndex + .62);
+
+    return 4600 * (p1 + p2);
+
+  }
+
   public static Coordinate equatorialToCartesian(Double rightAscensionRadians, Double declinationRadians, double distance){
 
     double x = distance * Math.cos(rightAscensionRadians) * Math.cos(declinationRadians);

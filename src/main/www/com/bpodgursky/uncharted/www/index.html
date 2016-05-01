@@ -464,9 +464,6 @@
     geometry.vertices.push(targetMesh.position);
     lineSegment = new THREE.Line(geometry, lineMaterial);
 
-    console.log(currentStarPrimaryId);
-    console.log(currentStarMesh);
-    console.log(currentStarMesh.position);
     var lineDistance = currentStarMesh.position.distanceTo(targetMesh.position);
     var label = getLabelText(targetMesh.starData.identifiers);
     var cacheKey = label+lineDistance;  // could target each star from each other star.
