@@ -21,10 +21,10 @@ function TooltipMarker(label, distance, position) {
   var tipWidth = bitWidthMax / 510;
   var tipHeigh = bitHeightMax / 510;
 
-  g.fillStyle = '#00b33c';
+  g.fillStyle = '#006321';
   g.fillRect(0, 0, bitWidthMax, bitmap.height);
 
-  g.fillStyle = '#000066';
+  g.fillStyle = '#010154';
   g.fillRect(2, bitmap.height - bitHeightMax + 2 , bitWidthMax - 4, bitHeightMax - 4);
 
   g.fillStyle = 'white';
@@ -51,7 +51,7 @@ function TooltipMarker(label, distance, position) {
   }));
 
   var lineMaterial = new THREE.LineBasicMaterial({
-    color: 0x00b33c
+    color: 0x006321
   });
 
   var geometry = new THREE.Geometry();
