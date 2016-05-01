@@ -67,5 +67,7 @@ public class StarRecord {
     return parsedStellarClassification;
   }
 
-
+  public Double getTemperatureEstimate() {
+    return temperatureEstimate;
+  }
 }

@@ -1,3 +1,4 @@
+//  TODO this is an abomination
 function TooltipMarker(label, distance, position) {
 
   var distanceFormatted = distance.toFixed(1) + "ly";
@@ -23,13 +24,12 @@ function TooltipMarker(label, distance, position) {
   g.fillStyle = '#00b33c';
   g.fillRect(0, 0, bitWidthMax, bitmap.height);
 
-  //  + bitHeightMax/2
   g.fillStyle = '#000066';
-  g.fillRect(3, bitmap.height - bitHeightMax + 3 , bitWidthMax - 6, bitHeightMax - 6);
+  g.fillRect(2, bitmap.height - bitHeightMax + 2 , bitWidthMax - 4, bitHeightMax - 4);
 
   g.fillStyle = 'white';
-  g.fillText(label, 10, 455);// +bitHeightMax/2
-  g.fillText(distanceFormatted, 10, 495);// +bitHeightMax/2
+  g.fillText(label, 10, 455);
+  g.fillText(distanceFormatted, 10, 495);
 
   var texture = new THREE.Texture(bitmap);
   texture.magFilter = THREE.NearestFilter;
@@ -37,10 +37,6 @@ function TooltipMarker(label, distance, position) {
   texture.needsUpdate = true;
 
   var rectShape = new THREE.Shape();
-  //rectShape.moveTo(0, -tipHeigh/2);
-  //rectShape.lineTo(tipWidth, - tipHeigh/2);
-  //rectShape.lineTo(tipWidth, tipHeigh/2);
-  //rectShape.lineTo(0, tipHeigh/2);
 
   rectShape.moveTo(0, 0);
   rectShape.lineTo(tipWidth, 0);
@@ -60,15 +56,19 @@ function TooltipMarker(label, distance, position) {
 
   var geometry = new THREE.Geometry();
   geometry.vertices.push(new THREE.Vector3(0, 0, 0));
-  geometry.vertices.push(new THREE.Vector3(.08, 0, 0));
+  geometry.vertices.push(new THREE.Vector3(.05, 0, .01));
   var labelLine = new THREE.Line(geometry, lineMaterial);
 
-  this.object.add(this.rectMesh);
-  this.object.add(labelLine);
+  this.scaleObj = new THREE.Group();
+  this.scaleObj.add(this.rectMesh);
+  this.scaleObj.add(labelLine);
+  this.scaleObj.position.x = .05; //  TODO this depends on star radius
 
-  //this.distanceLabel.position.x = .08;
-  //this.labelMesh.position.x = .08;
-  this.rectMesh.position.x = .08;
+  this.object.add(this.scaleObj);
+
+  this.rectMesh.position.x = .05;
+  this.rectMesh.position.y = - (85/510)/2;
+  this.rectMesh.position.z = .01;
 
   this.object.position.set(
       position.x,
@@ -83,19 +83,9 @@ TooltipMarker.prototype.updateTo = function (camera) {
   var tooltipDistance = this.object.position.distanceTo(camera.position);
   var scale = .4 * tooltipDistance;
 
-  //this.distanceLabel.scale.x = scale;
-  //this.distanceLabel.scale.y = scale;
-  //this.distanceLabel.scale.z = scale;
-  //
-  //this.distanceLabel.position.y = -1*scale;
-  //
-  //this.labelMesh.scale.x = scale;
-  //this.labelMesh.scale.y = scale;
-  //this.labelMesh.scale.z = scale;
-
-  this.rectMesh.scale.x = scale;
-  this.rectMesh.scale.y = scale;
-  this.rectMesh.scale.z = scale;
+  this.scaleObj.scale.x = scale;
+  this.scaleObj.scale.y = scale;
+  this.scaleObj.scale.z = scale;
 
   this.object.rotation.x = camera.rotation.x;
   this.object.rotation.y = camera.rotation.y;

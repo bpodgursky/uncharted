@@ -464,18 +464,23 @@
     geometry.vertices.push(targetMesh.position);
     lineSegment = new THREE.Line(geometry, lineMaterial);
 
+    console.log(currentStarPrimaryId);
+    console.log(currentStarMesh);
+    console.log(currentStarMesh.position);
     var lineDistance = currentStarMesh.position.distanceTo(targetMesh.position);
-
     var label = getLabelText(targetMesh.starData.identifiers);
+    var cacheKey = label+lineDistance;  // could target each star from each other star.
 
-    if (!labelCache[label]) {
-      labelCache[label] = new TooltipMarker(label, lineDistance, targetMesh.position);
+    if (!labelCache[(cacheKey)]) {
+      labelCache[cacheKey] = new TooltipMarker(label, lineDistance, targetMesh.position);
     }
 
-    tooltip = labelCache[label];
+    tooltip = labelCache[cacheKey];
 
     scene.add(lineSegment)
     scene.add(tooltip.object);
+
+    tooltip.updateTo(camera);
 
   }
 
@@ -533,7 +538,7 @@
       var intersects = raycaster.intersectObjects(visibleStars, false);
 
       if (tooltip) {
-        var text = raycaster.intersectObjects(tooltip.object.children, false);
+        var text = raycaster.intersectObjects(tooltip.scaleObj.children, false);
         if (text.length > 0) {
           return tooltipStar;
         }
@@ -556,7 +561,7 @@
 
   }
 
-  function getMouseoverStar(event) {
+  function getMouseoverStar() {
     if (!freeLookControls.dragView) {
       var star = getStarForPoint(mouseX, mouseY);
 
@@ -656,9 +661,7 @@
 
           updateTarget();
 
-          if (mesh == tooltipStar) {
-            doReassign(tooltipStar);
-          }
+          doReassign(currentStarMesh);
 
         }
       }
