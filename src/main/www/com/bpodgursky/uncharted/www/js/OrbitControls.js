@@ -152,8 +152,9 @@ THREE.OrbitControls = function (object, domElement, target) {
     //  don't zoom forwards if we're too close (or you'll zoom past it
     if (this.moveDelta != 0) {
 
-      if (dO + actualMoveSpeed < .08) {
-        var advance = dO - .08;
+
+      if (dO + actualMoveSpeed < 7.410385869928919*Math.pow(10, -8)*4) {
+        var advance = dO - 7.410385869928919*Math.pow(10, -8)*4;
         this.camera.translateZ(- advance);
       } else {
         this.camera.translateZ(actualMoveSpeed);

@@ -251,7 +251,7 @@
   //    Y: "#60517"
   //  };
 
-  var STAR_GEOMETRY = new THREE.SphereGeometry(.05, 32, 32);
+  var STAR_GEOMETRY = new THREE.SphereGeometry(1.0, 32, 32);
 
   //  webgl init
 
@@ -260,7 +260,7 @@
 
   var scene = new THREE.Scene();
 
-  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000);
+  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.000001, 10000);
   camera.position.set(0, 0, -15);
 
   camera.rotateZ(Math.PI);
@@ -283,7 +283,7 @@
 
   var selector = new DynamicMarker(
       new THREE.Vector3(0, 0, 0),
-      .15,
+      .0000014,
       0x00b33c,
       Math.PI / 4
   );
@@ -515,7 +515,7 @@
 
     if (currentStarPrimaryId == "") {
       select(starsByID[0]);
-      reassignLabel(starsByID[70667]);
+      reassignLabel(starsByID[71453]);
     }
     //  if we shrunk the render distance
     else if (!renderedStars[currentStarPrimaryId]) {
@@ -599,7 +599,7 @@
         },
         vertexShader: vertexShader,
         fragmentShader: fragmentShader
-      });
+      } );
 
       var mesh = new THREE.Mesh(STAR_GEOMETRY, material);
 
@@ -607,7 +607,7 @@
       mesh.position.y = star.cartesianCoordsInLys.y;
       mesh.position.z = star.cartesianCoordsInLys.z;
 
-      mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
+      mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys*1;
       mesh.starData = star;
 
       starsByID[star.identifiers.primaryId] = mesh;

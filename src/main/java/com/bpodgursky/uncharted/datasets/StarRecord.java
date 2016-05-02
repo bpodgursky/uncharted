@@ -9,12 +9,13 @@ public class StarRecord {
   private final Double rightAscensionRadians;
   private final Double declinationRadians;
   private final Double absoluteMagnitude;
-  private final Double temperatureEstimate;
-
   private final String rawStellarClassification;
   private final StellarClassification parsedStellarClassification;
-
   private final Coordinate cartesianCoordsInLys;
+
+
+  private final Double temperatureEstimate;
+  private final Double radiusInLys;
 
   public StarRecord(StarIdentifiers identifiers,
                     ExternalLinks links,
@@ -23,7 +24,8 @@ public class StarRecord {
                     Double declinationRadians,
                     Double absoluteMagnitude,
                     String stellarClass,
-                    Double colorIndex) {
+                    Double colorIndex,
+                    Double luminosity) {
     this.identifiers = identifiers;
     this.links = links;
     this.lightYearDistance = lightYearDistance;
@@ -32,14 +34,18 @@ public class StarRecord {
     this.absoluteMagnitude = absoluteMagnitude;
     this.rawStellarClassification = stellarClass;
     this.parsedStellarClassification = StarClassHelper.parseClass(stellarClass);
+    this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(rightAscensionRadians, declinationRadians, lightYearDistance);
 
-    if(colorIndex == null) {
+
+    if (colorIndex == null) {
       this.temperatureEstimate = StarClassHelper.getTemperatureEstimate(parsedStellarClassification);
-    }else{
+    } else {
       this.temperatureEstimate = AstroConvert.bvToTemperature(colorIndex);
     }
 
-    this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(rightAscensionRadians, declinationRadians, lightYearDistance);
+    this.radiusInLys = AstroConvert.getRadiusLys(luminosity, temperatureEstimate)*1000000;
+    System.out.println(radiusInLys);
+
   }
 
   public StarIdentifiers getIdentifiers() {

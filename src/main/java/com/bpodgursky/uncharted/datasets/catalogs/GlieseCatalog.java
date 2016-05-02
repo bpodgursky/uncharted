@@ -55,7 +55,8 @@ public class GlieseCatalog implements StarCatalog {
             0.0,
             4.83,
             "G2V",
-            0.65
+            0.65,
+            null
         ));
 
     while (scan.hasNext()) {
@@ -84,7 +85,8 @@ public class GlieseCatalog implements StarCatalog {
             AstroConvert.parseDegreeMinSec(split[3]),
             parseOrNull(split[32]),
             safeTrim(split[5]),
-            parseOrNull(split[21])
+            parseOrNull(split[21]),
+            null
         );
 
         starsByName.put(glieseName, record);
