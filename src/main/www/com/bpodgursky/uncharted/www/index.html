@@ -317,15 +317,19 @@
   var raycaster = new THREE.Raycaster();
   var mouse = new THREE.Vector2();
 
+  var sceneObj = new THREE.Group();
+  sceneObj.add(solMarker.mesh);
+  sceneObj.add(selector.mesh);
+
   var freeLookControls = new THREE.FreeLookControls(camera, canvas);
-  var orbitControls = new THREE.OrbitControls(camera, canvas, new THREE.Vector3(0, 0, 0));
+  var orbitControls = new THREE.OrbitControls(camera, canvas, new THREE.Vector3(0, 0, 0), sceneObj);
   var tweenControls = new THREE.TweenControls(camera);
 
   scene.add(camera);
   scene.add(ambientLight);
   scene.add(light1);
-  scene.add(solMarker.mesh);
-  scene.add(selector.mesh);
+  scene.add(sceneObj);
+//  scene.add(selector.mesh);
 
   //  other data
 
@@ -454,9 +458,9 @@
 
     tooltipStar = targetMesh;
 
-    scene.remove(lineSegment);
+    sceneObj.remove(lineSegment);
     if(tooltip) {
-      scene.remove(tooltip.object);
+      sceneObj.remove(tooltip.object);
     }
 
     var geometry = new THREE.Geometry();
@@ -474,8 +478,8 @@
 
     tooltip = labelCache[cacheKey];
 
-    scene.add(lineSegment)
-    scene.add(tooltip.object);
+    sceneObj.add(lineSegment)
+    sceneObj.add(tooltip.object);
 
     tooltip.updateTo(camera);
 
@@ -504,11 +508,11 @@
       if (isRender(data)) {
         visibleStars.push(starMesh);
         if (!renderedStars[starID]) {
-          scene.add(starMesh);
+          sceneObj.add(starMesh);
         }
       } else {
         if (renderedStars[starID]) {
-          scene.remove(starMesh);
+          sceneObj.remove(starMesh);
         }
       }
     });
