@@ -1,7 +1,8 @@
-THREE.OrbitControls = function (object, domElement, target) {
+THREE.OrbitControls = function (object, domElement, target, sceneParent) {
 
   //  static
 
+  this.scene = sceneParent;
   this.camera = object;
   this.target = target;
   this.domElement = domElement;
@@ -146,19 +147,19 @@ THREE.OrbitControls = function (object, domElement, target) {
 
   this.update = function (delta) {
 
-    var dO = this.target.distanceTo(this.camera.position);
+    var dO = this.target.distanceTo(this.scene.position);
     var actualMoveSpeed = this.moveDelta * dO;
 
     //  don't zoom forwards if we're too close (or you'll zoom past it
     if (this.moveDelta != 0) {
 
-
       //  TODO real radius
-      if (dO + actualMoveSpeed < .00000008) {
-        var advance = dO - .00000008;
+      if (dO + actualMoveSpeed < .00000000000008) {
+        var advance = dO - .00000000000008;
         this.camera.translateZ(-advance);
+        this.scene.translateZ(- advance);
       } else {
-        this.camera.translateZ(actualMoveSpeed);
+        this.scene.translateZ(actualMoveSpeed);
       }
     }
 
@@ -172,10 +173,10 @@ THREE.OrbitControls = function (object, domElement, target) {
 
     //  TODO make this work
     if (this.rotateZL) {
-      this.camera.rotateZ(.02);
+      this.scene.rotateZ(.02);
     }
     if (this.rotateZR) {
-      this.camera.rotateZ(-.02);
+      this.scene.rotateZ(-.02);
     }
 
     this.rotateZL = false;
@@ -197,17 +198,17 @@ THREE.OrbitControls = function (object, domElement, target) {
 
     }
 
-    //translateX += .04 * dO  * delta * LY_SCALE;
-    //
-    this.camera.translateX(translateX);
-    this.camera.rotateY(Math.atan(translateX / dO));
+    //translateX += .04 * dO  * delta;
 
-    this.camera.translateY(translateY);
-    this.camera.rotateX(-Math.atan(translateY / dO));
-    //
+    this.scene.translateX(translateX);
+    this.scene.rotateY(Math.atan(translateX / dO));
+
+    this.scene.translateY(translateY);
+    this.scene.rotateX(-Math.atan(translateY / dO));
+
     var dN = this.target.distanceTo(this.camera.position);
-    //
-    this.camera.translateZ(-(dN - dO));
+
+    this.scene.translateZ(-(dN - dO));
 
   };
 

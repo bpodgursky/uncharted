@@ -307,15 +307,19 @@
   var raycaster = new THREE.Raycaster();
   var mouse = new THREE.Vector2();
 
+  var sceneObj = new THREE.Group();
+  sceneObj.add(solMarker.mesh);
+  sceneObj.add(selector.mesh);
+
   var freeLookControls = new THREE.FreeLookControls(camera, canvas);
-  var orbitControls = new THREE.OrbitControls(camera, canvas, new THREE.Vector3(0, 0, 0));
-  var tweenControls = new THREE.TweenControls(camera);
+  var orbitControls = new THREE.OrbitControls(camera, canvas, new THREE.Vector3(0, 0, 0), sceneObj);
+  var tweenControls = new THREE.TweenControls(sceneObj);
 
   scene.add(camera);
   scene.add(ambientLight);
   scene.add(light1);
-  scene.add(solMarker.mesh);
-  scene.add(selector.mesh);
+  scene.add(sceneObj);
+//  scene.add(selector.mesh);
 
   //  other data
 
@@ -356,7 +360,7 @@
       camera.lookAt(currentStarMesh.position);
 
       var distance = camera.position.distanceTo(currentStarMesh.position);
-      camera.translateZ(-distance + .00000008);
+      camera.translateZ(-distance + .000000000008);
 
       var endRotation = new THREE.Euler().copy(camera.rotation);
       var endPosition = new THREE.Vector3().copy(camera.position);
@@ -365,7 +369,7 @@
       camera.position.copy(startPosition);
 
       tweenControls.lookAt(endRotation, endPosition, function () {
-        controlMode = 'orbit';
+        controlMode = 'free';
         orbitControls.target = currentStarMesh.position;
       }, 2);
 
@@ -444,9 +448,9 @@
 
     tooltipStar = targetMesh;
 
-    scene.remove(lineSegment);
-    if (tooltip) {
-      scene.remove(tooltip.object);
+    sceneObj.remove(lineSegment);
+    if(tooltip) {
+      sceneObj.remove(tooltip.object);
     }
 
     var geometry = new THREE.Geometry();
@@ -464,8 +468,8 @@
 
     tooltip = labelCache[cacheKey];
 
-    scene.add(lineSegment)
-    scene.add(tooltip.object);
+    sceneObj.add(lineSegment)
+    sceneObj.add(tooltip.object);
 
     tooltip.updateTo(camera);
 
@@ -494,11 +498,11 @@
       if (isRender(data)) {
         visibleStars.push(starMesh);
         if (!renderedStars[starID]) {
-          scene.add(starMesh);
+          sceneObj.add(starMesh);
         }
       } else {
         if (renderedStars[starID]) {
-          scene.remove(starMesh);
+          sceneObj.remove(starMesh);
         }
       }
     });
