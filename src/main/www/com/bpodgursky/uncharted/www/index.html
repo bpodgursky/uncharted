@@ -323,7 +323,7 @@
 
   var freeLookControls = new THREE.FreeLookControls(camera, canvas);
   var orbitControls = new THREE.OrbitControls(camera, canvas, new THREE.Vector3(0, 0, 0), sceneObj);
-  var tweenControls = new THREE.TweenControls(camera);
+  var tweenControls = new THREE.TweenControls(camera, sceneObj);
 
   scene.add(camera);
   scene.add(ambientLight);
@@ -367,9 +367,10 @@
       var startRotation = new THREE.Euler().copy(camera.rotation);
       var startPosition = new THREE.Vector3().copy(camera.position);
 
-      camera.lookAt(currentStarMesh.position);
+      var starWorldPos = currentStarMesh.getWorldPosition();
+      camera.lookAt(starWorldPos);
 
-      var distance = camera.position.distanceTo(currentStarMesh.position);
+      var distance = camera.position.distanceTo(starWorldPos);
       camera.translateZ(-distance + .3);
 
       var endRotation = new THREE.Euler().copy(camera.rotation);
@@ -380,7 +381,7 @@
 
       tweenControls.lookAt(endRotation, endPosition, function () {
         controlMode = 'orbit';
-        orbitControls.target = currentStarMesh.position;
+        orbitControls.target = starWorldPos;
       }, 2);
 
     }

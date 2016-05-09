@@ -1,6 +1,7 @@
-THREE.TweenControls = function (object) {
+THREE.TweenControls = function (camera, scene) {
 
-  this.camera = object;
+  this.camera = camera;
+  this.scene = scene;
 
   this.targetRotation = null;
   this.startRotation = null;
@@ -51,9 +52,9 @@ THREE.TweenControls = function (object) {
     };
 
     this.startPosition = {
-      x: this.camera.position.x,
-      y: this.camera.position.y,
-      z: this.camera.position.z
+      x: this.scene.position.x,
+      y: this.scene.position.y,
+      z: this.scene.position.z
     };
 
     this.targetPosition = {
@@ -87,7 +88,7 @@ THREE.TweenControls = function (object) {
   this.update = function (delta) {
 
     this.updateVec(this.midRotation, this.startRotation, this.targetRotation, this.camera.rotation);
-    this.updateVec(this.midPosition, this.startPosition, this.targetPosition, this.camera.position);
+    this.updateVec(this.midPosition, this.startPosition, this.targetPosition, this.scene.position);
 
     this.tCurrent += delta;
 
