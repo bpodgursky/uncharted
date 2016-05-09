@@ -42,7 +42,7 @@ public class AstroConvert {
   }
 
   public static Double parsecsToLightyears(double parsecs){
-    return LIGHTYEARS_PER_PARSEC * parsecs*1000000;
+    return LIGHTYEARS_PER_PARSEC * parsecs;
   }
 
   public static Double hoursToRadians(double hours){

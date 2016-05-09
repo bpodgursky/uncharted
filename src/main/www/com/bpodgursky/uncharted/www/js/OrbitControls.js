@@ -87,7 +87,7 @@ THREE.OrbitControls = function (object, domElement, target) {
     var delta = 0;
 
     if (event.wheelDelta) { // WebKit / Opera / Explorer 9
-      delta = - event.wheelDelta / 2000;
+      delta = -event.wheelDelta / 2000;
     } else if (event.detail) { // Firefox
       delta = -event.detail / 300;
     }
@@ -110,15 +110,15 @@ THREE.OrbitControls = function (object, domElement, target) {
 
       case 38: /*up*/
       case 87: /*W    */
-          if(trigger) {
-            this.moveDelta = -.1;
-          }
+        if (trigger) {
+          this.moveDelta = -.1;
+        }
         break;
       case 40: /*down*/
       case 83: /*S*/
-          if(trigger){
-            this.moveDelta = .1;
-          }
+        if (trigger) {
+          this.moveDelta = .1;
+        }
         break;
 
       case 74:
@@ -153,9 +153,10 @@ THREE.OrbitControls = function (object, domElement, target) {
     if (this.moveDelta != 0) {
 
 
-      if (dO + actualMoveSpeed < 7.410385869928919*Math.pow(10, -8)*4) {
-        var advance = dO - 7.410385869928919*Math.pow(10, -8)*4;
-        this.camera.translateZ(- advance);
+      //  TODO real radius
+      if (dO + actualMoveSpeed < .00000008) {
+        var advance = dO - .00000008;
+        this.camera.translateZ(-advance);
       } else {
         this.camera.translateZ(actualMoveSpeed);
       }
@@ -196,16 +197,16 @@ THREE.OrbitControls = function (object, domElement, target) {
 
     }
 
-    translateX += .04 * dO  * delta;
-
+    //translateX += .04 * dO  * delta * LY_SCALE;
+    //
     this.camera.translateX(translateX);
     this.camera.rotateY(Math.atan(translateX / dO));
 
     this.camera.translateY(translateY);
     this.camera.rotateX(-Math.atan(translateY / dO));
-
+    //
     var dN = this.target.distanceTo(this.camera.position);
-
+    //
     this.camera.translateZ(-(dN - dO));
 
   };

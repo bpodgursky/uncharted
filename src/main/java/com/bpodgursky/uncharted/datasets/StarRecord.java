@@ -43,7 +43,7 @@ public class StarRecord {
       this.temperatureEstimate = AstroConvert.bvToTemperature(colorIndex);
     }
 
-    this.radiusInLys = AstroConvert.getRadiusLys(luminosity, temperatureEstimate)*1000000;
+    this.radiusInLys = AstroConvert.getRadiusLys(luminosity, temperatureEstimate);
     System.out.println(radiusInLys);
 
   }

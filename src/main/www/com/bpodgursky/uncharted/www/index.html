@@ -238,19 +238,7 @@
 
   //  constant stuff
 
-  //  var CLASS_TO_APPARENT_COLOR_STR = {
-  //    O: "#9db4ff",
-  //    B: "#aabfff",
-  //    A: "#cad8ff",
-  //    F: "#fbf8ff",
-  //    G: "#fff4e8",
-  //    K: "#ffddb4",
-  //    M: "#ffbd6f",
-  //    L: "#f84235",
-  //    T: "#ba3059",
-  //    Y: "#60517"
-  //  };
-
+  //  1.0 is placeholder, scale later (so we avoid having a trillion geometries
   var STAR_GEOMETRY = new THREE.SphereGeometry(1.0, 32, 32);
 
   //  webgl init
@@ -259,6 +247,7 @@
   var canvas = $("#webgl_canvas").get(0);
 
   var scene = new THREE.Scene();
+  scene.position.x = .1;
 
   var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.000001, 10000);
   camera.position.set(0, 0, -15);
@@ -266,7 +255,7 @@
   camera.rotateZ(Math.PI);
 
   var ambientLight = new THREE.AmbientLight(0xcccccc);
-  var light1 = new THREE.PointLight(0xffffff);
+  var light1 = new THREE.DirectionalLight(0xffffff);
 
   var windowHalfX = window.innerWidth / 2;
   var windowHalfY = window.innerHeight / 2;
@@ -309,7 +298,8 @@
   var controlMode = 'orbit';
 
   var renderer = new THREE.WebGLRenderer({
-    canvas: canvas
+    canvas: canvas,
+    logarithmicDepthBuffer: true
   });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.autoClear = true;
@@ -366,7 +356,7 @@
       camera.lookAt(currentStarMesh.position);
 
       var distance = camera.position.distanceTo(currentStarMesh.position);
-      camera.translateZ(-distance + .3);
+      camera.translateZ(-distance + .00000008);
 
       var endRotation = new THREE.Euler().copy(camera.rotation);
       var endPosition = new THREE.Vector3().copy(camera.position);
@@ -455,7 +445,7 @@
     tooltipStar = targetMesh;
 
     scene.remove(lineSegment);
-    if(tooltip) {
+    if (tooltip) {
       scene.remove(tooltip.object);
     }
 
@@ -466,7 +456,7 @@
 
     var lineDistance = currentStarMesh.position.distanceTo(targetMesh.position);
     var label = getLabelText(targetMesh.starData.identifiers);
-    var cacheKey = label+lineDistance;  // could target each star from each other star.
+    var cacheKey = label + lineDistance;  // could target each star from each other star.
 
     if (!labelCache[(cacheKey)]) {
       labelCache[cacheKey] = new TooltipMarker(label, lineDistance, targetMesh.position);
@@ -514,7 +504,7 @@
     });
 
     if (currentStarPrimaryId == "") {
-      select(starsByID[0]);
+      select(starsByID[71453]);
       reassignLabel(starsByID[71453]);
     }
     //  if we shrunk the render distance
@@ -708,7 +698,7 @@
   function render() {
 
     var delta = clock.getDelta();
-    uniforms.time.value += 0.0005 * delta;
+    uniforms.time.value += 0.007 * delta;
 
     selector.updateTo(camera, delta);
     solMarker.updateTo(camera, delta);
