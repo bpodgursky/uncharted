@@ -354,25 +354,25 @@
 
       controlMode = 'tween';
 
-      var startRotation = new THREE.Euler().copy(camera.rotation);
-      var startPosition = new THREE.Vector3().copy(camera.position);
+      var startRotation = new THREE.Euler().copy(currentStarMesh.rotation);
+      var startPosition = new THREE.Vector3().copy(currentStarMesh.position);
 
       var starWorldPos = currentStarMesh.getWorldPosition();
       currentStarMesh.lookAt(camera);
 
       var distance = camera.position.distanceTo(starWorldPos);
-      camera.translateZ(-distance + .000000000008);
+      currentStarMesh.translateZ(-distance - .000000000008);
 
       var endRotation = new THREE.Euler(
-          camera.rotation.x,
-          camera.rotation.y,
-          camera.rotation.z
+          currentStarMesh.rotation.x,
+          currentStarMesh.rotation.y,
+          currentStarMesh.rotation.z
       );
       //.copy(camera.rotation).multiplyScalar(-1);
-      var endPosition = new THREE.Vector3().copy(camera.position);
+      var endPosition = new THREE.Vector3().copy(currentStarMesh.position);
 
-      camera.rotation.copy(startRotation);
-      camera.position.copy(startPosition);
+      currentStarMesh.rotation.copy(startRotation);
+      currentStarMesh.position.copy(startPosition);
 
       tweenControls.lookAt(endRotation, endPosition, function () {
         controlMode = 'orbit';
