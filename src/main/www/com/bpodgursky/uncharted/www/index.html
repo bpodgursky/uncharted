@@ -358,12 +358,17 @@
       var startPosition = new THREE.Vector3().copy(camera.position);
 
       var starWorldPos = currentStarMesh.getWorldPosition();
-      camera.lookAt(starWorldPos);
+      currentStarMesh.lookAt(camera);
 
       var distance = camera.position.distanceTo(starWorldPos);
       camera.translateZ(-distance + .000000000008);
 
-      var endRotation = new THREE.Euler().copy(camera.rotation);
+      var endRotation = new THREE.Euler(
+          camera.rotation.x,
+          camera.rotation.y,
+          camera.rotation.z
+      );
+      //.copy(camera.rotation).multiplyScalar(-1);
       var endPosition = new THREE.Vector3().copy(camera.position);
 
       camera.rotation.copy(startRotation);
