@@ -329,7 +329,7 @@
   scene.add(ambientLight);
   scene.add(light1);
   scene.add(sceneObj);
-//  scene.add(selector.mesh);
+  //  scene.add(selector.mesh);
 
   //  other data
 
@@ -368,12 +368,17 @@
       var startPosition = new THREE.Vector3().copy(camera.position);
 
       var starWorldPos = currentStarMesh.getWorldPosition();
-      camera.lookAt(starWorldPos);
+      currentStarMesh.lookAt(camera);
 
       var distance = camera.position.distanceTo(starWorldPos);
       camera.translateZ(-distance + .3);
 
-      var endRotation = new THREE.Euler().copy(camera.rotation);
+      var endRotation = new THREE.Euler(
+          camera.rotation.x,
+          camera.rotation.y,
+          camera.rotation.z
+      );
+      //.copy(camera.rotation).multiplyScalar(-1);
       var endPosition = new THREE.Vector3().copy(camera.position);
 
       camera.rotation.copy(startRotation);
@@ -460,7 +465,7 @@
     tooltipStar = targetMesh;
 
     sceneObj.remove(lineSegment);
-    if(tooltip) {
+    if (tooltip) {
       sceneObj.remove(tooltip.object);
     }
 
@@ -471,7 +476,7 @@
 
     var lineDistance = currentStarMesh.position.distanceTo(targetMesh.position);
     var label = getLabelText(targetMesh.starData.identifiers);
-    var cacheKey = label+lineDistance;  // could target each star from each other star.
+    var cacheKey = label + lineDistance;  // could target each star from each other star.
 
     if (!labelCache[(cacheKey)]) {
       labelCache[cacheKey] = new TooltipMarker(label, lineDistance, targetMesh.position);
