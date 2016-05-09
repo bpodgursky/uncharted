@@ -313,13 +313,13 @@
 
   var freeLookControls = new THREE.FreeLookControls(camera, canvas);
   var orbitControls = new THREE.OrbitControls(camera, canvas, new THREE.Vector3(0, 0, 0), sceneObj);
-  var tweenControls = new THREE.TweenControls(sceneObj);
+  var tweenControls = new THREE.TweenControls(camera, sceneObj);
 
   scene.add(camera);
   scene.add(ambientLight);
   scene.add(light1);
   scene.add(sceneObj);
-//  scene.add(selector.mesh);
+  //  scene.add(selector.mesh);
 
   //  other data
 
@@ -357,9 +357,10 @@
       var startRotation = new THREE.Euler().copy(camera.rotation);
       var startPosition = new THREE.Vector3().copy(camera.position);
 
-      camera.lookAt(currentStarMesh.position);
+      var starWorldPos = currentStarMesh.getWorldPosition();
+      camera.lookAt(starWorldPos);
 
-      var distance = camera.position.distanceTo(currentStarMesh.position);
+      var distance = camera.position.distanceTo(starWorldPos);
       camera.translateZ(-distance + .000000000008);
 
       var endRotation = new THREE.Euler().copy(camera.rotation);
@@ -369,7 +370,7 @@
       camera.position.copy(startPosition);
 
       tweenControls.lookAt(endRotation, endPosition, function () {
-        controlMode = 'free';
+        controlMode = 'orbit';
         orbitControls.target = currentStarMesh.position;
       }, 2);
 
@@ -449,7 +450,7 @@
     tooltipStar = targetMesh;
 
     sceneObj.remove(lineSegment);
-    if(tooltip) {
+    if (tooltip) {
       sceneObj.remove(tooltip.object);
     }
 
@@ -593,7 +594,7 @@
         },
         vertexShader: vertexShader,
         fragmentShader: fragmentShader
-      } );
+      });
 
       var mesh = new THREE.Mesh(STAR_GEOMETRY, material);
 
@@ -601,7 +602,7 @@
       mesh.position.y = star.cartesianCoordsInLys.y;
       mesh.position.z = star.cartesianCoordsInLys.z;
 
-      mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys*1;
+      mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys * 1;
       mesh.starData = star;
 
       starsByID[star.identifiers.primaryId] = mesh;
