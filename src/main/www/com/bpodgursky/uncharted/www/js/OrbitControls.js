@@ -110,15 +110,15 @@ THREE.OrbitControls = function (object, domElement, target) {
 
       case 38: /*up*/
       case 87: /*W    */
-          if(trigger) {
-            this.moveDelta = -.1;
-          }
+        if(trigger) {
+          this.moveDelta = -.1;
+        }
         break;
       case 40: /*down*/
       case 83: /*S*/
-          if(trigger){
-            this.moveDelta = .1;
-          }
+        if(trigger){
+          this.moveDelta = .1;
+        }
         break;
 
       case 74:

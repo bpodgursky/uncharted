@@ -20,6 +20,14 @@ public class AstroConvert {
 
   }
 
+  //  http://skyserver.sdss.org/dr1/en/proj/advanced/hr/radius1.asp
+  public static Double getRadiusLys(Double solLuminosityMultiples, Double temperature){
+    Double luminosityWatts = solLuminosityMultiples*3.846*Math.pow(10, 26);
+    Double radiusMeters = Math.sqrt(luminosityWatts / (4*Math.PI*5.67*Math.pow(10, -8) * Math.pow(temperature, 4)));
+    return radiusMeters / (9.461*Math.pow(10, 15));
+
+  }
+
   public static Coordinate equatorialToCartesian(Double rightAscensionRadians, Double declinationRadians, double distance){
 
     double x = distance * Math.cos(rightAscensionRadians) * Math.cos(declinationRadians);

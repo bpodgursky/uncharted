@@ -40,7 +40,7 @@ public class HYGDatabase implements StarCatalog {
       idToWikiLink.put(split[0], split[1]);
     }
 
-    InputStream resourceAsStream = HYGDatabase.class.getClassLoader().getResourceAsStream("com/bpodgursky/uncharted/datasets/hygxyz.csv.gz");
+    InputStream resourceAsStream = HYGDatabase.class.getClassLoader().getResourceAsStream("com/bpodgursky/uncharted/datasets/hygdata_v3.csv.gz");
 
     GZIPInputStream gzis = new GZIPInputStream(resourceAsStream);
     Scanner scan = new Scanner(gzis);
@@ -52,43 +52,58 @@ public class HYGDatabase implements StarCatalog {
     while(scan.hasNext()){
       String line = scan.nextLine();
       String[] split = line.split(",");
+
+      //  id,
       String mainId = split[0];
 
       StarIdentifiers identifiers = new StarIdentifiers(mainId);
 
+
+      //  hip
       String hipparcosID = split[1];
       if(!hipparcosID.equals("") && !hipparcosID.equals("0")){
         identifiers.setHipparcosId(hipparcosID);
       }
 
+      // hd
       String henryDraperID = split[2];
       if(!henryDraperID.equals("")){
         identifiers.setHenryDraperId(henryDraperID);
       }
 
+      //        ,hr
       String harvardRevisedId = split[3];
       if(!harvardRevisedId.equals("")){
         identifiers.setHarvardRevisedId(harvardRevisedId);
       }
 
+      // ,gl
       String glieseId = split[4];
       if(!glieseId.equals("")){
         identifiers.setGlieseId(glieseId);
       }
 
+      //  ,bf,
       String bayerFlamsteed = split[5];
       if(!bayerFlamsteed.equals("")){
         identifiers.setBayerFlamsteed(BayerFlamsteed.parse(bayerFlamsteed));
       }
 
+      // proper,
       String properName = split[6];
       if(!properName.equals("")){
         identifiers.setProperName(properName);
       }
 
+      // ra,
       String rightAscension = split[7];
+      // dec,
       String declination = split[8];
+      // dist,
       String distanceParsecs = split[9];
+
+      // pmra,pmdec,rv,mag,absmag,spect,ci,x,y,z,vx,vy,vz,rarad,decrad,pmrarad,pmdecrad,bayer,flam,con,comp,comp_primary,base,lum,var,var_min,var_max
+
 
       if(!rightAscension.equals("") && !declination.equals("")
           && !distanceParsecs.equals("") && !distanceParsecs.equals("10000000")){
@@ -101,6 +116,8 @@ public class HYGDatabase implements StarCatalog {
           links.setWikipedia(idToWikiLink.get(mainId));
         }
 
+        Double luminosity = Double.parseDouble(split[33]);
+
         StarRecord record = new StarRecord(
             identifiers,
             links,
@@ -109,7 +126,8 @@ public class HYGDatabase implements StarCatalog {
             AstroConvert.degreesToRadians(Double.parseDouble(declination)),
             Double.parseDouble(absMag),
             split[15],
-            parseOrNull(split[16])
+            parseOrNull(split[16]),
+            luminosity
         );
 
         stars.add(record);
