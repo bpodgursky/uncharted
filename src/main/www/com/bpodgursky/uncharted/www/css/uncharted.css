@@ -60,3 +60,6 @@ body {
   font-size: 13px;
 }
 
+ul.ui-autocomplete.ui-menu {
+  z-index: 1000;
+}

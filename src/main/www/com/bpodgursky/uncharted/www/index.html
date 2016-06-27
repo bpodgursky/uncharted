@@ -5,10 +5,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
+  <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css">
   <link rel="stylesheet" type="text/css" href="css/uncharted.css">
 
   <script type="text/javascript" src="resources/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="resources/tinycolor-min.js"></script>
+  <script type="text/javascript" src="resources/jquery-ui.min.js"></script>
   <script src="resources/three.min.js"></script>
   <script src="resources/stats.js"></script>
   <script src="js/FreeLookControls.js"></script>
@@ -158,6 +160,7 @@
           </td>
         </tr>
 
+
         </tbody>
       </table>
     </div>
@@ -214,6 +217,23 @@
             </form>
           </td>
         </tr>
+
+        <tr class="header-row">
+          <td>
+            <b>Jump to</b>
+          </td>
+        </tr>
+
+        <tr class="child-row">
+
+          <td>
+            <div class="ui-widget">
+              <label for="jump_to_list">Star: </label>
+              <input id="jump_to_list" type="text">
+            </div>
+          </td>
+        </tr>
+
         </tbody>
       </table>
     </div>
@@ -238,8 +258,7 @@
 
   //  constant stuff
 
-  //  1.0 is placeholder, scale later (so we avoid having a trillion geometries
-  var STAR_GEOMETRY = new THREE.SphereGeometry(1.0, 32, 32);
+  var STAR_GEOMETRY = new THREE.SphereGeometry(.05, 32, 32);
 
   //  webgl init
 
@@ -326,13 +345,18 @@
   var stars = [];
   var starsByID = {};
   var visibleStars = [];
+  var visibleStarsByName = {};
   var renderRadius = 75;
 
   var fragmentShader;
   var vertexShader;
 
-  $("#selector").keydown(function (e) {
-    e.preventDefault();
+
+  $("#jump_to_list").keydown(function(e){
+    if (e.keyCode == 13) {
+      e.preventDefault();
+      select(visibleStarsByName[this.value]);
+    }
   });
 
   $("#render_radius").click(function (e) {
@@ -454,9 +478,15 @@
 
     tooltipStar = targetMesh;
 
+<<<<<<< HEAD
     sceneObj.remove(lineSegment);
     if (tooltip) {
       sceneObj.remove(tooltip.object);
+=======
+    scene.remove(lineSegment);
+    if (tooltip) {
+      scene.remove(tooltip.object);
+>>>>>>> master
     }
 
     var geometry = new THREE.Geometry();
@@ -474,8 +504,13 @@
 
     tooltip = labelCache[cacheKey];
 
+<<<<<<< HEAD
     sceneObj.add(lineSegment)
     sceneObj.add(tooltip.object);
+=======
+    scene.add(lineSegment);
+    scene.add(tooltip.object);
+>>>>>>> master
 
     tooltip.updateTo(camera);
 
@@ -496,10 +531,16 @@
       renderedStars[e.starData.identifiers.primaryId] = true;
     });
     visibleStars = [];
+    visibleStarsByName = {};
+
+    var nameList = [];
 
     stars.forEach(function (starMesh) {
       var data = starMesh.starData;
       var starID = data.identifiers.primaryId;
+      var commonName = getLabelText(data.identifiers);
+      nameList.push(commonName);
+      visibleStarsByName[commonName] = starMesh;
 
       if (isRender(data)) {
         visibleStars.push(starMesh);
@@ -521,6 +562,12 @@
     else if (!renderedStars[currentStarPrimaryId]) {
       select(starsByID[0]);
     }
+
+
+    $("#jump_to_list").autocomplete({
+      source: nameList
+    });
+
   }
 
   function getStarForPoint(x, y) {
