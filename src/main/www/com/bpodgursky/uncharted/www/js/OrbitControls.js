@@ -1,8 +1,7 @@
-THREE.OrbitControls = function (object, domElement, target, sceneParent) {
+THREE.OrbitControls = function (object, domElement, target) {
 
   //  static
 
-  this.scene = sceneParent;
   this.camera = object;
   this.target = target;
   this.domElement = domElement;
@@ -88,7 +87,7 @@ THREE.OrbitControls = function (object, domElement, target, sceneParent) {
     var delta = 0;
 
     if (event.wheelDelta) { // WebKit / Opera / Explorer 9
-      delta = -event.wheelDelta / 2000;
+      delta = - event.wheelDelta / 2000;
     } else if (event.detail) { // Firefox
       delta = -event.detail / 300;
     }
@@ -111,13 +110,13 @@ THREE.OrbitControls = function (object, domElement, target, sceneParent) {
 
       case 38: /*up*/
       case 87: /*W    */
-        if (trigger) {
+        if(trigger) {
           this.moveDelta = -.1;
         }
         break;
       case 40: /*down*/
       case 83: /*S*/
-        if (trigger) {
+        if(trigger){
           this.moveDelta = .1;
         }
         break;
@@ -147,19 +146,17 @@ THREE.OrbitControls = function (object, domElement, target, sceneParent) {
 
   this.update = function (delta) {
 
-    var dO = this.target.distanceTo(this.scene.position);
+    var dO = this.target.distanceTo(this.camera.position);
     var actualMoveSpeed = this.moveDelta * dO;
 
     //  don't zoom forwards if we're too close (or you'll zoom past it
     if (this.moveDelta != 0) {
 
-      //  TODO real radius
-      if (dO + actualMoveSpeed < .00000000000008) {
-        var advance = dO - .00000000000008;
-        this.camera.translateZ(-advance);
-        this.scene.translateZ(- advance);
+      if (dO + actualMoveSpeed < .08) {
+        var advance = dO - .08;
+        this.camera.translateZ(- advance);
       } else {
-        this.scene.translateZ(actualMoveSpeed);
+        this.camera.translateZ(actualMoveSpeed);
       }
     }
 
@@ -173,10 +170,10 @@ THREE.OrbitControls = function (object, domElement, target, sceneParent) {
 
     //  TODO make this work
     if (this.rotateZL) {
-      this.scene.rotateZ(.02);
+      this.camera.rotateZ(.02);
     }
     if (this.rotateZR) {
-      this.scene.rotateZ(-.02);
+      this.camera.rotateZ(-.02);
     }
 
     this.rotateZL = false;
@@ -198,17 +195,17 @@ THREE.OrbitControls = function (object, domElement, target, sceneParent) {
 
     }
 
-    //translateX += .04 * dO  * delta;
+    translateX += .04 * dO  * delta;
 
-    this.scene.translateX(translateX);
-    this.scene.rotateY(Math.atan(translateX / dO));
+    this.camera.translateX(translateX);
+    this.camera.rotateY(Math.atan(translateX / dO));
 
-    this.scene.translateY(translateY);
-    this.scene.rotateX(-Math.atan(translateY / dO));
+    this.camera.translateY(translateY);
+    this.camera.rotateX(-Math.atan(translateY / dO));
 
     var dN = this.target.distanceTo(this.camera.position);
 
-    this.scene.translateZ(-(dN - dO));
+    this.camera.translateZ(-(dN - dO));
 
   };
 

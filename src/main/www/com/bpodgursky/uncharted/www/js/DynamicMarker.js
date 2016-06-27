@@ -1,8 +1,5 @@
 function DynamicMarker(position, markRadius, color, initialZ) {
 
-  this.tmpQuaternion = new THREE.Quaternion();
-  this.zAxis = new THREE.Vector3( 0, 0, 1 );
-
   var shape1 = new THREE.Shape();
   shape1.moveTo(0, 0);
   shape1.lineTo(.025, .10);
@@ -79,19 +76,5 @@ DynamicMarker.prototype.updateTo = function (camera, delta) {
   this.mesh.rotation.x = camera.rotation.x;
   this.mesh.rotation.y = camera.rotation.y;
   this.mesh.rotateZ(.5 * delta);
-
-};
-
-DynamicMarker.prototype.rotateZSmooth = function(angle){
-
-  this.tmpQuaternion.copy(this.mesh.quaternion);
-  console.log(this.mesh.quaternion);
-
-  var q1 = new THREE.Quaternion();
-  q1.setFromAxisAngle(this.zAxis, angle);
-
-  this.tmpQuaternion.multiply( q1 );
-
-  this.mesh.quaternion.copy(this.tmpQuaternion);
 
 };

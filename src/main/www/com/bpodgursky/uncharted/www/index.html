@@ -266,15 +266,14 @@
   var canvas = $("#webgl_canvas").get(0);
 
   var scene = new THREE.Scene();
-  scene.position.x = .1;
 
-  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.000001, 10000);
+  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000);
   camera.position.set(0, 0, -15);
 
   camera.rotateZ(Math.PI);
 
   var ambientLight = new THREE.AmbientLight(0xcccccc);
-  var light1 = new THREE.DirectionalLight(0xffffff);
+  var light1 = new THREE.PointLight(0xffffff);
 
   var windowHalfX = window.innerWidth / 2;
   var windowHalfY = window.innerHeight / 2;
@@ -291,7 +290,7 @@
 
   var selector = new DynamicMarker(
       new THREE.Vector3(0, 0, 0),
-      .0000014,
+      .15,
       0x00b33c,
       Math.PI / 4
   );
@@ -317,8 +316,7 @@
   var controlMode = 'orbit';
 
   var renderer = new THREE.WebGLRenderer({
-    canvas: canvas,
-    logarithmicDepthBuffer: true
+    canvas: canvas
   });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.autoClear = true;
@@ -326,19 +324,15 @@
   var raycaster = new THREE.Raycaster();
   var mouse = new THREE.Vector2();
 
-  var sceneObj = new THREE.Group();
-  sceneObj.add(solMarker.mesh);
-  sceneObj.add(selector.mesh);
-
   var freeLookControls = new THREE.FreeLookControls(camera, canvas);
-  var orbitControls = new THREE.OrbitControls(camera, canvas, new THREE.Vector3(0, 0, 0), sceneObj);
-  var tweenControls = new THREE.TweenControls(camera, sceneObj);
+  var orbitControls = new THREE.OrbitControls(camera, canvas, new THREE.Vector3(0, 0, 0));
+  var tweenControls = new THREE.TweenControls(camera);
 
   scene.add(camera);
   scene.add(ambientLight);
   scene.add(light1);
-  scene.add(sceneObj);
-  //  scene.add(selector.mesh);
+  scene.add(solMarker.mesh);
+  scene.add(selector.mesh);
 
   //  other data
 
@@ -378,25 +372,19 @@
 
       controlMode = 'tween';
 
-      var startRotation = new THREE.Euler().copy(currentStarMesh.rotation);
-      var startPosition = new THREE.Vector3().copy(currentStarMesh.position);
+      var startRotation = new THREE.Euler().copy(camera.rotation);
+      var startPosition = new THREE.Vector3().copy(camera.position);
 
-      var starWorldPos = currentStarMesh.getWorldPosition();
-      currentStarMesh.lookAt(camera);
+      camera.lookAt(currentStarMesh.position);
 
-      var distance = camera.position.distanceTo(starWorldPos);
-      currentStarMesh.translateZ(-distance - .000000000008);
+      var distance = camera.position.distanceTo(currentStarMesh.position);
+      camera.translateZ(-distance + .3);
 
-      var endRotation = new THREE.Euler(
-          currentStarMesh.rotation.x,
-          currentStarMesh.rotation.y,
-          currentStarMesh.rotation.z
-      );
-      //.copy(camera.rotation).multiplyScalar(-1);
-      var endPosition = new THREE.Vector3().copy(currentStarMesh.position);
+      var endRotation = new THREE.Euler().copy(camera.rotation);
+      var endPosition = new THREE.Vector3().copy(camera.position);
 
-      currentStarMesh.rotation.copy(startRotation);
-      currentStarMesh.position.copy(startPosition);
+      camera.rotation.copy(startRotation);
+      camera.position.copy(startPosition);
 
       tweenControls.lookAt(endRotation, endPosition, function () {
         controlMode = 'orbit';
@@ -478,15 +466,9 @@
 
     tooltipStar = targetMesh;
 
-<<<<<<< HEAD
-    sceneObj.remove(lineSegment);
-    if (tooltip) {
-      sceneObj.remove(tooltip.object);
-=======
     scene.remove(lineSegment);
     if (tooltip) {
       scene.remove(tooltip.object);
->>>>>>> master
     }
 
     var geometry = new THREE.Geometry();
@@ -504,13 +486,8 @@
 
     tooltip = labelCache[cacheKey];
 
-<<<<<<< HEAD
-    sceneObj.add(lineSegment)
-    sceneObj.add(tooltip.object);
-=======
     scene.add(lineSegment);
     scene.add(tooltip.object);
->>>>>>> master
 
     tooltip.updateTo(camera);
 
@@ -545,18 +522,18 @@
       if (isRender(data)) {
         visibleStars.push(starMesh);
         if (!renderedStars[starID]) {
-          sceneObj.add(starMesh);
+          scene.add(starMesh);
         }
       } else {
         if (renderedStars[starID]) {
-          sceneObj.remove(starMesh);
+          scene.remove(starMesh);
         }
       }
     });
 
     if (currentStarPrimaryId == "") {
-      select(starsByID[71453]);
-      reassignLabel(starsByID[71453]);
+      select(starsByID[0]);
+      reassignLabel(starsByID[70667]);
     }
     //  if we shrunk the render distance
     else if (!renderedStars[currentStarPrimaryId]) {
@@ -654,7 +631,7 @@
       mesh.position.y = star.cartesianCoordsInLys.y;
       mesh.position.z = star.cartesianCoordsInLys.z;
 
-      mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys * 1;
+      mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
       mesh.starData = star;
 
       starsByID[star.identifiers.primaryId] = mesh;
@@ -755,7 +732,7 @@
   function render() {
 
     var delta = clock.getDelta();
-    uniforms.time.value += 0.007 * delta;
+    uniforms.time.value += 0.0005 * delta;
 
     selector.updateTo(camera, delta);
     solMarker.updateTo(camera, delta);

@@ -44,7 +44,6 @@ public class StarRecord {
     }
 
     this.radiusInLys = AstroConvert.getRadiusLys(luminosity, temperatureEstimate);
-    System.out.println(radiusInLys);
 
   }
 
