@@ -200,8 +200,8 @@ THREE.OrbitControls = function (object, domElement, target) {
     this.camera.translateX(translateX);
     this.camera.rotateY(Math.atan(translateX / dO));
 
-    dS = this.target.distanceTo(this.camera.position);
-    
+    var dS = this.target.distanceTo(this.camera.position);
+
     this.camera.translateY(translateY);
     this.camera.rotateX(-Math.atan(translateY / dS));
 
