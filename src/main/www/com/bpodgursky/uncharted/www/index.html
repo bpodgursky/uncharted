@@ -258,7 +258,7 @@
 
   //  constant stuff
 
-  var STAR_GEOMETRY = new THREE.SphereGeometry(.05, 32, 32);
+  var STAR_GEOMETRY = new THREE.SphereGeometry(1.0, 32, 32);
 
   //  webgl init
 
@@ -267,13 +267,13 @@
 
   var scene = new THREE.Scene();
 
-  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000);
+  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.00000001, 10000);
   camera.position.set(0, 0, -15);
 
   camera.rotateZ(Math.PI);
 
   var ambientLight = new THREE.AmbientLight(0xcccccc);
-  var light1 = new THREE.PointLight(0xffffff);
+  var light1 = new THREE.DirectionalLight(0xffffff);
 
   var windowHalfX = window.innerWidth / 2;
   var windowHalfY = window.innerHeight / 2;
@@ -283,14 +283,14 @@
   //  kind of cheating since we know the sun is here
   var solMarker = new DynamicMarker(
       new THREE.Vector3(0, 0, 0),
-      .3,
+      2*.000001470711,
       0x0000FF,
       0
   );
 
   var selector = new DynamicMarker(
       new THREE.Vector3(0, 0, 0),
-      .15,
+      2*.000001470711,
       0x00b33c,
       Math.PI / 4
   );
@@ -316,7 +316,8 @@
   var controlMode = 'orbit';
 
   var renderer = new THREE.WebGLRenderer({
-    canvas: canvas
+    canvas: canvas,
+    logarithmicDepthBuffer: true
   });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.autoClear = true;
@@ -346,7 +347,7 @@
   var vertexShader;
 
 
-  $("#jump_to_list").keydown(function(e){
+  $("#jump_to_list").keydown(function (e) {
     if (e.keyCode == 13) {
       e.preventDefault();
       select(visibleStarsByName[this.value]);
@@ -378,7 +379,7 @@
       camera.lookAt(currentStarMesh.position);
 
       var distance = camera.position.distanceTo(currentStarMesh.position);
-      camera.translateZ(-distance + .3);
+      camera.translateZ(-distance + .00000001470711);
 
       var endRotation = new THREE.Euler().copy(camera.rotation);
       var endPosition = new THREE.Vector3().copy(camera.position);
@@ -631,7 +632,9 @@
       mesh.position.y = star.cartesianCoordsInLys.y;
       mesh.position.z = star.cartesianCoordsInLys.z;
 
-      mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
+      mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys;
+
+      console.log(star.radiusInLys);
       mesh.starData = star;
 
       starsByID[star.identifiers.primaryId] = mesh;
@@ -648,6 +651,15 @@
 
       var newStar = mesh.starData;
 
+      var deltaX = mesh.position.x;
+      var deltaY = mesh.position.y;
+      var deltaZ = mesh.position.z;
+
+      scene.children.forEach(function (e) {
+        e.position.x -= deltaX;
+        e.position.y -= deltaY;
+        e.position.z -= deltaZ;
+      });
 
       if (newStar != null) {
         var newStarPrimaryId = newStar.identifiers.primaryId;
@@ -676,6 +688,8 @@
           setLink(newStar.links.wikipedia, infoWiki);
 
           selector.target(mesh.position);
+
+          console.log(mesh.position);
 
           currentStarMesh = mesh;
           currentStarPrimaryId = newStarPrimaryId;
@@ -732,7 +746,7 @@
   function render() {
 
     var delta = clock.getDelta();
-    uniforms.time.value += 0.0005 * delta;
+    uniforms.time.value += 0.005 * delta;
 
     selector.updateTo(camera, delta);
     solMarker.updateTo(camera, delta);

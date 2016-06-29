@@ -152,8 +152,8 @@ THREE.OrbitControls = function (object, domElement, target) {
     //  don't zoom forwards if we're too close (or you'll zoom past it
     if (this.moveDelta != 0) {
 
-      if (dO + actualMoveSpeed < .08) {
-        var advance = dO - .08;
+      if (dO + actualMoveSpeed < .000001470711/8) {
+        var advance = dO - .000001470711/8;
         this.camera.translateZ(- advance);
       } else {
         this.camera.translateZ(actualMoveSpeed);
@@ -187,8 +187,8 @@ THREE.OrbitControls = function (object, domElement, target) {
       var diffX = (this.mouseX - this.lastUpdateMouseX) / window.innerWidth;
       var diffY = -(this.mouseY - this.lastUpdateMouseY) / window.innerHeight;
 
-      translateX -= 10 * diffX;
-      translateY -= 10 * diffY;
+      translateX -= .0000010 * diffX;
+      translateY -= .0000010 * diffY;
 
       this.lastUpdateMouseX = this.mouseX;
       this.lastUpdateMouseY = this.mouseY;
@@ -200,8 +200,10 @@ THREE.OrbitControls = function (object, domElement, target) {
     this.camera.translateX(translateX);
     this.camera.rotateY(Math.atan(translateX / dO));
 
+    dS = this.target.distanceTo(this.camera.position);
+    
     this.camera.translateY(translateY);
-    this.camera.rotateX(-Math.atan(translateY / dO));
+    this.camera.rotateX(-Math.atan(translateY / dS));
 
     var dN = this.target.distanceTo(this.camera.position);
 
