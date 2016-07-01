@@ -379,7 +379,7 @@
       camera.lookAt(currentStarMesh.position);
 
       var distance = camera.position.distanceTo(currentStarMesh.position);
-      camera.translateZ(-distance + .00000001470711);
+      camera.translateZ(-distance + .000001470711/4);
 
       var endRotation = new THREE.Euler().copy(camera.rotation);
       var endPosition = new THREE.Vector3().copy(camera.position);

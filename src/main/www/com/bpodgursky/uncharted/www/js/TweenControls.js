@@ -92,16 +92,6 @@ THREE.TweenControls = function (object) {
     this.tCurrent += delta;
 
     if (this.tCurrent >= this.tMax) {
-
-      this.camera.rotation.x = this.targetRotation.x;
-      this.camera.rotation.y = this.targetRotation.y;
-      this.camera.rotation.z = this.targetRotation.z;
-
-      this.camera.position.x = this.targetPosition.x;
-      this.camera.position.y = this.targetPosition.y;
-      this.camera.position.z = this.targetPosition.z;
-
-
       this.onComplete();
     }
 
