@@ -283,14 +283,14 @@
   //  kind of cheating since we know the sun is here
   var solMarker = new DynamicMarker(
       new THREE.Vector3(0, 0, 0),
-      2*.000001470711,
+      2 * .000001470711,
       0x0000FF,
       0
   );
 
   var selector = new DynamicMarker(
       new THREE.Vector3(0, 0, 0),
-      2*.000001470711,
+      2 * .000001470711,
       0x00b33c,
       Math.PI / 4
   );
@@ -373,24 +373,16 @@
 
       controlMode = 'tween';
 
-      var startRotation = new THREE.Euler().copy(camera.rotation);
-      var startPosition = new THREE.Vector3().copy(camera.position);
-
-      camera.lookAt(currentStarMesh.position);
-
-      var distance = camera.position.distanceTo(currentStarMesh.position);
-      camera.translateZ(-distance + .000001470711/4);
-
-      var endRotation = new THREE.Euler().copy(camera.rotation);
-      var endPosition = new THREE.Vector3().copy(camera.position);
-
-      camera.rotation.copy(startRotation);
-      camera.position.copy(startPosition);
-
-      tweenControls.lookAt(endRotation, endPosition, function () {
-        controlMode = 'orbit';
-        orbitControls.target = currentStarMesh.position;
-      }, 2);
+      tweenControls.setZoom(currentStarMesh.position, .000001470711, 2,
+          function () {
+            tweenControls.setZoom(currentStarMesh.position,
+                .000001470711 / 4, 1,
+                function () {
+                  controlMode = 'orbit';
+                  orbitControls.target = currentStarMesh.position;
+                }
+            )
+          });
 
     }
   }
@@ -634,7 +626,6 @@
 
       mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys;
 
-      console.log(star.radiusInLys);
       mesh.starData = star;
 
       starsByID[star.identifiers.primaryId] = mesh;
@@ -688,8 +679,6 @@
           setLink(newStar.links.wikipedia, infoWiki);
 
           selector.target(mesh.position);
-
-          console.log(mesh.position);
 
           currentStarMesh = mesh;
           currentStarPrimaryId = newStarPrimaryId;
@@ -748,9 +737,6 @@
     var delta = clock.getDelta();
     uniforms.time.value += 0.005 * delta;
 
-    selector.updateTo(camera, delta);
-    solMarker.updateTo(camera, delta);
-
     light1.position = camera.position;
     light1.position.set(
         camera.position.x,
@@ -771,6 +757,9 @@
     if (tooltip) {
       tooltip.updateTo(camera);
     }
+
+    selector.updateTo(camera, delta);
+    solMarker.updateTo(camera, delta);
 
     renderer.render(scene, camera);
 

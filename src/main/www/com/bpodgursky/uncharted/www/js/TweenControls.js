@@ -1,6 +1,8 @@
 THREE.TweenControls = function (object) {
 
   this.camera = object;
+  this.target = null;
+  this.radius = null;
 
   this.targetRotation = null;
   this.startRotation = null;
@@ -29,14 +31,25 @@ THREE.TweenControls = function (object) {
     return target;
 
   };
+  
+  
+  this.recomputeTargets = function(){
 
-  this.lookAt = function (endRotation, endPosition, onComplete, time) {
+    var startRotation = new THREE.Euler().copy(camera.rotation);
+    var startPosition = new THREE.Vector3().copy(camera.position);
 
-    this.startRotation = {
-      x: this.camera.rotation.x,
-      y: this.camera.rotation.y,
-      z: this.camera.rotation.z
-    };
+    camera.lookAt(this.target);
+
+    var distance = camera.position.distanceTo(this.target);
+    camera.translateZ(-distance + this.radius);
+
+    var endRotation = new THREE.Euler().copy(camera.rotation);
+    var endPosition = new THREE.Vector3().copy(camera.position);
+
+    camera.rotation.copy(startRotation);
+    camera.position.copy(startPosition);
+
+    this.targetPosition = endPosition;
 
     this.targetRotation = {
       x: this.getTarget(this.startRotation.x, endRotation.x),
@@ -45,9 +58,28 @@ THREE.TweenControls = function (object) {
     };
 
     this.midRotation = {
-      x: (this.camera.rotation.x + this.targetRotation.x) / 2,
-      y: (this.camera.rotation.y + this.targetRotation.y) / 2,
-      z: (this.camera.rotation.z + this.targetRotation.z) / 2
+      x: (this.startRotation.x + this.targetRotation.x) / 2,
+      y: (this.startRotation.y + this.targetRotation.y) / 2,
+      z: (this.startRotation.z + this.targetRotation.z) / 2
+    };
+
+    this.midPosition = {
+      x: (this.startPosition.x + this.targetPosition.x) / 2,
+      y: (this.startPosition.y + this.targetPosition.y) / 2,
+      z: (this.startPosition.z + this.targetPosition.z) / 2
+    };
+
+  }
+
+  this.setZoom = function (target, radius, time, onComplete) {
+
+    this.target = target;
+    this.radius = radius;
+
+    this.startRotation = {
+      x: this.camera.rotation.x,
+      y: this.camera.rotation.y,
+      z: this.camera.rotation.z
     };
 
     this.startPosition = {
@@ -56,17 +88,7 @@ THREE.TweenControls = function (object) {
       z: this.camera.position.z
     };
 
-    this.targetPosition = {
-      x: endPosition.x,
-      y: endPosition.y,
-      z: endPosition.z
-    };
-
-    this.midPosition = {
-      x: (this.startPosition.x + this.targetPosition.x) / 2,
-      y: (this.startPosition.y + this.targetPosition.y) / 2,
-      z: (this.startPosition.z + this.targetPosition.z) / 2
-    };
+    this.recomputeTargets();
 
     this.tMax = time;
     this.tCurrent = 0;
