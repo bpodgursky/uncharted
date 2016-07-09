@@ -13,6 +13,7 @@
   <script type="text/javascript" src="resources/jquery-ui.min.js"></script>
   <script src="resources/three.min.js"></script>
   <script src="resources/stats.js"></script>
+  <script src="js/constants.js"></script>
   <script src="js/FreeLookControls.js"></script>
   <script src="js/OrbitControls.js"></script>
   <script src="js/DynamicMarker.js"></script>
@@ -267,7 +268,7 @@
 
   var scene = new THREE.Scene();
 
-  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.00000001, 10000);
+  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.000000001, 10000);
   camera.position.set(0, 0, -15);
 
   camera.rotateZ(Math.PI);
@@ -283,14 +284,14 @@
   //  kind of cheating since we know the sun is here
   var solMarker = new DynamicMarker(
       new THREE.Vector3(0, 0, 0),
-      2 * .000001470711,
+      SOL_MARKER_RADIUS,
       0x0000FF,
       0
   );
 
   var selector = new DynamicMarker(
       new THREE.Vector3(0, 0, 0),
-      2 * .000001470711,
+      MARKER_RADIUS,
       0x00b33c,
       Math.PI / 4
   );
@@ -313,7 +314,7 @@
   var mouseX;
   var mouseY;
 
-  var controlMode = 'orbit';
+  var controlMode = '';
 
   var renderer = new THREE.WebGLRenderer({
     canvas: canvas,
@@ -326,7 +327,7 @@
   var mouse = new THREE.Vector2();
 
   var freeLookControls = new THREE.FreeLookControls(camera, canvas);
-  var orbitControls = new THREE.OrbitControls(camera, canvas, new THREE.Vector3(0, 0, 0));
+  var orbitControls = new THREE.OrbitControls(camera, canvas);
   var tweenControls = new THREE.TweenControls(camera);
 
   scene.add(camera);
@@ -369,22 +370,25 @@
   });
 
   function updateTarget() {
-    if (controlMode == 'orbit') {
 
-      controlMode = 'tween';
+    var prevControlMode = controlMode;
+    controlMode = 'tween';
 
-      tweenControls.setZoom(currentStarMesh.position, .000001470711, 2,
-          function () {
-            tweenControls.setZoom(currentStarMesh.position,
-                .000001470711 / 4, 1,
-                function () {
-                  controlMode = 'orbit';
-                  orbitControls.target = currentStarMesh.position;
-                }
-            )
-          });
+    tweenControls.setZoom(currentStarMesh.position, MARKER_RADIUS, 2,
+        function () {
+          tweenControls.setZoom(currentStarMesh.position,
+              MARKER_RADIUS, 1,
+              function () {
+                controlMode = prevControlMode ? prevControlMode: 'orbit';
 
-    }
+                orbitControls.orbit(
+                    currentStarMesh.position,
+                    starsByID[currentStarPrimaryId].starData.radiusInLys * 2
+                )
+              }
+          )
+        });
+
   }
 
   var currentStarPrimaryId = "";
@@ -474,7 +478,7 @@
     var cacheKey = label + lineDistance;  // could target each star from each other star.
 
     if (!labelCache[(cacheKey)]) {
-      labelCache[cacheKey] = new TooltipMarker(label, lineDistance, targetMesh.position);
+      labelCache[cacheKey] = new TooltipMarker(label, lineDistance, targetMesh.position, targetMesh.starData.radiusInLys);
     }
 
     tooltip = labelCache[cacheKey];
@@ -631,6 +635,7 @@
       starsByID[star.identifiers.primaryId] = mesh;
       stars.push(mesh);
     });
+
   }
 
   function select(mesh) {
@@ -744,6 +749,7 @@
         camera.position.z
     );
 
+
     if (controlMode == 'orbit') {
       orbitControls.update(delta);
     } else if (controlMode == 'free') {
@@ -757,6 +763,8 @@
     if (tooltip) {
       tooltip.updateTo(camera);
     }
+
+
 
     selector.updateTo(camera, delta);
     solMarker.updateTo(camera, delta);

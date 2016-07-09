@@ -1,5 +1,5 @@
 //  TODO this is an abomination
-function TooltipMarker(label, distance, position) {
+function TooltipMarker(label, distance, position, radius) {
 
   var distanceFormatted = distance.toFixed(1) + "ly";
 
@@ -62,7 +62,8 @@ function TooltipMarker(label, distance, position) {
   this.scaleObj = new THREE.Group();
   this.scaleObj.add(this.rectMesh);
   this.scaleObj.add(labelLine);
-  this.scaleObj.position.x = .05; //  TODO this depends on star radius
+
+  this.scaleObj.position.x = radius;
 
   this.object.add(this.scaleObj);
 
