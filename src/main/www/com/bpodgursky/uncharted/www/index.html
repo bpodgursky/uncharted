@@ -338,15 +338,15 @@
 
   //  other data
 
+  var starData;
   var stars = [];
   var starsByID = {};
   var visibleStars = [];
   var visibleStarsByName = {};
   var renderRadius = 75;
 
-  var fragmentShader;
-  var vertexShader;
-
+  var starFragmentShader;
+  var starVertexShader;
 
   $("#jump_to_list").keydown(function (e) {
     if (e.keyCode == 13) {
@@ -379,7 +379,7 @@
           tweenControls.setZoom(currentStarMesh.position,
               MARKER_RADIUS, 1,
               function () {
-                controlMode = prevControlMode ? prevControlMode: 'orbit';
+                controlMode = prevControlMode ? prevControlMode : 'orbit';
 
                 orbitControls.orbit(
                     currentStarMesh.position,
@@ -609,6 +609,15 @@
 
   function initializeStarData(data) {
 
+    var glowImage = new THREE.ImageUtils.loadTexture('resources/glow.png');
+
+    var spriteMaterial = new THREE.SpriteMaterial({
+      map: glowImage,
+      color: 0xffffcc,
+      transparent: true,
+      blending: THREE.AdditiveBlending
+    });
+
     data.forEach(function (star) {
 
       var material = new THREE.ShaderMaterial({
@@ -618,8 +627,8 @@
           highTemp: {type: "f", value: star.temperatureEstimate},
           lowTemp: {type: "f", value: star.temperatureEstimate / 4}
         },
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShader
+        vertexShader: starVertexShader,
+        fragmentShader: starFragmentShader
       });
 
       var mesh = new THREE.Mesh(STAR_GEOMETRY, material);
@@ -629,12 +638,17 @@
       mesh.position.z = star.cartesianCoordsInLys.z;
 
       mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys;
-
       mesh.starData = star;
+
+      var sprite = new THREE.Sprite(spriteMaterial);
+      sprite.scale.set(2000000, 2000000, 2000000);
+      mesh.add(sprite); // this centers the glow at the mesh
 
       starsByID[star.identifiers.primaryId] = mesh;
       stars.push(mesh);
-    });
+        }
+    )
+    ;
 
   }
 
@@ -764,8 +778,6 @@
       tooltip.updateTo(camera);
     }
 
-
-
     selector.updateTo(camera, delta);
     solMarker.updateTo(camera, delta);
 
@@ -834,7 +846,7 @@
         dataType: 'html',
         url: "resources/noise/noise-grainy-fragment.glsl",
         success: function (frag) {
-          fragmentShader = frag;
+          starFragmentShader = frag;
         }
       }),
       $.ajax({
@@ -842,7 +854,7 @@
         dataType: 'html',
         url: "resources/noise/vertex-shader.glsl",
         success: function (vert) {
-          vertexShader = vert;
+          starVertexShader = vert;
         }
       }),
       $.ajax({
@@ -853,12 +865,13 @@
           "max_lys": 75
         },
         success: function (data) {
-          initializeStarData(JSON.parse(data));
+          starData = JSON.parse(data);
         }
       })
   ).then(function () {
     loader.load('js/font.js', function (response) {
           font = response;
+          initializeStarData(starData);
           animate();
           updateStarData();
         }
