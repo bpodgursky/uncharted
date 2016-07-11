@@ -517,7 +517,7 @@
       visibleStarsByName[commonName] = starMesh;
 
       if (isRender(data)) {
-        visibleStars.push(starMesh);
+        visibleStars.push(starMesh.children[0]);
         if (!renderedStars[starID]) {
           scene.add(starMesh);
         }
@@ -553,7 +553,9 @@
 
       raycaster.setFromCamera(mouse, camera);
 
-      var intersects = raycaster.intersectObjects(visibleStars, false);
+      //  TODO redo to not be recursive -- only look at shells
+      var intersects = raycaster.intersectObjects(visibleStars, true);
+
 
       if (tooltip) {
         var text = raycaster.intersectObjects(tooltip.scaleObj.children, false);
@@ -563,7 +565,7 @@
       }
 
       if (intersects.length > 0) {
-        return intersects[0].object;
+        return starsByID[intersects[0].object.starData.identifiers.primaryId];
       }
     }
 
@@ -611,41 +613,73 @@
 
     var glowImage = new THREE.ImageUtils.loadTexture('resources/glow.png');
 
-    var spriteMaterial = new THREE.SpriteMaterial({
+    var spriteSurround = new THREE.SpriteMaterial({
       map: glowImage,
-      color: 0xffffcc,
+      color: 0x4d4d4d,
       transparent: true,
+      alphaTest: 0.5,
       blending: THREE.AdditiveBlending
+    });
+
+//    spriteSurround.blending = THREE[ "CustomBlending" ];
+//    spriteSurround.blendSrc = THREE["OneMinusSrcColorFactor"];
+//    spriteSurround.blendDst = THREE["OneMinusDstColorFactor"];
+//    spriteSurround.blendEquation = THREE.AddEquation;
+//
+
+    var spriteCore = new THREE.SpriteMaterial({
+      map: glowImage,
+      color: 0xb3b3b3,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      alphaTest: 0.5
+    });
+
+    var transparentMaterial = new THREE.MeshLambertMaterial({
+      color: 0x000000,
+      transparent: true,
+      opacity: 0.0,
+      alphaTest: 0.5
     });
 
     data.forEach(function (star) {
 
-      var material = new THREE.ShaderMaterial({
-        uniforms: {
-          time: uniforms.time,
-          scale: uniforms.scale,
-          highTemp: {type: "f", value: star.temperatureEstimate},
-          lowTemp: {type: "f", value: star.temperatureEstimate / 4}
-        },
-        vertexShader: starVertexShader,
-        fragmentShader: starFragmentShader
-      });
+          var material = new THREE.ShaderMaterial({
+            uniforms: {
+              time: uniforms.time,
+              scale: uniforms.scale,
+              highTemp: {type: "f", value: star.temperatureEstimate},
+              lowTemp: {type: "f", value: star.temperatureEstimate / 4}
+            },
+            vertexShader: starVertexShader,
+            fragmentShader: starFragmentShader
+          });
 
-      var mesh = new THREE.Mesh(STAR_GEOMETRY, material);
+          var mesh = new THREE.Mesh(STAR_GEOMETRY, material);
 
-      mesh.position.x = star.cartesianCoordsInLys.x;
-      mesh.position.y = star.cartesianCoordsInLys.y;
-      mesh.position.z = star.cartesianCoordsInLys.z;
+          mesh.position.x = star.cartesianCoordsInLys.x;
+          mesh.position.y = star.cartesianCoordsInLys.y;
+          mesh.position.z = star.cartesianCoordsInLys.z;
 
-      mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys;
-      mesh.starData = star;
+          mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys;
+          mesh.starData = star;
 
-      var sprite = new THREE.Sprite(spriteMaterial);
-      sprite.scale.set(2000000, 2000000, 2000000);
-      mesh.add(sprite); // this centers the glow at the mesh
+          var surround = new THREE.Sprite(spriteSurround);
+          surround.scale.set(3000000, 3000000, 3000000);
 
-      starsByID[star.identifiers.primaryId] = mesh;
-      stars.push(mesh);
+          var mousey = new THREE.Mesh(STAR_GEOMETRY, transparentMaterial);
+          mousey.scale.set(3000000, 3000000, 3000000);
+          mousey.starData = star;
+
+          var core = new THREE.Sprite(spriteCore);
+          core.scale.set(600000, 600000, 60000);
+
+          mesh.add(mousey);
+          mesh.add(surround); // this centers the glow at the mesh
+//      mesh.add(core);
+
+          starsByID[star.identifiers.primaryId] = mesh;
+          stars.push(mesh);
         }
     )
     ;
