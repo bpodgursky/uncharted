@@ -270,8 +270,10 @@
 
   var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.000000001, 10000);
   camera.position.set(0, 0, -15);
-
   camera.rotateZ(Math.PI);
+
+  var intersectCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1.0, 10000);
+
 
   var ambientLight = new THREE.AmbientLight(0xcccccc);
   var light1 = new THREE.DirectionalLight(0xffffff);
@@ -331,6 +333,7 @@
   var tweenControls = new THREE.TweenControls(camera);
 
   scene.add(camera);
+  scene.add(intersectCamera);
   scene.add(ambientLight);
   scene.add(light1);
   scene.add(solMarker.mesh);
@@ -551,18 +554,24 @@
       mouse.x = ( x / window.innerWidth ) * 2 - 1;
       mouse.y = -( y / window.innerHeight ) * 2 + 1;
 
-      raycaster.setFromCamera(mouse, camera);
+      intersectCamera.position.copy(camera.position);
+      intersectCamera.rotation.copy(camera.rotation);
+
+      raycaster.setFromCamera(mouse, intersectCamera);
 
       //  TODO redo to not be recursive -- only look at shells
-      var intersects = raycaster.intersectObjects(visibleStars, true);
+      var intersects = raycaster.intersectObjects(visibleStars, false);
 
 
       if (tooltip) {
         var text = raycaster.intersectObjects(tooltip.scaleObj.children, false);
         if (text.length > 0) {
+          console.log("tooltipstar");
           return tooltipStar;
         }
       }
+
+      console.log(intersects.length);
 
       if (intersects.length > 0) {
         return starsByID[intersects[0].object.starData.identifiers.primaryId];
@@ -617,22 +626,7 @@
       map: glowImage,
       color: 0x4d4d4d,
       transparent: true,
-      alphaTest: 0.5,
       blending: THREE.AdditiveBlending
-    });
-
-//    spriteSurround.blending = THREE[ "CustomBlending" ];
-//    spriteSurround.blendSrc = THREE["OneMinusSrcColorFactor"];
-//    spriteSurround.blendDst = THREE["OneMinusDstColorFactor"];
-//    spriteSurround.blendEquation = THREE.AddEquation;
-//
-
-    var spriteCore = new THREE.SpriteMaterial({
-      map: glowImage,
-      color: 0xb3b3b3,
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      alphaTest: 0.5
     });
 
     var transparentMaterial = new THREE.MeshLambertMaterial({
@@ -671,12 +665,8 @@
           mousey.scale.set(3000000, 3000000, 3000000);
           mousey.starData = star;
 
-          var core = new THREE.Sprite(spriteCore);
-          core.scale.set(600000, 600000, 60000);
-
           mesh.add(mousey);
           mesh.add(surround); // this centers the glow at the mesh
-//      mesh.add(core);
 
           starsByID[star.identifiers.primaryId] = mesh;
           stars.push(mesh);
