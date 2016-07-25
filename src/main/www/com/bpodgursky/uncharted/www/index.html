@@ -620,13 +620,17 @@
 
   function initializeStarData(data) {
 
-    var glowImage = new THREE.ImageUtils.loadTexture('resources/glow.png');
+    //  https://www.seedofandromeda.com/blogs/51-procedural-star-rendering
+    //  > Below is the texture that Andreas Ressl and Georg Hammershmid made. If you want to steal it, remember to credit them somewhere!
+    var glowImage = new THREE.ImageUtils.loadTexture('resources/star_glow.png');
 
     var spriteSurround = new THREE.SpriteMaterial({
       map: glowImage,
       color: 0x4d4d4d,
       transparent: true,
-      blending: THREE.AdditiveBlending
+      blending: THREE.AdditiveBlending,
+      blendSrc: THREE["OneFactor"],
+      blendDst: THREE["OneFactor"]
     });
 
     var transparentMaterial = new THREE.MeshLambertMaterial({
@@ -635,6 +639,9 @@
       opacity: 0.0,
       alphaTest: 0.5
     });
+
+    var geometry = new THREE.PlaneGeometry( 1, 1 );
+
 
     data.forEach(function (star) {
 
@@ -658,7 +665,28 @@
           mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys;
           mesh.starData = star;
 
-          var surround = new THREE.Sprite(spriteSurround);
+          uniforms = {
+            cur_time: {type:"f", value:1.0},
+            beg_time:{type:"f", value:1.0},
+            scale:{type: "v3", value:new THREE.Vector3()}
+          };
+
+      //  TODO finish, re: http://stackoverflow.com/questions/24259404/how-to-apply-custom-shader-to-sprite-in-three-js
+          var glowMat = new THREE.ShaderMaterial( {
+
+            uniforms: uniforms,
+            vertexShader: document.getElementById( 'vertexShader' ).textContent,
+            fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+            transparent: true,
+            blending:THREE.AdditiveBlending // It looks like real blast with Additive blending!!!
+
+          } );
+
+        var surround = new THREE.Mesh( geometry, glowMat );
+
+
+
+//      var surround = new THREE.Sprite(spriteSurround);
           surround.scale.set(3000000, 3000000, 3000000);
 
           var mousey = new THREE.Mesh(STAR_GEOMETRY, transparentMaterial);
