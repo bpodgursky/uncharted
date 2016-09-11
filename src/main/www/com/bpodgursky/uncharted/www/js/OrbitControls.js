@@ -215,6 +215,8 @@ THREE.OrbitControls = function (object, domElement) {
 
     this.camera.translateZ(-(dN - dO));
 
+
+
   };
 
 

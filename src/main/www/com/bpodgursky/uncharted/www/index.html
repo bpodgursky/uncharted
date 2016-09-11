@@ -351,6 +351,9 @@
   var starFragmentShader;
   var starVertexShader;
 
+  var coronaFragmentShader;
+  var coronaVertexShader;
+
   $("#jump_to_list").keydown(function (e) {
     if (e.keyCode == 13) {
       e.preventDefault();
@@ -459,7 +462,6 @@
 
   }
 
-  var distanceCache = {};
   var labelCache = {};
 
   function doReassign(targetMesh) {
@@ -559,23 +561,19 @@
 
       raycaster.setFromCamera(mouse, intersectCamera);
 
-      //  TODO redo to not be recursive -- only look at shells
       var intersects = raycaster.intersectObjects(visibleStars, false);
 
+      if (intersects.length > 0) {
+        return starsByID[intersects[intersects.length - 1].object.starData.identifiers.primaryId];
+      }
 
       if (tooltip) {
         var text = raycaster.intersectObjects(tooltip.scaleObj.children, false);
         if (text.length > 0) {
-          console.log("tooltipstar");
           return tooltipStar;
         }
       }
 
-      console.log(intersects.length);
-
-      if (intersects.length > 0) {
-        return starsByID[intersects[0].object.starData.identifiers.primaryId];
-      }
     }
 
     return null;
@@ -584,10 +582,6 @@
   function setMouseXY(event) {
     mouseX = event.clientX;
     mouseY = event.clientY;
-  }
-
-  function resizeTipText() {
-
   }
 
   function getMouseoverStar() {
@@ -608,16 +602,6 @@
     select(getStarForPoint(event.clientX, event.clientY));
   }
 
-  function getBase64Image() {
-    var img = document.getElementById('spectrum_ref');
-    var canvas = document.createElement('canvas');
-    canvas.width = img.width;
-    canvas.height = img.height;
-    canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-    return canvas;
-  }
-
-
   function initializeStarData(data) {
 
     //  https://www.seedofandromeda.com/blogs/51-procedural-star-rendering
@@ -627,7 +611,7 @@
     var spriteSurround = new THREE.SpriteMaterial({
       map: glowImage,
       color: 0x4d4d4d,
-      transparent: true,
+      transparent: false,
       blending: THREE.AdditiveBlending,
       blendSrc: THREE["OneFactor"],
       blendDst: THREE["OneFactor"]
@@ -640,7 +624,7 @@
       alphaTest: 0.5
     });
 
-    var geometry = new THREE.PlaneGeometry( 1, 1 );
+//    var geometry = new THREE.PlaneGeometry( 1, 1 );
 
 
     data.forEach(function (star) {
@@ -665,28 +649,26 @@
           mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys;
           mesh.starData = star;
 
-          uniforms = {
-            cur_time: {type:"f", value:1.0},
-            beg_time:{type:"f", value:1.0},
-            scale:{type: "v3", value:new THREE.Vector3()}
-          };
+//          var uniforms2 = {
+//            cur_time: {type:"f", value:1.0},
+//            beg_time:{type:"f", value:1.0},
+//            scale:{type: "v3", value:new THREE.Vector3()}
+//          };
 
-      //  TODO finish, re: http://stackoverflow.com/questions/24259404/how-to-apply-custom-shader-to-sprite-in-three-js
-          var glowMat = new THREE.ShaderMaterial( {
+          //  TODO finish, re: http://stackoverflow.com/questions/24259404/how-to-apply-custom-shader-to-sprite-in-three-js
+//          var glowMat = new THREE.ShaderMaterial( {
+//
+//            uniforms: uniforms2,
+//            vertexShader: coronaVertexShader,
+//            fragmentShader: coronaFragmentShader,
+//            transparent: true,
+//            blending:THREE.AdditiveBlending // It looks like real blast with Additive blending!!!
+//
+//          } );
 
-            uniforms: uniforms,
-            vertexShader: document.getElementById( 'vertexShader' ).textContent,
-            fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-            transparent: true,
-            blending:THREE.AdditiveBlending // It looks like real blast with Additive blending!!!
+//        var surround = new THREE.Mesh( geometry, spriteSurround );
 
-          } );
-
-        var surround = new THREE.Mesh( geometry, glowMat );
-
-
-
-//      var surround = new THREE.Sprite(spriteSurround);
+          var surround = new THREE.Sprite(spriteSurround);
           surround.scale.set(3000000, 3000000, 3000000);
 
           var mousey = new THREE.Mesh(STAR_GEOMETRY, transparentMaterial);
@@ -750,6 +732,10 @@
           setLink(newStar.links.wikipedia, infoWiki);
 
           selector.target(mesh.position);
+
+          if(currentStarMesh) {
+            currentStarMesh.children[1].scale.set(3000000, 3000000, 3000000);
+          }
 
           currentStarMesh = mesh;
           currentStarPrimaryId = newStarPrimaryId;
@@ -833,6 +819,11 @@
     selector.updateTo(camera, delta);
     solMarker.updateTo(camera, delta);
 
+    if(currentStarMesh) {
+      var distance = camera.position.distanceTo(currentStarMesh.position) * 3000000;
+      currentStarMesh.children[1].scale.set(distance, distance, distance)
+    }
+
     renderer.render(scene, camera);
 
   }
@@ -907,6 +898,22 @@
         url: "resources/noise/vertex-shader.glsl",
         success: function (vert) {
           starVertexShader = vert;
+        }
+      }),
+      $.ajax({
+        type: 'GET',
+        dataType: 'html',
+        url: "resources/noise/corona-vertex-shader.glsl",
+        success: function (vert) {
+          coronaVertexShader = vert;
+        }
+      }),
+      $.ajax({
+        type: 'GET',
+        dataType: 'html',
+        url: "resources/noise/corona-fragment-shader.glsl",
+        success: function (vert) {
+          coronaFragmentShader = vert;
         }
       }),
       $.ajax({
