@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Solar Neighorhood</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+  <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css">
+  <link rel="stylesheet" type="text/css" href="css/uncharted.css">
+
+  <script type="text/javascript" src="resources/jquery-2.0.0.min.js"></script>
+  <script src="resources/three.min.js"></script>
+
+
+</head>
+
+<body>
+
+<div>
+  <canvas id='webgl_canvas'></canvas>
+
+</div>
+</body>
+
+<script>
+
+  function animate() {
+    render();
+    requestAnimationFrame(animate);
+  }
+
+  function render() {
+
+    light1.position = camera.position;
+    light1.position.set(
+        camera.position.x,
+        camera.position.y,
+        camera.position.z
+    );
+
+    renderer.render(scene, camera);
+
+  }
+
+  $.when(
+      $.ajax({
+        type: 'GET',
+        dataType: 'html',
+        url: "resources/noise/corona-vertex-shader.glsl",
+        success: function (vert) {
+          coronaVertexShader = vert;
+        }
+      }),
+      $.ajax({
+        type: 'GET',
+        dataType: 'html',
+        url: "resources/noise/corona-fragment-shader.glsl",
+        success: function (vert) {
+          coronaFragmentShader = vert;
+        }
+      })
+  ).then(function(){
+
+    canvas = $("#webgl_canvas").get(0);
+    scene = new THREE.Scene();
+
+    ambientLight = new THREE.AmbientLight(0xcccccc);
+    light1 = new THREE.DirectionalLight(0xffffff);
+
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 5);
+
+    renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
+      logarithmicDepthBuffer: true
+    });
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.autoClear = true;
+
+    var sphere = new THREE.CircleGeometry(1.0, 32);
+
+    var sphereBak = new THREE.CircleGeometry(5.0, 32);
+
+    console.log(coronaVertexShader);
+    console.log(coronaFragmentShader);
+
+    var material = new THREE.ShaderMaterial({
+      vertexShader: coronaVertexShader,
+      fragmentShader: coronaFragmentShader,
+      uniforms: {
+        r: {type: "f", value: 0.0},
+        g: {type: "f", value: 1.0},
+        scale: {type: "f", value: 1.0}
+      },
+//      blending: THREE.AdditiveBlending,
+      transparent: true
+    });
+
+    var material2 = new THREE.ShaderMaterial({
+      vertexShader: coronaVertexShader,
+      fragmentShader: coronaFragmentShader,
+      uniforms: {
+        r: {type: "f", value: 1.0},
+        g: {type: "f", value: 0.0},
+        scale: {type: "f", value: 5.0}
+      },
+//      blending: THREE.AdditiveBlending,
+      transparent: true
+    });
+
+
+    var mesh = new THREE.Mesh(sphere, material);
+    mesh.position.set(0, 0, 0);
+
+
+    var backMesh = new THREE.Mesh(sphereBak, material2);
+    backMesh.position.set(0, 0, -6);
+    backMesh.scale.set(5, 5, 5);
+
+    scene.add(camera);
+    scene.add(ambientLight);
+    scene.add(light1);
+//    scene.add(mesh);
+    scene.add(backMesh);
+
+    animate();
+
+  });
+
+</script>
+
+</html>
+

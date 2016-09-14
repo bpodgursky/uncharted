@@ -1,24 +1,12 @@
-        varying vec2 vUv;
-        uniform vec3 scale;
+varying vec3 sPos;
+uniform float r;
+uniform float g;
+uniform float scale;
 
-        void main() {
-            vUv = uv;
-            float rotation = 0.0;
+void main() {
 
-            vec3 alignedPosition = vec3(position.x * scale.x, position.y * scale.y, position.z*scale.z);
+  sPos = position;
 
-            vec2 pos = alignedPosition.xy;
+gl_Position = projectionMatrix * (modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0) + vec4(position.x, position.y, 0.0, 0.0));
 
-            vec2 rotatedPosition;
-            rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;
-            rotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;
-
-            vec4 finalPosition;
-
-            finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );
-            finalPosition.xy += rotatedPosition;
-            finalPosition = projectionMatrix * finalPosition;
-
-            gl_Position =  finalPosition;
-
-        }
+}
