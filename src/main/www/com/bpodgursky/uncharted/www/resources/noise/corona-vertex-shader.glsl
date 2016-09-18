@@ -1,6 +1,4 @@
 varying vec3 sPos;
-uniform float r;
-uniform float g;
 uniform float scale;
 
 void main() {

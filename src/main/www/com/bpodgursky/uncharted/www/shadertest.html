@@ -68,7 +68,7 @@
     light1 = new THREE.DirectionalLight(0xffffff);
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 0, 5);
+    camera.position.set(0, 0, 3);
 
     renderer = new THREE.WebGLRenderer({
       canvas: canvas,
@@ -89,9 +89,8 @@
       vertexShader: coronaVertexShader,
       fragmentShader: coronaFragmentShader,
       uniforms: {
-        r: {type: "f", value: 0.0},
-        g: {type: "f", value: 1.0},
-        scale: {type: "f", value: 1.0}
+        scale: {type: "f", value: 1.0},
+        temp: {type: "f", value: 2400}
       },
 //      blending: THREE.AdditiveBlending,
       transparent: true
@@ -101,9 +100,8 @@
       vertexShader: coronaVertexShader,
       fragmentShader: coronaFragmentShader,
       uniforms: {
-        r: {type: "f", value: 1.0},
-        g: {type: "f", value: 0.0},
-        scale: {type: "f", value: 5.0}
+        scale: {type: "f", value: 5.0},
+        temp: {type: "f", value: 2400}
       },
 //      blending: THREE.AdditiveBlending,
       transparent: true
@@ -111,7 +109,7 @@
 
 
     var mesh = new THREE.Mesh(sphere, material);
-    mesh.position.set(0, 0, 0);
+    mesh.position.set(.1, .1, 0);
 
 
     var backMesh = new THREE.Mesh(sphereBak, material2);

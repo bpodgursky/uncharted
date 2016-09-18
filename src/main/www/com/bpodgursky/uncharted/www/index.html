@@ -261,6 +261,8 @@
 
   var STAR_GEOMETRY = new THREE.SphereGeometry(1.0, 32, 32);
 
+  var SURROUND_GEOMETRY = new THREE.CircleGeometry(1.0, 32);
+
   //  webgl init
 
 
@@ -606,16 +608,17 @@
 
     //  https://www.seedofandromeda.com/blogs/51-procedural-star-rendering
     //  > Below is the texture that Andreas Ressl and Georg Hammershmid made. If you want to steal it, remember to credit them somewhere!
-    var glowImage = new THREE.ImageUtils.loadTexture('resources/star_glow.png');
+//    var glowImage = new THREE.ImageUtils.loadTexture('resources/star_glow.png');
 
-    var spriteSurround = new THREE.SpriteMaterial({
-      map: glowImage,
-      color: 0x4d4d4d,
-      transparent: false,
-      blending: THREE.AdditiveBlending,
-      blendSrc: THREE["OneFactor"],
-      blendDst: THREE["OneFactor"]
-    });
+//    var spriteSurround = new THREE.SpriteMaterial({
+//      map: glowImage,
+//      color: 0x4d4d4d,
+//      transparent: false,
+//      blending: THREE.AdditiveBlending,
+//      blendSrc: THREE["OneFactor"],
+//      blendDst: THREE["OneFactor"]
+//    });
+
 
     var transparentMaterial = new THREE.MeshLambertMaterial({
       color: 0x000000,
@@ -627,7 +630,9 @@
 //    var geometry = new THREE.PlaneGeometry( 1, 1 );
 
 
+
     data.forEach(function (star) {
+
 
           var material = new THREE.ShaderMaterial({
             uniforms: {
@@ -638,6 +643,16 @@
             },
             vertexShader: starVertexShader,
             fragmentShader: starFragmentShader
+          });
+
+          var spriteSurround = new THREE.ShaderMaterial({
+            vertexShader: coronaVertexShader,
+            fragmentShader: coronaFragmentShader,
+            uniforms: {
+              scale: {type: "f", value: star.radiusInLys*3000000},
+              temp: {type: "f", value: star.temperatureEstimate/2}
+            },
+            transparent: true
           });
 
           var mesh = new THREE.Mesh(STAR_GEOMETRY, material);
@@ -668,14 +683,15 @@
 
 //        var surround = new THREE.Mesh( geometry, spriteSurround );
 
-          var surround = new THREE.Sprite(spriteSurround);
+          var surround = new THREE.Mesh(STAR_GEOMETRY, spriteSurround);
           surround.scale.set(3000000, 3000000, 3000000);
+          surround.starData = star;
 
-          var mousey = new THREE.Mesh(STAR_GEOMETRY, transparentMaterial);
-          mousey.scale.set(3000000, 3000000, 3000000);
-          mousey.starData = star;
+//          var mousey = new THREE.Mesh(STAR_GEOMETRY, transparentMaterial);
+//          mousey.scale.set(3000000, 3000000, 3000000);
+//          mousey.starData = star;
 
-          mesh.add(mousey);
+//          mesh.add(mousey);
           mesh.add(surround); // this centers the glow at the mesh
 
           starsByID[star.identifiers.primaryId] = mesh;
@@ -734,7 +750,8 @@
           selector.target(mesh.position);
 
           if(currentStarMesh) {
-            currentStarMesh.children[1].scale.set(3000000, 3000000, 3000000);
+            //  TODO make a amethod for getting radius
+            currentStarMesh.children[0].material.uniforms.scale.value = currentStarMesh.starData.radiusInLys * 3000000;
           }
 
           currentStarMesh = mesh;
@@ -820,8 +837,13 @@
     solMarker.updateTo(camera, delta);
 
     if(currentStarMesh) {
-      var distance = camera.position.distanceTo(currentStarMesh.position) * 3000000;
-      currentStarMesh.children[1].scale.set(distance, distance, distance)
+
+      var distance = camera.position.distanceTo(currentStarMesh.position)*.1;
+      var child = currentStarMesh.children[0];
+      var childUniform = child.material.uniforms;
+      if(childUniform.scale.value != distance) {
+        childUniform.scale.value = Math.min(distance, currentStarMesh.starData.radiusInLys*3000000);
+      }
     }
 
     renderer.render(scene, camera);
