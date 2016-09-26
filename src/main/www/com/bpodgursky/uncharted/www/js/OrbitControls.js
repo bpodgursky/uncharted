@@ -58,7 +58,7 @@ THREE.OrbitControls = function (object, domElement) {
       this.lastUpdateMouseY = this.mouseY;
 
       event.preventDefault();
-      event.stopPropagation();
+   //   event.stopPropagation();
     }
 
   };
@@ -66,7 +66,7 @@ THREE.OrbitControls = function (object, domElement) {
   this.onMouseUp = function (event) {
 
     event.preventDefault();
-    event.stopPropagation();
+    // event.stopPropagation();
 
     this.dragView = false;
 
@@ -193,8 +193,8 @@ THREE.OrbitControls = function (object, domElement) {
       var diffX = (this.mouseX - this.lastUpdateMouseX) / window.innerWidth;
       var diffY = -(this.mouseY - this.lastUpdateMouseY) / window.innerHeight;
 
-      translateX -= .000010 * diffX;
-      translateY -= .000010 * diffY;
+      translateX -= 10 * diffX * dO;
+      translateY -= 10 * diffY * dO;
 
       this.lastUpdateMouseX = this.mouseX;
       this.lastUpdateMouseY = this.mouseY;

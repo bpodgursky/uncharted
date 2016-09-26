@@ -270,11 +270,11 @@
 
   var scene = new THREE.Scene();
 
-  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.000000001, 10000);
+  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.00000000005, 10000);
   camera.position.set(0, 0, -15);
   camera.rotateZ(Math.PI);
 
-  var intersectCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1.0, 10000);
+  var intersectCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, .01, 10000);
 
 
   var ambientLight = new THREE.AmbientLight(0xcccccc);
@@ -584,7 +584,11 @@
       var intersects = raycaster.intersectObjects(visibleStars, false);
 
       if (intersects.length > 0) {
-        return starsByID[intersects[intersects.length - 1].object.starData.identifiers.primaryId];
+        console.log(intersects.length);
+        var targetId = intersects[intersects.length - 1].object.starData.identifiers.primaryId;
+        if(targetId != currentStarPrimaryId) {
+          return starsByID[targetId];
+        }
       }
 
       if (tooltip) {
@@ -620,15 +624,15 @@
 
   function onMouseClick (event) {
 
-//    var diffX = Math.abs(mouseDownX - event.clientX);
-//    var diffY = Math.abs(mouseDownY - event.clientY);
-//    var delta = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2))
-//
-//    console.log(delta);
+    var diffX = Math.abs(mouseDownX - event.clientX);
+    var diffY = Math.abs(mouseDownY - event.clientY);
+    var delta = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2))
 
-//    if(delta < 5) {
+    console.log(delta);
+
+    if(delta < 5) {
       select(getStarForPoint(event.clientX, event.clientY));
-//    }
+    }
 
   }
 
@@ -644,7 +648,8 @@
               lowTemp: {type: "f", value: star.temperatureEstimate / 4}
             },
             vertexShader: starVertexShader,
-            fragmentShader: starFragmentShader
+            fragmentShader: starFragmentShader,
+            transparent: false
           });
 
           var spriteSurround = new THREE.ShaderMaterial({
@@ -885,7 +890,8 @@
 
   window.addEventListener('resize', onWindowResize, false);
   document.addEventListener('mousemove', setMouseXY, false);
-  document.addEventListener('click', onMouseClick, false);
+  document.addEventListener('mousedown', setmouseDown, false);
+  document.addEventListener('mouseup', onMouseClick, false);
 
   var loader = new THREE.FontLoader();
 
