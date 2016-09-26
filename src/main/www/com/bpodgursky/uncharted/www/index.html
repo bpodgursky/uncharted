@@ -618,17 +618,17 @@
     }
   }
 
-  function onMouseClick(event) {
+  function onMouseClick (event) {
 
-    var diffX = Math.abs(mouseDownX - event.clientX);
-    var diffY = Math.abs(mouseDownY - event.clientY);
-    var delta = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2))
+//    var diffX = Math.abs(mouseDownX - event.clientX);
+//    var diffY = Math.abs(mouseDownY - event.clientY);
+//    var delta = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2))
+//
+//    console.log(delta);
 
-    console.log(delta);
-
-    if(delta < 5) {
+//    if(delta < 5) {
       select(getStarForPoint(event.clientX, event.clientY));
-    }
+//    }
 
   }
 
