@@ -377,7 +377,7 @@
     e.preventDefault();
   });
 
-  function updateTarget() {
+  function updateTarget(prevStarMesh) {
 
     var prevControlMode = controlMode;
     controlMode = 'tween';
@@ -387,12 +387,23 @@
           tweenControls.setZoom(currentStarMesh.position,
               MARKER_RADIUS, 1,
               function () {
-                controlMode = prevControlMode ? prevControlMode : 'orbit';
+
+                if(prevStarMesh) {
+                  //  TODO make a amethod for getting radius
+                  prevStarMesh.children[0].material.uniforms.scale.value = currentStarMesh.starData.radiusInLys * 3000000;
+                }
+
+                if(!prevControlMode || prevControlMode == 'tween'){
+                  controlMode = 'orbit';
+                }else {
+                  controlMode = prevControlMode
+                }
 
                 orbitControls.orbit(
                     currentStarMesh.position,
                     starsByID[currentStarPrimaryId].starData.radiusInLys * 2
                 )
+
               }
           )
         });
@@ -475,20 +486,27 @@
       scene.remove(tooltip.object);
     }
 
+    var targetPos = targetMesh.position;
+
     var geometry = new THREE.Geometry();
     geometry.vertices.push(currentStarMesh.position);
-    geometry.vertices.push(targetMesh.position);
+    geometry.vertices.push(targetPos);
     lineSegment = new THREE.Line(geometry, lineMaterial);
 
-    var lineDistance = currentStarMesh.position.distanceTo(targetMesh.position);
+    var lineDistance = currentStarMesh.position.distanceTo(targetPos);
     var label = getLabelText(targetMesh.starData.identifiers);
     var cacheKey = label + lineDistance;  // could target each star from each other star.
 
     if (!labelCache[(cacheKey)]) {
-      labelCache[cacheKey] = new TooltipMarker(label, lineDistance, targetMesh.position, targetMesh.starData.radiusInLys);
+      labelCache[cacheKey] = new TooltipMarker(label, lineDistance, targetMesh.starData.radiusInLys);
     }
 
     tooltip = labelCache[cacheKey];
+    tooltip.object.position.set(
+        targetPos.x,
+        targetPos.y,
+        targetPos.z
+    );
 
     scene.add(lineSegment);
     scene.add(tooltip.object);
@@ -601,38 +619,22 @@
   }
 
   function onMouseClick(event) {
-    select(getStarForPoint(event.clientX, event.clientY));
+
+    var diffX = Math.abs(mouseDownX - event.clientX);
+    var diffY = Math.abs(mouseDownY - event.clientY);
+    var delta = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2))
+
+    console.log(delta);
+
+    if(delta < 5) {
+      select(getStarForPoint(event.clientX, event.clientY));
+    }
+
   }
 
   function initializeStarData(data) {
 
-    //  https://www.seedofandromeda.com/blogs/51-procedural-star-rendering
-    //  > Below is the texture that Andreas Ressl and Georg Hammershmid made. If you want to steal it, remember to credit them somewhere!
-//    var glowImage = new THREE.ImageUtils.loadTexture('resources/star_glow.png');
-
-//    var spriteSurround = new THREE.SpriteMaterial({
-//      map: glowImage,
-//      color: 0x4d4d4d,
-//      transparent: false,
-//      blending: THREE.AdditiveBlending,
-//      blendSrc: THREE["OneFactor"],
-//      blendDst: THREE["OneFactor"]
-//    });
-
-
-    var transparentMaterial = new THREE.MeshLambertMaterial({
-      color: 0x000000,
-      transparent: true,
-      opacity: 0.0,
-      alphaTest: 0.5
-    });
-
-//    var geometry = new THREE.PlaneGeometry( 1, 1 );
-
-
-
     data.forEach(function (star) {
-
 
           var material = new THREE.ShaderMaterial({
             uniforms: {
@@ -664,34 +666,10 @@
           mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys;
           mesh.starData = star;
 
-//          var uniforms2 = {
-//            cur_time: {type:"f", value:1.0},
-//            beg_time:{type:"f", value:1.0},
-//            scale:{type: "v3", value:new THREE.Vector3()}
-//          };
-
-          //  TODO finish, re: http://stackoverflow.com/questions/24259404/how-to-apply-custom-shader-to-sprite-in-three-js
-//          var glowMat = new THREE.ShaderMaterial( {
-//
-//            uniforms: uniforms2,
-//            vertexShader: coronaVertexShader,
-//            fragmentShader: coronaFragmentShader,
-//            transparent: true,
-//            blending:THREE.AdditiveBlending // It looks like real blast with Additive blending!!!
-//
-//          } );
-
-//        var surround = new THREE.Mesh( geometry, spriteSurround );
-
           var surround = new THREE.Mesh(STAR_GEOMETRY, spriteSurround);
           surround.scale.set(3000000, 3000000, 3000000);
           surround.starData = star;
 
-//          var mousey = new THREE.Mesh(STAR_GEOMETRY, transparentMaterial);
-//          mousey.scale.set(3000000, 3000000, 3000000);
-//          mousey.starData = star;
-
-//          mesh.add(mousey);
           mesh.add(surround); // this centers the glow at the mesh
 
           starsByID[star.identifiers.primaryId] = mesh;
@@ -749,15 +727,12 @@
 
           selector.target(mesh.position);
 
-          if(currentStarMesh) {
-            //  TODO make a amethod for getting radius
-            currentStarMesh.children[0].material.uniforms.scale.value = currentStarMesh.starData.radiusInLys * 3000000;
-          }
+          var prevStarMesh = currentStarMesh;
 
           currentStarMesh = mesh;
           currentStarPrimaryId = newStarPrimaryId;
 
-          updateTarget();
+          updateTarget(prevStarMesh);
 
           doReassign(currentStarMesh);
 
@@ -897,6 +872,15 @@
         orbitFn.apply(orbitControls, arguments);
       }
     };
+  }
+
+  var mouseDownX = 0;
+  var mouseDownY = 0;
+
+  function setmouseDown(event) {
+    console.log("downdown")
+    mouseDownX = event.clientX;
+    mouseDownY = event.clientY;
   }
 
   window.addEventListener('resize', onWindowResize, false);

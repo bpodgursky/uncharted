@@ -1,5 +1,5 @@
 //  TODO this is an abomination
-function TooltipMarker(label, distance, position, radius) {
+function TooltipMarker(label, distance, radius) {
 
   var distanceFormatted = distance.toFixed(1) + "ly";
 
@@ -70,12 +70,6 @@ function TooltipMarker(label, distance, position, radius) {
   this.rectMesh.position.x = .05;
   this.rectMesh.position.y = - (85/510)/2;
   this.rectMesh.position.z = .01;
-
-  this.object.position.set(
-      position.x,
-      position.y,
-      position.z
-  );
 
 }
 

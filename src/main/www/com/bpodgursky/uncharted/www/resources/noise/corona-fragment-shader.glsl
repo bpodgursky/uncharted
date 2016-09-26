@@ -107,12 +107,11 @@ void main() {
   float scaleDist = dist/scale;
 
   float ring = 0.0;//max((snoise(vec3(scaleDist*15.0, scaleDist*15.0, scaleDist*15.0)) - .5)*.04, 0.0);
-  float noise1 = 0.0;//max(snoise(normalize(viewVector) + nDistVec * 15.0), 0.0) * .03;
   float noise2 = abs(.01/(abs(nDistVec.y)+.05)) * 2.3;
 
-  float fade = 1.0 - 2.0*dist/scale;
+  float fade = 1.0 - 3.0*dist/scale;
 
-  float totalStrength = fade*(1.0 + noise2 + ring +noise1);
+  float totalStrength = fade*(1.0 + noise2 + ring );
 
 
       float i =(temp - 800.0)*0.035068;
