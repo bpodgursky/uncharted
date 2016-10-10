@@ -276,10 +276,6 @@
 
   var intersectCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, .01, 10000);
 
-
-  var ambientLight = new THREE.AmbientLight(0xcccccc);
-  var light1 = new THREE.DirectionalLight(0xffffff);
-
   var windowHalfX = window.innerWidth / 2;
   var windowHalfY = window.innerHeight / 2;
 
@@ -301,7 +297,8 @@
   );
 
   var lineMaterial = new THREE.LineBasicMaterial({
-    color: 0x0000ff
+    color: 0x0000ff,
+    depthWrite: false
   });
 
   var uniforms = {
@@ -336,16 +333,17 @@
 
   scene.add(camera);
   scene.add(intersectCamera);
-  scene.add(ambientLight);
-  scene.add(light1);
   scene.add(solMarker.mesh);
   scene.add(selector.mesh);
 
   //  other data
 
   var starData;
+  var planetData;
+
   var stars = [];
   var starsByID = {};
+  var planetsByStarID = {};
   var visibleStars = [];
   var visibleStarsByName = {};
   var renderRadius = 75;
@@ -652,7 +650,7 @@
             transparent: false
           });
 
-          var spriteSurround = new THREE.ShaderMaterial({
+          var shaderSurround = new THREE.ShaderMaterial({
             vertexShader: coronaVertexShader,
             fragmentShader: coronaFragmentShader,
             uniforms: {
@@ -671,7 +669,7 @@
           mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys;
           mesh.starData = star;
 
-          var surround = new THREE.Mesh(STAR_GEOMETRY, spriteSurround);
+          var surround = new THREE.Mesh(STAR_GEOMETRY, shaderSurround);
           surround.scale.set(3000000, 3000000, 3000000);
           surround.starData = star;
 
@@ -679,9 +677,14 @@
 
           starsByID[star.identifiers.primaryId] = mesh;
           stars.push(mesh);
+          planetsByStarID[star.identifiers.primaryId] = [];
         }
-    )
-    ;
+    );
+
+    planetData.forEach(function(planet){
+      var star = planet.starId;
+      planetsByStarID[star].push(planet);
+    });
 
   }
 
@@ -730,12 +733,38 @@
 
           setLink(newStar.links.wikipedia, infoWiki);
 
+          var planets = planetsByStarID[newStar.identifiers.primaryId];
+
+          planets.forEach(function(planet){
+
+            var eccentricity = planet.eccentricity;
+            var major = planet.semiMajorAxisLys;
+            var minor = major * Math.sqrt(1-Math.pow(eccentricity, 2));
+
+            var material = new THREE.LineBasicMaterial({
+              color:0x33cc33,
+              depthWrite: false
+            });
+            var ellipse = new THREE.EllipseCurve(mesh.position.x, mesh.position.y, major, minor, 0, 2.0 * Math.PI, false);
+            var ellipsePath = new THREE.CurvePath();
+            ellipsePath.add(ellipse);
+            var ellipseGeometry = ellipsePath.createPointsGeometry(100);
+            ellipseGeometry.computeTangents();
+            var line = new THREE.Line(ellipseGeometry, material);
+            scene.add( line );
+
+          });
+
+
           selector.target(mesh.position);
+
 
           var prevStarMesh = currentStarMesh;
 
           currentStarMesh = mesh;
           currentStarPrimaryId = newStarPrimaryId;
+
+
 
           updateTarget(prevStarMesh);
 
@@ -790,14 +819,6 @@
 
     var delta = clock.getDelta();
     uniforms.time.value += 0.005 * delta;
-
-    light1.position = camera.position;
-    light1.position.set(
-        camera.position.x,
-        camera.position.y,
-        camera.position.z
-    );
-
 
     if (controlMode == 'orbit') {
       orbitControls.update(delta);
@@ -936,7 +957,9 @@
           "max_lys": 75
         },
         success: function (data) {
-          starData = JSON.parse(data);
+          var dataParsed = JSON.parse(data);
+          starData = dataParsed.stars;
+          planetData = dataParsed.planets;
         }
       })
   ).then(function () {

@@ -58,7 +58,7 @@ THREE.OrbitControls = function (object, domElement) {
       this.lastUpdateMouseY = this.mouseY;
 
       event.preventDefault();
-   //   event.stopPropagation();
+      //   event.stopPropagation();
     }
 
   };
@@ -88,7 +88,7 @@ THREE.OrbitControls = function (object, domElement) {
     var delta = 0;
 
     if (event.wheelDelta) { // WebKit / Opera / Explorer 9
-      delta = - event.wheelDelta / 2000;
+      delta = -event.wheelDelta / 2000;
     } else if (event.detail) { // Firefox
       delta = -event.detail / 300;
     }
@@ -111,13 +111,13 @@ THREE.OrbitControls = function (object, domElement) {
 
       case 38: /*up*/
       case 87: /*W    */
-        if(trigger) {
+        if (trigger) {
           this.moveDelta = -.1;
         }
         break;
       case 40: /*down*/
       case 83: /*S*/
-        if(trigger){
+        if (trigger) {
           this.moveDelta = .1;
         }
         break;
@@ -145,11 +145,11 @@ THREE.OrbitControls = function (object, domElement) {
 
   };
 
-  this.orbit = function(target, minRadius){
+  this.orbit = function (target, minRadius) {
     this.target = target;
     this.minRadius = minRadius;
   }
-  
+
   this.update = function (delta) {
 
     var dO = this.target.distanceTo(this.camera.position);
@@ -160,7 +160,7 @@ THREE.OrbitControls = function (object, domElement) {
 
       if (dO + actualMoveSpeed < this.minRadius) {
         var advance = dO - this.minRadius;
-        this.camera.translateZ(- advance);
+        this.camera.translateZ(-advance);
       } else {
         this.camera.translateZ(actualMoveSpeed);
       }
@@ -201,7 +201,9 @@ THREE.OrbitControls = function (object, domElement) {
 
     }
 
-    translateX += .04 * dO  * delta;
+
+    console.log(dO);
+    translateX += delta * .04 * dO;
 
     this.camera.translateX(translateX);
     this.camera.rotateY(Math.atan(translateX / dO));
@@ -214,7 +216,6 @@ THREE.OrbitControls = function (object, domElement) {
     var dN = this.target.distanceTo(this.camera.position);
 
     this.camera.translateZ(-(dN - dO));
-
 
 
   };

@@ -7,8 +7,8 @@ public class AstroConvert {
   public static final double RADIANS_PER_ARCSECOND = Math.PI / 43200;
 
   private static final double DEGREE_IN_RADIANS = 0.0174532925;
-
   private static final double LIGHTYEARS_PER_PARSEC = 3.26163344;
+  private static final double LIGHTYEARS_PER_AU = 1.58125e-5;
 
   //  from https://en.wikipedia.org/wiki/Color_index
   public static Double bvToTemperature(Double bvIndex){
@@ -43,6 +43,10 @@ public class AstroConvert {
 
   public static Double parsecsToLightyears(double parsecs){
     return LIGHTYEARS_PER_PARSEC * parsecs;
+  }
+
+  public static Double auToLightyears(double au){
+    return LIGHTYEARS_PER_AU*au;
   }
 
   public static Double hoursToRadians(double hours){

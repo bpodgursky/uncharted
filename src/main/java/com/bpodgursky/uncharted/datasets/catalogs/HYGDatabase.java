@@ -86,6 +86,7 @@ public class HYGDatabase implements StarCatalog {
       //  ,bf,
       String bayerFlamsteed = split[5];
       if(!bayerFlamsteed.equals("")){
+        System.out.println(line);
         identifiers.setBayerFlamsteed(BayerFlamsteed.parse(bayerFlamsteed));
       }
 

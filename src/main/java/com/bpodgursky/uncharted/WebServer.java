@@ -1,17 +1,19 @@
 package com.bpodgursky.uncharted;
 
+import javax.servlet.DispatcherType;
+import java.net.URL;
+import java.util.EnumSet;
+import java.util.concurrent.Semaphore;
+
 import com.bpodgursky.uncharted.api.StarCatalogServlet;
+import com.bpodgursky.uncharted.datasets.StellarLibrary;
 import com.bpodgursky.uncharted.datasets.catalogs.HYGDatabase;
+import com.bpodgursky.uncharted.datasets.catalogs.NasaExoplanetCatalog;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.GzipFilter;
 import org.eclipse.jetty.webapp.WebAppContext;
-
-import javax.servlet.DispatcherType;
-import java.net.URL;
-import java.util.EnumSet;
-import java.util.concurrent.Semaphore;
 
 public class WebServer implements Runnable {
   public static final int DEFAULT_PORT = 42315;
@@ -33,8 +35,17 @@ public class WebServer implements Runnable {
       final URL warUrl = uiServer.getClass().getClassLoader().getResource("com/bpodgursky/uncharted/www");
       final String warUrlString = warUrl.toExternalForm();
 
+      HYGDatabase hygDatabase = new HYGDatabase();
+      NasaExoplanetCatalog planetCatalog = new NasaExoplanetCatalog(new StellarLibrary(hygDatabase.getAllStars(75.0)));
+
+//      for (StarRecord starRecord : hygDatabase.getAllStars(75.0)) {
+//        if(starRecord.getIdentifiers().getBayerFlamsteed() != null){
+//          System.out.println(starRecord.getIdentifiers().getBayerFlamsteed());
+//        }
+//      }
+
       WebAppContext context = new WebAppContext(warUrlString, "/");
-      context.addServlet(new ServletHolder(new StarCatalogServlet(new HYGDatabase())), "/star_catalog");
+      context.addServlet(new ServletHolder(new StarCatalogServlet(hygDatabase, planetCatalog)), "/star_catalog");
       context.addFilter(GzipFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
 
       uiServer.setHandler(context);
