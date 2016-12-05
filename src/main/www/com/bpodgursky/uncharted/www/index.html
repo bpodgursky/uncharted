@@ -19,6 +19,7 @@
   <script src="js/DynamicMarker.js"></script>
   <script src="js/TweenControls.js"></script>
   <script src="js/TooltipMarker.js"></script>
+  <script src="js/System.js"></script>
   <script src="resources/Detector.js"></script>
 
 </head>
@@ -259,9 +260,7 @@
 
   //  constant stuff
 
-  var STAR_GEOMETRY = new THREE.SphereGeometry(1.0, 32, 32);
-
-  var SURROUND_GEOMETRY = new THREE.CircleGeometry(1.0, 32);
+  var SPHERE_GEOMETRY = new THREE.SphereGeometry(1.0, 32, 32);
 
   //  webgl init
 
@@ -410,6 +409,7 @@
 
   var currentStarPrimaryId = "";
   var currentStarMesh;
+  var currentSystem;
 
   //  infobox stuff
   var infoProperName = $("#proper_name_box");
@@ -552,12 +552,12 @@
     });
 
     if (currentStarPrimaryId == "") {
-      select(starsByID[0]);
+      select(starsByID[15471]);
       reassignLabel(starsByID[70667]);
     }
     //  if we shrunk the render distance
     else if (!renderedStars[currentStarPrimaryId]) {
-      select(starsByID[0]);
+      select(starsByID[15471]);
     }
 
 
@@ -582,7 +582,6 @@
       var intersects = raycaster.intersectObjects(visibleStars, false);
 
       if (intersects.length > 0) {
-        console.log(intersects.length);
         var targetId = intersects[intersects.length - 1].object.starData.identifiers.primaryId;
         if(targetId != currentStarPrimaryId) {
           return starsByID[targetId];
@@ -626,8 +625,6 @@
     var diffY = Math.abs(mouseDownY - event.clientY);
     var delta = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2))
 
-    console.log(delta);
-
     if(delta < 5) {
       select(getStarForPoint(event.clientX, event.clientY));
     }
@@ -660,7 +657,7 @@
             transparent: true
           });
 
-          var mesh = new THREE.Mesh(STAR_GEOMETRY, material);
+          var mesh = new THREE.Mesh(SPHERE_GEOMETRY, material);
 
           mesh.position.x = star.cartesianCoordsInLys.x;
           mesh.position.y = star.cartesianCoordsInLys.y;
@@ -669,7 +666,7 @@
           mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys;
           mesh.starData = star;
 
-          var surround = new THREE.Mesh(STAR_GEOMETRY, shaderSurround);
+          var surround = new THREE.Mesh(SPHERE_GEOMETRY, shaderSurround);
           surround.scale.set(3000000, 3000000, 3000000);
           surround.starData = star;
 
@@ -733,28 +730,12 @@
 
           setLink(newStar.links.wikipedia, infoWiki);
 
-          var planets = planetsByStarID[newStar.identifiers.primaryId];
+          if(currentSystem) {
+            scene.remove(currentSystem.object);
+          }
 
-          planets.forEach(function(planet){
-
-            var eccentricity = planet.eccentricity;
-            var major = planet.semiMajorAxisLys;
-            var minor = major * Math.sqrt(1-Math.pow(eccentricity, 2));
-
-            var material = new THREE.LineBasicMaterial({
-              color:0x33cc33,
-              depthWrite: false
-            });
-            var ellipse = new THREE.EllipseCurve(mesh.position.x, mesh.position.y, major, minor, 0, 2.0 * Math.PI, false);
-            var ellipsePath = new THREE.CurvePath();
-            ellipsePath.add(ellipse);
-            var ellipseGeometry = ellipsePath.createPointsGeometry(100);
-            ellipseGeometry.computeTangents();
-            var line = new THREE.Line(ellipseGeometry, material);
-            scene.add( line );
-
-          });
-
+          currentSystem = new System(mesh.position, planetsByStarID[newStar.identifiers.primaryId]);
+          scene.add(currentSystem.object);
 
           selector.target(mesh.position);
 
@@ -904,7 +885,6 @@
   var mouseDownY = 0;
 
   function setmouseDown(event) {
-    console.log("downdown")
     mouseDownX = event.clientX;
     mouseDownY = event.clientY;
   }

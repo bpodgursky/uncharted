@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Scanner;
 import java.util.zip.GZIPInputStream;
 
-import com.bpodgursky.uncharted.datasets.AstroConvert;
 import com.bpodgursky.uncharted.datasets.PlanetData;
 import com.bpodgursky.uncharted.datasets.StarRecord;
 import com.bpodgursky.uncharted.datasets.StellarLibrary;
@@ -53,16 +52,18 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
         continue;
       }
 
-      String orbitalPeriodDays = line[5];
-      String semiMajorAxis = line[9];
-      String eccentricity = line[13];
-      String inclination = line[17];
+      String orbitalPeriodDaysRaw = line[5];
+      String semiMajorAxisRaw = line[9];
+      String eccentricityRaw = line[13];
+      String inclinationRaw = line[17];
 
-      //  TODO try to calculate from each other?
-      //  TODO some we can fake / ignore (ex inclination)
-      if(semiMajorAxis.equals("") || eccentricity.equals("") || orbitalPeriodDays.equals("") || inclination.equals("")){
-        continue;
-      }
+      String massRaw = line[21];
+      String radiusRaw = line[26];
+      String densityRaw = line[30];
+
+      //  21 = Planet Mass or M*sin(i)[Jupiter mass]
+      //  26 = Planet Radius [Jupiter radii]
+      //  30 = Planet Density [g/cm**3]
 
       planetCount++;
 
@@ -79,10 +80,15 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
             planetID,
             starRecord.getIdentifiers().getPrimaryId(),
             new PlanetData.PlanetName(starName, planetLetter),
-            AstroConvert.auToLightyears(Double.parseDouble(semiMajorAxis)),
-            Double.parseDouble(eccentricity),
-            Double.parseDouble(orbitalPeriodDays),
-            Double.parseDouble(inclination)
+            PlanetDefaults.getPlanetProperties(
+                semiMajorAxisRaw,
+                eccentricityRaw,
+                orbitalPeriodDaysRaw,
+                inclinationRaw,
+                massRaw,
+                radiusRaw,
+                densityRaw
+            )
         ));
       } else {
         LOG.warn("Could not find star for name: " + starName);

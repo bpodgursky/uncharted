@@ -6,9 +6,12 @@ public class AstroConvert {
   public static final double RADIANS_PER_ARCMINUTE = Math.PI / 720;
   public static final double RADIANS_PER_ARCSECOND = Math.PI / 43200;
 
-  private static final double DEGREE_IN_RADIANS = 0.0174532925;
-  private static final double LIGHTYEARS_PER_PARSEC = 3.26163344;
-  private static final double LIGHTYEARS_PER_AU = 1.58125e-5;
+  public static final double DEGREE_IN_RADIANS = 0.0174532925;
+  public static final double LIGHTYEARS_PER_PARSEC = 3.26163344;
+  public static final double LIGHTYEARS_PER_AU = 1.58125e-5;
+
+  public static final double JUP_RADIUS_IN_LYS = 7.3896527e-9;
+  public static final Double JUP_MASS_IN_KG = 1.898e27;
 
   //  from https://en.wikipedia.org/wiki/Color_index
   public static Double bvToTemperature(Double bvIndex){
@@ -67,6 +70,14 @@ public class AstroConvert {
     return degrees * RADIANS_PER_HOUR +
         minute * RADIANS_PER_ARCMINUTE +
         second * RADIANS_PER_ARCSECOND;
+  }
+
+  public static double jupRadiiToLys(double jupRadii){
+    return jupRadii * JUP_RADIUS_IN_LYS;
+  }
+
+  public static double jupMassInKg(double jupMasses){
+    return jupMasses * JUP_MASS_IN_KG;
   }
 
 }

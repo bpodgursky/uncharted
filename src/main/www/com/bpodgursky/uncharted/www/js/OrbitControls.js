@@ -202,7 +202,6 @@ THREE.OrbitControls = function (object, domElement) {
     }
 
 
-    console.log(dO);
     translateX += delta * .04 * dO;
 
     this.camera.translateX(translateX);
