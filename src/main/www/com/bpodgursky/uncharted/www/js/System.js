@@ -9,13 +9,23 @@ var scaleMaterial = new THREE.LineBasicMaterial({
 });
 
 var transparentMaterial = new THREE.MeshBasicMaterial({
-  transparent: true
+  transparent: true,
+  color: 0x000000,
+  depthWrite: false,
+  renderOrder: 1,
+  opacity: 0.0
 });
+
+var transparentGeometry = new THREE.SphereGeometry(1.0, 32, 32);
+
 
 function System(position, planets) {
 
   this.object = new THREE.Group();
   var object = this.object;
+
+  this.planetSelectable = [];
+  var planetSelectable = this.planetSelectable;
 
   this.object.position.x = position.x;
   this.object.position.y = position.y;
@@ -55,17 +65,18 @@ function System(position, planets) {
     //   transparent: false
     // });
 
-
     var planetMesh = new THREE.Mesh(SPHERE_GEOMETRY, simpleMaterial);
     planetMesh.scale.x = planetMesh.scale.y = planetMesh.scale.z = planet.values.RADIUS_LYS.value;
 
-    var surround = new THREE.Mesh(SPHERE_GEOMETRY, transparentMaterial);
-    surround.scale.set(30000, 30000, 30000);
+    var surround = new THREE.Mesh(transparentGeometry, transparentMaterial);
+    surround.scale.set(10, 10, 10);
 
     planetMesh.add(surround);
 
     planetMesh.position.x = major;
     object.add(planetMesh);
+
+    planetSelectable.push(surround);
 
   });
 

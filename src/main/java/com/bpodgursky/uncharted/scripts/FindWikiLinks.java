@@ -44,7 +44,7 @@ public class FindWikiLinks {
 
       if(foundUrl != null){
         System.out.println("Found: "+ foundUrl+"\t"+record.getIdentifiers());
-        matchFile.write(record.getIdentifiers().getPrimaryId() + "\t" + foundUrl + "\n");
+        matchFile.write(record.getPrimaryId() + "\t" + foundUrl + "\n");
       }
 
       //  if we had a reasonable chance...

@@ -42,7 +42,7 @@ public class GlieseCatalog implements StarCatalog {
     sunIds.put(DatasetName.GLIESE_ID, "Sun");
     sunIds.put(DatasetName.PROPER_NAME, "The Sun");
 
-    StarIdentifiers sunIdentifiers = new StarIdentifiers("Sun");
+    StarIdentifiers sunIdentifiers = new StarIdentifiers();
     sunIdentifiers.setProperName("The Sun");
     sunIdentifiers.setGlieseId("Sun");
 
@@ -67,7 +67,7 @@ public class GlieseCatalog implements StarCatalog {
 
       String glieseName = split[1].trim();
 
-      StarIdentifiers identifiers = new StarIdentifiers(glieseName);
+      StarIdentifiers identifiers = new StarIdentifiers();
       identifiers.setGlieseId(glieseName);
 
       String otherName = safeTrim(split[41]);

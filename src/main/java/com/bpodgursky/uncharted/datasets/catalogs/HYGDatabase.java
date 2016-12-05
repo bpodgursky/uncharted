@@ -56,8 +56,7 @@ public class HYGDatabase implements StarCatalog {
       //  id,
       String mainId = split[0];
 
-      StarIdentifiers identifiers = new StarIdentifiers(mainId);
-
+      StarIdentifiers identifiers = new StarIdentifiers();
 
       //  hip
       String hipparcosID = split[1];
@@ -86,7 +85,6 @@ public class HYGDatabase implements StarCatalog {
       //  ,bf,
       String bayerFlamsteed = split[5];
       if(!bayerFlamsteed.equals("")){
-        System.out.println(line);
         identifiers.setBayerFlamsteed(BayerFlamsteed.parse(bayerFlamsteed));
       }
 
@@ -130,6 +128,16 @@ public class HYGDatabase implements StarCatalog {
             parseOrNull(split[16]),
             luminosity
         );
+
+
+        if(properName.equals("82 G. Eri")){
+          System.out.println("PRIMARY SUPER IMPORTANT "+record.getPrimaryId());
+        }
+
+        if(mainId.equals("15471")){
+          System.out.println("PRIMARY SUPER IMPORTANT " +record.getPrimaryId());
+        }
+
 
         stars.add(record);
       }

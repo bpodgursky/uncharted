@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 public class NasaExoplanetCatalog implements ExoplanetCatalog {
   private static final Logger LOG = LoggerFactory.getLogger(NasaExoplanetCatalog.class);
 
-  private final Multimap<String, PlanetData> allPlanetsByStarID = LinkedListMultimap.create();
+  private final Multimap<Integer, PlanetData> allPlanetsByStarID = LinkedListMultimap.create();
 
   public NasaExoplanetCatalog(StellarLibrary library) throws IOException {
 
@@ -76,9 +76,9 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
       }
 
       if (starRecord != null) {
-        allPlanetsByStarID.put(starRecord.getIdentifiers().getPrimaryId(), new PlanetData(
+        allPlanetsByStarID.put(starRecord.getPrimaryId(), new PlanetData(
             planetID,
-            starRecord.getIdentifiers().getPrimaryId(),
+            starRecord.getPrimaryId(),
             new PlanetData.PlanetName(starName, planetLetter),
             PlanetDefaults.getPlanetProperties(
                 semiMajorAxisRaw,
@@ -91,7 +91,7 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
             )
         ));
       } else {
-        LOG.warn("Could not find star for name: " + starName);
+//        LOG.warn("Could not find star for name: " + starName);
       }
 
     }
@@ -101,11 +101,11 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
   }
 
   @Override
-  public Multimap<String, PlanetData> getAllPlanetsByStarID(Collection<StarRecord> stars) {
+  public Multimap<Integer, PlanetData> getAllPlanetsByStarID(Collection<StarRecord> stars) {
 
-    Multimap<String, PlanetData> forStars = HashMultimap.create();
+    Multimap<Integer, PlanetData> forStars = HashMultimap.create();
     for (StarRecord star : stars) {
-      String starID = star.getIdentifiers().getPrimaryId();
+      Integer starID = star.getPrimaryId();
       forStars.putAll(starID, allPlanetsByStarID.get(starID));
     }
 

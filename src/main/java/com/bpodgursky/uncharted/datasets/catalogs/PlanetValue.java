@@ -12,4 +12,12 @@ public class PlanetValue {
   public static PlanetValue of(double property, ValueSource source){
     return new PlanetValue(property, source);
   }
+
+  public double getValue() {
+    return value;
+  }
+
+  public ValueSource getSource() {
+    return source;
+  }
 }

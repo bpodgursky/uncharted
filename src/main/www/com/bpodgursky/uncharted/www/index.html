@@ -464,7 +464,7 @@
       return;
     }
 
-    if (tooltipStar.starData.identifiers.primaryId == targetMesh.starData.identifiers.primaryId) {
+    if (tooltipStar.starData.primaryId == targetMesh.starData.primaryId) {
       return;
     }
 
@@ -492,7 +492,7 @@
     lineSegment = new THREE.Line(geometry, lineMaterial);
 
     var lineDistance = currentStarMesh.position.distanceTo(targetPos);
-    var label = getLabelText(targetMesh.starData.identifiers);
+    var label = targetMesh.starData.properName;
     var cacheKey = label + lineDistance;  // could target each star from each other star.
 
     if (!labelCache[(cacheKey)]) {
@@ -525,7 +525,7 @@
 
     var renderedStars = {};
     visibleStars.forEach(function (e) {
-      renderedStars[e.starData.identifiers.primaryId] = true;
+      renderedStars[e.starData.primaryId] = true;
     });
     visibleStars = [];
     visibleStarsByName = {};
@@ -534,7 +534,7 @@
 
     stars.forEach(function (starMesh) {
       var data = starMesh.starData;
-      var starID = data.identifiers.primaryId;
+      var starID = data.primaryId;
       var commonName = getLabelText(data.identifiers);
       nameList.push(commonName);
       visibleStarsByName[commonName] = starMesh;
@@ -552,12 +552,12 @@
     });
 
     if (currentStarPrimaryId == "") {
-      select(starsByID[15471]);
+      select(starsByID[15472]);
       reassignLabel(starsByID[70667]);
     }
     //  if we shrunk the render distance
     else if (!renderedStars[currentStarPrimaryId]) {
-      select(starsByID[15471]);
+      select(starsByID[15472]);
     }
 
 
@@ -582,7 +582,7 @@
       var intersects = raycaster.intersectObjects(visibleStars, false);
 
       if (intersects.length > 0) {
-        var targetId = intersects[intersects.length - 1].object.starData.identifiers.primaryId;
+        var targetId = intersects[intersects.length - 1].object.starData.primaryId;
         if(targetId != currentStarPrimaryId) {
           return starsByID[targetId];
         }
@@ -672,9 +672,9 @@
 
           mesh.add(surround); // this centers the glow at the mesh
 
-          starsByID[star.identifiers.primaryId] = mesh;
+          starsByID[star.primaryId] = mesh;
           stars.push(mesh);
-          planetsByStarID[star.identifiers.primaryId] = [];
+          planetsByStarID[star.primaryId] = [];
         }
     );
 
@@ -705,36 +705,35 @@
       });
 
       if (newStar != null) {
-        var newStarPrimaryId = newStar.identifiers.primaryId;
+        var newStarPrimaryId = newStar.primaryId;
 
         if (newStarPrimaryId != currentStarPrimaryId) {
 
-          var bf = null;
-          if (newStar.identifiers.bayerFlamsteed) {
-            bf = newStar.identifiers.bayerFlamsteed.prettyName;
-          }
-
-          setInfoData(bf, infoBayerFlamteed);
-          setInfoData(newStar.identifiers.glieseId, infoGliese);
-          setInfoData(newStar.identifiers.harvardRevisedId, infoHarvard);
-          setInfoData(newStar.identifiers.henryDraperId, infoHenryDraper);
-          setInfoData(newStar.identifiers.hipparcosId, infoHipparcos);
-          setInfoData(newStar.identifiers.properName, infoProperName);
-
-          setInfoData(newStar.rawStellarClassification, infoSpectralType);
-          setInfoData(newStar.absoluteMagnitude.toFixed(2), infoAbsMagnitude);
-
-          setInfoData(newStar.lightYearDistance.toFixed(2), infoDistance);
-          setInfoData(newStar.declinationRadians.toFixed(5), infoDeclination);
-          setInfoData(newStar.rightAscensionRadians.toFixed(5), infoRightAscension);
-
-          setLink(newStar.links.wikipedia, infoWiki);
-
+//          var bf = null;
+//          if (newStar.identifiers.bayerFlamsteed) {
+//            bf = newStar.identifiers.bayerFlamsteed.prettyName;
+//          }
+//          setInfoData(bf, infoBayerFlamteed);
+//          setInfoData(newStar.identifiers.glieseId, infoGliese);
+//          setInfoData(newStar.identifiers.harvardRevisedId, infoHarvard);
+//          setInfoData(newStar.identifiers.henryDraperId, infoHenryDraper);
+//          setInfoData(newStar.identifiers.hipparcosId, infoHipparcos);
+//          setInfoData(newStar.identifiers.properName, infoProperName);
+//
+//          setInfoData(newStar.rawStellarClassification, infoSpectralType);
+//          setInfoData(newStar.absoluteMagnitude.toFixed(2), infoAbsMagnitude);
+//
+//          setInfoData(newStar.lightYearDistance.toFixed(2), infoDistance);
+//          setInfoData(newStar.declinationRadians.toFixed(5), infoDeclination);
+//          setInfoData(newStar.rightAscensionRadians.toFixed(5), infoRightAscension);
+//
+//          setLink(newStar.links.wikipedia, infoWiki);
+//
           if(currentSystem) {
             scene.remove(currentSystem.object);
           }
 
-          currentSystem = new System(mesh.position, planetsByStarID[newStar.identifiers.primaryId]);
+          currentSystem = new System(mesh.position, planetsByStarID[newStar.primaryId]);
           scene.add(currentSystem.object);
 
           selector.target(mesh.position);

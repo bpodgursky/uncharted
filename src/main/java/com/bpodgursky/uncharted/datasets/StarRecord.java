@@ -1,9 +1,8 @@
 package com.bpodgursky.uncharted.datasets;
 
-public class StarRecord {
+public class StarRecord extends ObjectRecord{
 
   private final StarIdentifiers identifiers;
-  private final ExternalLinks links;
 
   private final Double lightYearDistance;
   private final Double rightAscensionRadians;
@@ -13,9 +12,7 @@ public class StarRecord {
   private final StellarClassification parsedStellarClassification;
   private final Coordinate cartesianCoordsInLys;
 
-
   private final Double temperatureEstimate;
-  private final Double radiusInLys;
 
   public StarRecord(StarIdentifiers identifiers,
                     ExternalLinks links,
@@ -26,8 +23,8 @@ public class StarRecord {
                     String stellarClass,
                     Double colorIndex,
                     Double luminosity) {
+    super(identifiers.getPrimaryName(), "STAR");
     this.identifiers = identifiers;
-    this.links = links;
     this.lightYearDistance = lightYearDistance;
     this.rightAscensionRadians = rightAscensionRadians;
     this.declinationRadians = declinationRadians;
@@ -36,15 +33,14 @@ public class StarRecord {
     this.parsedStellarClassification = StarClassHelper.parseClass(stellarClass);
     this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(rightAscensionRadians, declinationRadians, lightYearDistance);
 
-
     if (colorIndex == null) {
       this.temperatureEstimate = StarClassHelper.getTemperatureEstimate(parsedStellarClassification);
     } else {
       this.temperatureEstimate = AstroConvert.bvToTemperature(colorIndex);
     }
 
-    this.radiusInLys = AstroConvert.getRadiusLys(luminosity, temperatureEstimate);
-
+    setLinks(links);
+    setRadiusInLys(AstroConvert.getRadiusLys(luminosity, temperatureEstimate));
   }
 
   public StarIdentifiers getIdentifiers() {

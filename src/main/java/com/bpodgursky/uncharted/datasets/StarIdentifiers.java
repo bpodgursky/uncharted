@@ -4,9 +4,6 @@ import com.bpodgursky.uncharted.datasets.identifiers.BayerFlamsteed;
 
 public class StarIdentifiers {
 
-  //  anything unique
-  private final String primaryId;
-
   private String hipparcosId;
   private String henryDraperId;
   private String harvardRevisedId;
@@ -14,10 +11,7 @@ public class StarIdentifiers {
   private BayerFlamsteed bayerFlamsteed;
   private String properName;
 
-
-  public StarIdentifiers(String primaryId) {
-    this.primaryId = primaryId;
-  }
+  public StarIdentifiers() {}
 
   public void setHipparcosId(String hipparcosId) {
     this.hipparcosId = hipparcosId;
@@ -41,10 +35,6 @@ public class StarIdentifiers {
 
   public void setProperName(String properName) {
     this.properName = properName;
-  }
-
-  public String getPrimaryId() {
-    return primaryId;
   }
 
   public String getHipparcosId() {
@@ -71,16 +61,29 @@ public class StarIdentifiers {
     return properName;
   }
 
-  @Override
-  public String toString() {
-    return "StarIdentifiers{" +
-        "primaryId='" + primaryId + '\'' +
-        ", hipparcosId='" + hipparcosId + '\'' +
-        ", henryDraperId='" + henryDraperId + '\'' +
-        ", harvardRevisedId='" + harvardRevisedId + '\'' +
-        ", glieseId='" + glieseId + '\'' +
-        ", bayerFlamsteed='" + bayerFlamsteed + '\'' +
-        ", properName='" + properName + '\'' +
-        '}';
+  public String getPrimaryName() {
+
+    if (properName != null) {
+      return properName;
+    }
+
+    if (bayerFlamsteed != null) {
+      return bayerFlamsteed.getPrettyName();
+    }
+
+    if (glieseId != null) {
+      return glieseId;
+    }
+
+    if (harvardRevisedId != null) {
+      return harvardRevisedId;
+    }
+
+    if (henryDraperId != null) {
+      return henryDraperId;
+    }
+
+    return hipparcosId;
   }
+
 }

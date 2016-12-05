@@ -4,10 +4,10 @@ import java.util.Map;
 
 import com.bpodgursky.uncharted.datasets.catalogs.PlanetValue;
 
-public class PlanetData {
+public class PlanetData extends ObjectRecord{
 
   private final Integer planetId;
-  private final String starId;
+  private final int starId;
   private final PlanetName name;
 
   private final Map<PlanetProperties, PlanetValue> values;
@@ -28,13 +28,17 @@ public class PlanetData {
   }
 
   public PlanetData(Integer planetId,
-                    String starID,
+                    int starID,
                     PlanetName name,
                     Map<PlanetProperties, PlanetValue> values){
+    super(name.toString(), "PLANET");
+
     this.planetId = planetId;
     this.starId = starID;
     this.name = name;
     this.values = values;
+
+    setRadiusInLys(values.get(PlanetProperties.RADIUS_LYS).getValue());
   }
 
 }

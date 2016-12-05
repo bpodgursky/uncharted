@@ -34,7 +34,7 @@ public class StarCatalogServlet extends HttpServlet {
     try {
       JSONArray stars = new JSONArray();
       Collection<StarRecord> allStars = catalog.getAllStars(Double.parseDouble(req.getParameter("max_lys")));
-      Multimap<String, PlanetData> planetObjs = exoplanets.getAllPlanetsByStarID(allStars);
+      Multimap<Integer, PlanetData> planetObjs = exoplanets.getAllPlanetsByStarID(allStars);
 
       for (StarRecord star : allStars) {
         stars.put(new JSONObject(gson.toJson(star)));

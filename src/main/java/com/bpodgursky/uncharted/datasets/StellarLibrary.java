@@ -92,7 +92,7 @@ public class StellarLibrary {
       if(starRecord != null){
         return starRecord;
       }else{
-        LOG.warn("Could not find star with GJ id: "+gj);
+//        LOG.warn("Could not find star with GJ id: "+gj);
       }
     }
 
@@ -102,7 +102,7 @@ public class StellarLibrary {
       if(starRecord != null){
         return starRecord;
       }else{
-        LOG.warn("Could not find star with BF id: "+bayerFlamsteedID);
+//        LOG.warn("Could not find star with BF id: "+bayerFlamsteedID);
       }
     }
 
@@ -112,7 +112,7 @@ public class StellarLibrary {
       if(record != null){
         return record;
       }else{
-        LOG.warn("Could not find star with hipparcos ID: "+ hip);
+//        LOG.warn("Could not find star with hipparcos ID: "+ hip);
       }
     }
 
@@ -122,7 +122,7 @@ public class StellarLibrary {
       if(record != null){
         return record;
       }else{
-        LOG.warn("Could not find star with HD ID: "+ hd);
+//        LOG.warn("Could not find star with HD ID: "+ hd);
       }
     }
 
