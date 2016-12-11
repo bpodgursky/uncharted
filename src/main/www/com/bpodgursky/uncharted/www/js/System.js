@@ -19,13 +19,19 @@ var transparentMaterial = new THREE.MeshBasicMaterial({
 var transparentGeometry = new THREE.SphereGeometry(1.0, 32, 32);
 
 
-function System(position, planets) {
+function System(star, position, planets) {
 
   this.object = new THREE.Group();
+  this.star = star;
   var object = this.object;
 
-  this.planetSelectable = [];
-  var planetSelectable = this.planetSelectable;
+  this.selectable = [star];
+  var planetSelectable = this.selectable;
+
+  this.objectsByID = {};
+  this.objectsByID[star.objectData.primaryId] = star;
+
+  var planetsByID = this.objectsByID;
 
   this.object.position.x = position.x;
   this.object.position.y = position.y;
@@ -39,9 +45,11 @@ function System(position, planets) {
     var major = planet.values.SEMI_MAJOR_AXIS_LYS.value;
     var minor = major * Math.sqrt(1 - Math.pow(eccentricity, 2));
 
-    axes.push(major);
+    var focusOffset = Math.sqrt(Math.pow(major/2, 2) - Math.pow(minor/2, 2));
 
-    var ellipse = new THREE.EllipseCurve(0, 0, major, minor, 0, 2.0 * Math.PI, false);
+    axes.push(major+focusOffset);
+
+    var ellipse = new THREE.EllipseCurve(focusOffset, 0, major, minor, 0, 2.0 * Math.PI, false);
     var ellipsePath = new THREE.CurvePath();
     ellipsePath.add(ellipse);
     var ellipseGeometry = ellipsePath.createPointsGeometry(100);
@@ -49,34 +57,35 @@ function System(position, planets) {
     var line = new THREE.Line(ellipseGeometry, orbitMaterial);
     object.add(line);
 
-    var simpleMaterial = new THREE.MeshBasicMaterial({
-      color: 0x33ccff
-    });
-
-    // var material = new THREE.ShaderMaterial({
-    //   // uniforms: {
-    //   //   time: uniforms.time,
-    //   //   scale: uniforms.scale,
-    //   //   highTemp: {type: "f", value: star.temperatureEstimate},
-    //   //   lowTemp: {type: "f", value: star.temperatureEstimate / 4}
-    //   // },
-    //   // vertexShader: starVertexShader,
-    //   // fragmentShader: starFragmentShader,
-    //   transparent: false
+    // var simpleMaterial = new THREE.MeshBasicMaterial({
+    //   color: 0x33ccff
     // });
 
-    var planetMesh = new THREE.Mesh(SPHERE_GEOMETRY, simpleMaterial);
+    var material = new THREE.ShaderMaterial({
+      uniforms: {
+        time: uniforms.time,
+        scale: uniforms.scale
+      },
+      vertexShader: shaders.defaultPlanetVertexShader,
+      fragmentShader: shaders.defaultPlanetFragmentShader,
+      transparent: false
+    });
+
+    var planetMesh = new THREE.Mesh(SPHERE_GEOMETRY, material);
     planetMesh.scale.x = planetMesh.scale.y = planetMesh.scale.z = planet.values.RADIUS_LYS.value;
 
     var surround = new THREE.Mesh(transparentGeometry, transparentMaterial);
     surround.scale.set(10, 10, 10);
+    surround.objectData = planet;
 
+    planetMesh.objectData = planet;
     planetMesh.add(surround);
 
-    planetMesh.position.x = major;
+    planetMesh.position.x = major+focusOffset;
     object.add(planetMesh);
 
     planetSelectable.push(surround);
+    planetsByID[planet.primaryId] = planetMesh;
 
   });
 
