@@ -34,7 +34,7 @@ function System(star, position, planets) {
       highTemp: {type: "f", value: starData.temperatureEstimate},
       lowTemp: {type: "f", value: starData.temperatureEstimate / 4}
     },
-    vertexShader: shaders.starVertexShader,
+    vertexShader: shaders.vertexShader,
     fragmentShader: shaders.starFragmentShader,
     transparent: false
   });
@@ -86,8 +86,8 @@ function System(star, position, planets) {
         time: uniforms.time,
         scale: uniforms.scale
       },
-      vertexShader: shaders.defaultPlanetVertexShader,
-      fragmentShader: shaders.defaultPlanetFragmentShader,
+      vertexShader: shaders.vertexShader,
+      fragmentShader: shaders.rockyPlanetFragmentShader,
       transparent: false
     });
 

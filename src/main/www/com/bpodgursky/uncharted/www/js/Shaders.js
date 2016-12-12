@@ -1,13 +1,13 @@
 function Shaders() {
 
   this.starFragmentShader = null;
-  this.starVertexShader = null;
+  this.vertexShader = null;
   this.coronaFragmentShader = null;
   this.coronaVertexShader = null;
-
+  this.rockyPlanetFragmentShader = null;
 }
 
-Shaders.prototype.loaders = function() {
+Shaders.prototype.loaders = function () {
 
   var obj = this;
 
@@ -24,7 +24,7 @@ Shaders.prototype.loaders = function() {
       dataType: 'html',
       url: "resources/noise/vertex-shader.glsl",
       success: function (vert) {
-        obj.starVertexShader = vert;
+        obj.vertexShader = vert;
       }
     }),
     $.ajax({
@@ -46,7 +46,7 @@ Shaders.prototype.loaders = function() {
     $.ajax({
       type: 'GET',
       dataType: 'html',
-      url: "resources/noise/planets/default-planet-fragment-shader.glsl",
+      url: "resources/noise/planets/gas-planet-fragment-shader.glsl",
       success: function (vert) {
         obj.defaultPlanetFragmentShader = vert;
       }
@@ -54,7 +54,7 @@ Shaders.prototype.loaders = function() {
     $.ajax({
       type: 'GET',
       dataType: 'html',
-      url: "resources/noise/planets/default-planet-vertex-shader.glsl",
+      url: "resources/noise/planets/gas-planet-vertex-shader.glsl",
       success: function (vert) {
         obj.defaultPlanetVertexShader = vert;
       }
@@ -62,9 +62,9 @@ Shaders.prototype.loaders = function() {
     $.ajax({
       type: 'GET',
       dataType: 'html',
-      url: "resources/noise/planets/test-texture-fragment-shader.glsl",
+      url: "resources/noise/planets/rocky-planet-fragment-shader.glsl",
       success: function (vert) {
-        obj.testTexturePlanetFragmentShader = vert;
+        obj.rockyPlanetFragmentShader = vert;
       }
     })
 
