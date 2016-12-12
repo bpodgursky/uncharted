@@ -34,7 +34,7 @@ function System(star, position, planets) {
       highTemp: {type: "f", value: starData.temperatureEstimate},
       lowTemp: {type: "f", value: starData.temperatureEstimate / 4}
     },
-    vertexShader: shaders.vertexShader,
+    vertexShader: shaders.dynamicVertexShader,
     fragmentShader: shaders.starFragmentShader,
     transparent: false
   });
@@ -77,22 +77,7 @@ function System(star, position, planets) {
     var line = new THREE.Line(ellipseGeometry, orbitMaterial);
     object.add(line);
 
-    // var simpleMaterial = new THREE.MeshBasicMaterial({
-    //   color: 0x33ccff
-    // });
-
-    var material = new THREE.ShaderMaterial({
-      uniforms: {
-        time: uniforms.time,
-        scale: uniforms.scale
-      },
-      vertexShader: shaders.vertexShader,
-      fragmentShader: shaders.rockyPlanetFragmentShader,
-      transparent: false
-    });
-
-    var planetMesh = new THREE.Mesh(DETAIL_GEOMETRY, material);
-    planetMesh.scale.x = planetMesh.scale.y = planetMesh.scale.z = planet.values.RADIUS_LYS.value;
+    var planetMesh = getDetailMesh(planet);
 
     var surround = new THREE.Mesh(TRANSPARENT_GEOMETRY, transparentMaterial);
     surround.scale.set(10, 10, 10);
@@ -119,4 +104,34 @@ function System(star, position, planets) {
 
   object.add(lineMesh);
 
+}
+
+//  TODO this is 99.9% unscientific.  I'm using this SO answer http://astronomy.stackexchange.com/questions/13382/planets-classification-by-density?rq=1
+//  to say rocky < .1 jupiter masses.  also the shaders are super crude placeholders.
+function getShader(planetData){
+  if(planetData.values.MASS_KG.value < 1.898e26){ //  10% jupiter
+    return shaders.rockyPlanetFragmentShader;
+  }else{
+    return shaders.gasPlanetFragmentShader;
+  }
+}
+
+function getDetailMesh(planetData){
+
+  var material = new THREE.ShaderMaterial({
+    uniforms: {
+      time: uniforms.time,
+      scale: uniforms.scale
+    },
+    vertexShader: shaders.staticVertexShader,
+    fragmentShader: getShader(planetData),
+    transparent: false
+  });
+
+  var planetMesh = new THREE.Mesh(DETAIL_GEOMETRY, material);
+  planetMesh.scale.x = planetMesh.scale.y = planetMesh.scale.z = planetData.values.RADIUS_LYS.value;
+
+  planetMesh.rotateY(Math.PI/2);
+
+  return planetMesh;
 }

@@ -61,10 +61,6 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
       String radiusRaw = line[26];
       String densityRaw = line[30];
 
-      //  21 = Planet Mass or M*sin(i)[Jupiter mass]
-      //  26 = Planet Radius [Jupiter radii]
-      //  30 = Planet Density [g/cm**3]
-
       planetCount++;
 
       if (starRecord == null) {

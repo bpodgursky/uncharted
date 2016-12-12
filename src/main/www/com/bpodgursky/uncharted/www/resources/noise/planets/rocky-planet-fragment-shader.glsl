@@ -89,7 +89,7 @@
 			}
 
 
-const int octaves = 4;
+const int octaves = 7;
 
  float noise(vec3 position, float frequency, float persistence) {
     float total = 0.0; // Total value so far
@@ -112,17 +112,21 @@ const int octaves = 4;
     void main( void ) {
 
       vec3 warp = vec3(vTexCoord3D);
-//      warp.x = warp.x * 50.0;
 
-      float noiseBase = (noise(warp , .0006, 0.7)+1.0)/2.0;
-//      float noiseBase2 = (noise(warp , .06, 0.7)+1.0)/10.0;
+      float noiseBase = (noise(warp , .006, 0.8)+1.0)/2.0;
 
        // Sunspots
       float frequency = 0.06;
-      float brightNoise= snoise(vTexCoord3D * .02)*1.4- .9;
+      float brightNoise= snoise(vTexCoord3D * .015)*1.4- .9;
+
+      float craterNoise = snoise(vTexCoord3D * .07);
+      float craterPlus = max(0.0, craterNoise * 3.0 - 2.0);
+      float craterMinus = max(0.0, craterNoise * 5.0 - 3.8);
+      float smallCraters= max(0.0, craterPlus - craterMinus) * .3;
+
 
       float brightSpot = max(0.0, brightNoise);
-      float total = noiseBase + brightSpot + noiseBase2;
+      float total = noiseBase + brightSpot + smallCraters;
 
       gl_FragColor = vec4(vec3(total, total*(204.0/255.0), total*(153.0/255.0)), 1.0);
 
