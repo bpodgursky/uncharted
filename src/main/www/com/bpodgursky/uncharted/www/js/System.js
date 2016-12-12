@@ -16,8 +16,8 @@ var transparentMaterial = new THREE.MeshBasicMaterial({
   opacity: 0.0
 });
 
-var transparentGeometry = new THREE.SphereGeometry(1.0, 32, 32);
-
+var TRANSPARENT_GEOMETRY = new THREE.SphereGeometry(1.0, 16, 16);
+var DETAIL_GEOMETRY = new THREE.SphereGeometry(1.0, 64, 64);
 
 function System(star, position, planets) {
 
@@ -25,7 +25,27 @@ function System(star, position, planets) {
   this.star = star;
   var object = this.object;
 
-  this.selectable = [star];
+  var starData = star.objectData;
+
+  var material = new THREE.ShaderMaterial({
+    uniforms: {
+      time: uniforms.time,
+      scale: uniforms.scale,
+      highTemp: {type: "f", value: starData.temperatureEstimate},
+      lowTemp: {type: "f", value: starData.temperatureEstimate / 4}
+    },
+    vertexShader: shaders.starVertexShader,
+    fragmentShader: shaders.starFragmentShader,
+    transparent: false
+  });
+
+  var starDetail = new THREE.Mesh(DETAIL_GEOMETRY, material);
+  starDetail.objectData = starData;
+  starDetail.scale.x = starDetail.scale.y = starDetail.scale.z = starData.radiusInLys;
+
+  object.add(starDetail);
+
+  this.selectable = [starDetail];
   var planetSelectable = this.selectable;
 
   this.objectsByID = {};
@@ -71,10 +91,10 @@ function System(star, position, planets) {
       transparent: false
     });
 
-    var planetMesh = new THREE.Mesh(SPHERE_GEOMETRY, material);
+    var planetMesh = new THREE.Mesh(DETAIL_GEOMETRY, material);
     planetMesh.scale.x = planetMesh.scale.y = planetMesh.scale.z = planet.values.RADIUS_LYS.value;
 
-    var surround = new THREE.Mesh(transparentGeometry, transparentMaterial);
+    var surround = new THREE.Mesh(TRANSPARENT_GEOMETRY, transparentMaterial);
     surround.scale.set(10, 10, 10);
     surround.objectData = planet;
 

@@ -21,6 +21,8 @@
   <script src="js/TooltipMarker.js"></script>
   <script src="js/System.js"></script>
   <script src="js/Shaders.js"></script>
+  <script src="js/CircularQueue.js"></script>
+  <script src="js/RollingAverage.js"></script>
   <script src="resources/Detector.js"></script>
 
 </head>
@@ -261,7 +263,7 @@
 
   //  constant stuff
 
-  var SPHERE_GEOMETRY = new THREE.SphereGeometry(1.0, 32, 32);
+  var SURROUND_GEOMETRY = new THREE.SphereGeometry(1.0, 8, 8);
 
   //  webgl init
 
@@ -314,6 +316,7 @@
 
   var mouseX;
   var mouseY;
+  var mouseMoved = false;
 
   var controlMode = '';
 
@@ -385,7 +388,7 @@
 
                 if (isStar(prevStarMesh)) {
                   //  TODO make a amethod for getting radius
-                  prevStarMesh.children[0].material.uniforms.scale.value = currentObjectMesh.objectData.radiusInLys * 3000000;
+                  prevStarMesh.material.uniforms.scale.value = currentObjectMesh.objectData.radiusInLys * 3000000;
                 }
 
                 if (!prevControlMode || prevControlMode == 'tween') {
@@ -457,19 +460,9 @@
 
   function reassignLabel(targetMesh) {
 
-    if (!targetMesh) {
+    if (!tooltipObject || tooltipObject.objectData.primaryId == targetMesh.objectData.primaryId) {
       return;
     }
-
-    if (!tooltipObject) {
-      doReassign(targetMesh);
-      return;
-    }
-
-    if (tooltipObject.objectData.primaryId == targetMesh.objectData.primaryId) {
-      return;
-    }
-
 
     doReassign(targetMesh);
 
@@ -542,7 +535,7 @@
       visibleStarsByName[commonName] = starMesh;
 
       if (isRender(data)) {
-        visibleStars.push(starMesh.children[0]);
+        visibleStars.push(starMesh);
         if (!renderedStars[starID]) {
           scene.add(starMesh);
         }
@@ -623,19 +616,30 @@
   function setMouseXY(event) {
     mouseX = event.clientX;
     mouseY = event.clientY;
+    mouseMoved = true;
+  }
+
+  function consumeMouseMove(){
+    if (!mouseMoved){
+      return false
+    }
+
+    mouseMoved = false;
+
+    return true;
   }
 
   function getMouseoverStar() {
-    if (!freeLookControls.dragView) {
+    if (!freeLookControls.dragView && consumeMouseMove()) {
       var object = getStarForPoint(mouseX, mouseY);
 
       if (object) {
+        reassignLabel(object);
         canvas.style.cursor = 'pointer';
       } else {
         canvas.style.cursor = 'auto';
       }
 
-      reassignLabel(object);
     }
   }
 
@@ -655,18 +659,6 @@
 
     starData.forEach(function (star) {
 
-          var material = new THREE.ShaderMaterial({
-            uniforms: {
-              time: uniforms.time,
-              scale: uniforms.scale,
-              highTemp: {type: "f", value: star.temperatureEstimate},
-              lowTemp: {type: "f", value: star.temperatureEstimate / 4}
-            },
-            vertexShader: shaders.starVertexShader,
-            fragmentShader: shaders.starFragmentShader,
-            transparent: false
-          });
-
           var shaderSurround = new THREE.ShaderMaterial({
             vertexShader: shaders.coronaVertexShader,
             fragmentShader: shaders.coronaFragmentShader,
@@ -677,23 +669,19 @@
             transparent: true
           });
 
-          var mesh = new THREE.Mesh(SPHERE_GEOMETRY, material);
-
-          mesh.position.x = star.cartesianCoordsInLys.x;
-          mesh.position.y = star.cartesianCoordsInLys.y;
-          mesh.position.z = star.cartesianCoordsInLys.z;
-
-          mesh.scale.x = mesh.scale.y = mesh.scale.z = star.radiusInLys;
-          mesh.objectData = star;
-
-          var surround = new THREE.Mesh(SPHERE_GEOMETRY, shaderSurround);
-          surround.scale.set(3000000, 3000000, 3000000);
+          var surround = new THREE.Mesh(SURROUND_GEOMETRY, shaderSurround);
+          var scale = star.radiusInLys * 3000000;
+          surround.scale.set(scale, scale, scale);
           surround.objectData = star;
 
-          mesh.add(surround); // this centers the glow at the mesh
+          surround.position.x = star.cartesianCoordsInLys.x;
+          surround.position.y = star.cartesianCoordsInLys.y;
+          surround.position.z = star.cartesianCoordsInLys.z;
 
-          starsByID[star.primaryId] = mesh;
-          stars.push(mesh);
+          surround.objectData = star;
+
+          starsByID[star.primaryId] = surround;
+          stars.push(surround);
           planetsByStarID[star.primaryId] = [];
         }
     );
@@ -851,8 +839,7 @@
       var star = currentSystem.star;
 
       var distance = camera.position.distanceTo(star.position) * .1;
-      var surround = star.children[0];
-      var childUniform = surround.material.uniforms;
+      var childUniform = star.material.uniforms;
       if (childUniform.scale.value != distance) {
         childUniform.scale.value = Math.min(distance, star.objectData.radiusInLys * 3000000);
       }

@@ -35,6 +35,8 @@ THREE.OrbitControls = function (object, domElement) {
 
   this.dragView = false;
 
+  this.deltaAvg = new RollingAverage(50, 0);
+
   if (this.domElement !== document) {
     this.domElement.setAttribute('tabindex', -1);
   }
@@ -148,9 +150,12 @@ THREE.OrbitControls = function (object, domElement) {
   this.orbit = function (target, minRadius) {
     this.target = target;
     this.minRadius = minRadius;
-  }
+  };
 
-  this.update = function (delta) {
+
+  this.update = function (inDelta) {
+
+    var delta = this.deltaAvg.add(inDelta);
 
     var dO = this.target.distanceTo(this.camera.position);
     var actualMoveSpeed = this.moveDelta * dO;

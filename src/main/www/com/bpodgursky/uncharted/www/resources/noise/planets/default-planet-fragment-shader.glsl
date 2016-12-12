@@ -95,7 +95,7 @@
 			}
 
 
-const int octaves = 4;
+const int octaves = 2;
 
  float noise(vec3 position, float frequency, float persistence) {
     float total = 0.0; // Total value so far
