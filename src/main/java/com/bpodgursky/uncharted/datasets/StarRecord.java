@@ -1,5 +1,7 @@
 package com.bpodgursky.uncharted.datasets;
 
+import java.util.Set;
+
 public class StarRecord extends ObjectRecord{
 
   private final StarIdentifiers identifiers;
@@ -13,6 +15,8 @@ public class StarRecord extends ObjectRecord{
   private final Coordinate cartesianCoordsInLys;
 
   private final Double temperatureEstimate;
+
+  private Set<Integer> nearbyObjectIDs;
 
   public StarRecord(StarIdentifiers identifiers,
                     ExternalLinks links,
@@ -41,6 +45,10 @@ public class StarRecord extends ObjectRecord{
 
     setLinks(links);
     setRadiusInLys(AstroConvert.getRadiusLys(luminosity, temperatureEstimate));
+  }
+
+  public void setNearbyObjectIDs(Set<Integer> nearbyObjectIDs){
+    this.nearbyObjectIDs = nearbyObjectIDs;
   }
 
   public StarIdentifiers getIdentifiers() {

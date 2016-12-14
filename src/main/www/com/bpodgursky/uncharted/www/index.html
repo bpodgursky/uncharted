@@ -383,12 +383,13 @@
     tweenControls.setZoom(currentObjectMesh.position, MARKER_RADIUS, 2,
         function () {
           tweenControls.setZoom(currentObjectMesh.position,
-              currentObjectMesh.objectData.radiusInLys*10, 1,
+              currentObjectMesh.objectData.radiusInLys * 10, 1,
               function () {
 
                 if (isStar(prevStarMesh)) {
-                  //  TODO make a amethod for getting radius
-                  prevStarMesh.material.uniforms.scale.value = currentObjectMesh.objectData.radiusInLys * 3000000;
+                  prevStarMesh.objectData.nearbyObjectIDs.forEach(function(e){
+                    setStarScale(starsByID[e], currentObjectMesh.objectData.radiusInLys * 3000000);
+                  })
                 }
 
                 if (!prevControlMode || prevControlMode == 'tween') {
@@ -408,7 +409,7 @@
 
   }
 
-  function isStar(mesh){
+  function isStar(mesh) {
     return mesh && mesh.objectData.type == "STAR";
   }
 
@@ -562,12 +563,21 @@
 
   }
 
-  function lastObject(intersects) {
+  function lastNonPrimaryObject(intersects, currentPrimary) {
     if (intersects.length > 0) {
-      return intersects[intersects.length - 1].object;
+      var lastObject = intersects[intersects.length - 1].object;
+
+      if (lastObject.objectData.primaryId != currentPrimary) {
+        return lastObject;
+      }
+
+      if (intersects.length > 1) {
+        return intersects[intersects.length - 2].object
+      }
+
+      return null;
     }
   }
-
 
 
   function getStarForPoint(x, y) {
@@ -582,23 +592,19 @@
 
       raycaster.setFromCamera(mouse, intersectCamera);
 
+
       if (currentSystem) {
-        var last = lastObject(raycaster.intersectObjects(currentSystem.selectable, false));
+        var last = lastNonPrimaryObject(raycaster.intersectObjects(currentSystem.selectable, false), currentObjectPrimaryId);
         if (last) {
-          var newID = last.objectData.primaryId;
-          if (newID != currentObjectPrimaryId) {
-            return currentSystem.objectsByID[newID];
-          }
+          return currentSystem.objectsByID[last.objectData.primaryId];
         }
       }
 
-      var lastStar = lastObject(raycaster.intersectObjects(visibleStars, false));
+      var lastStar = lastNonPrimaryObject(raycaster.intersectObjects(visibleStars, false), currentObjectPrimaryId);
 
       if (lastStar) {
-        var primaryId = lastStar.objectData.primaryId;
-        if (primaryId != currentObjectPrimaryId) {
-          return starsByID[primaryId];
-        }
+//        var primaryId = lastStar.objectData.primaryId;
+        return lastStar;
       }
 
       if (tooltip) {
@@ -619,8 +625,8 @@
     mouseMoved = true;
   }
 
-  function consumeMouseMove(){
-    if (!mouseMoved){
+  function consumeMouseMove() {
+    if (!mouseMoved) {
       return false
     }
 
@@ -702,7 +708,7 @@
 
       var newTarget = mesh.objectData;
 
-      if(mesh.objectData.type == "STAR"){
+      if (mesh.objectData.type == "STAR") {
         var newCenter = mesh.position;
 
         var deltaX = newCenter.x;
@@ -745,7 +751,7 @@
 //
 //          setLink(newStar.links.wikipedia, infoWiki);
 //
-          if(newTarget.type == "STAR") {
+          if (newTarget.type == "STAR") {
 
             if (currentSystem) {
               scene.remove(currentSystem.object);
@@ -838,15 +844,26 @@
     if (currentSystem) {
       var star = currentSystem.star;
 
-      var distance = camera.position.distanceTo(star.position) * .1;
-      var childUniform = star.material.uniforms;
-      if (childUniform.scale.value != distance) {
-        childUniform.scale.value = Math.min(distance, star.objectData.radiusInLys * 3000000);
-      }
+      star.objectData.nearbyObjectIDs.forEach(function (e) {
+        var nearStar = starsByID[e];
+        var distance = camera.position.distanceTo(nearStar.position) * .2;
+        var childUniform = nearStar.material.uniforms;
+        if (childUniform.scale.value != distance) {
+          var scale = Math.min(distance, nearStar.objectData.radiusInLys * 3000000);
+          setStarScale(nearStar, scale);
+        }
+
+      });
+
     }
 
     renderer.render(scene, camera);
 
+  }
+
+  function setStarScale(star, scale){
+    star.material.uniforms.scale.value = scale;
+    star.scale.x = nearStar.scale.y = nearStar.scale.z = scale;
   }
 
   canvas.addEventListener('contextmenu', function (event) {
@@ -915,19 +932,19 @@
 
   $.when(
       $.ajax({
-        type: 'GET',
-        dataType: 'html',
-        url: "star_catalog",
-        data: {
-          "max_lys": 75
-        },
-        success: function (data) {
-          var dataParsed = JSON.parse(data);
-          starData = dataParsed.stars;
-          planetData = dataParsed.planets;
-        }
-      },
-      shaders.loaders())
+            type: 'GET',
+            dataType: 'html',
+            url: "star_catalog",
+            data: {
+              "max_lys": 75
+            },
+            success: function (data) {
+              var dataParsed = JSON.parse(data);
+              starData = dataParsed.stars;
+              planetData = dataParsed.planets;
+            }
+          },
+          shaders.loaders())
   ).then(function () {
     loader.load('js/font.js', function (response) {
           font = response;

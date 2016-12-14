@@ -38,11 +38,8 @@ public class WebServer implements Runnable {
       HYGDatabase hygDatabase = new HYGDatabase();
       NasaExoplanetCatalog planetCatalog = new NasaExoplanetCatalog(new StellarLibrary(hygDatabase.getAllStars(75.0)));
 
-//      for (StarRecord starRecord : hygDatabase.getAllStars(75.0)) {
-//        if(starRecord.getIdentifiers().getBayerFlamsteed() != null){
-//          System.out.println(starRecord.getIdentifiers().getBayerFlamsteed());
-//        }
-//      }
+
+
 
       WebAppContext context = new WebAppContext(warUrlString, "/");
       context.addServlet(new ServletHolder(new StarCatalogServlet(hygDatabase, planetCatalog)), "/star_catalog");

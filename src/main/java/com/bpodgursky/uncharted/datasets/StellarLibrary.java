@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.bpodgursky.uncharted.datasets.identifiers.BayerFlamsteed;
+import com.bpodgursky.uncharted.util.CoordinateSpace;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,18 @@ public class StellarLibrary {
   private final Map<String, StarRecord> starsByHDId = Maps.newHashMap();
   private final Map<String, StarRecord> starsByHipId = Maps.newHashMap();
 
+  private static final Double NEARBY_STAR_THRESHOLD = .65;
+
   public StellarLibrary(Collection<StarRecord> records) {
+
+    CoordinateSpace space = new CoordinateSpace();
+    for (StarRecord record : records) {
+      space.add(record);
+    }
+
+    for (StarRecord record : records) {
+      record.setNearbyObjectIDs(space.getNeighborIDs(record, NEARBY_STAR_THRESHOLD));
+    }
 
     for (StarRecord record : records) {
       StarIdentifiers ids = record.getIdentifiers();
