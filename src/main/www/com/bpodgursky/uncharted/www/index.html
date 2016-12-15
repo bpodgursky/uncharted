@@ -863,7 +863,7 @@
 
   function setStarScale(star, scale){
     star.material.uniforms.scale.value = scale;
-    star.scale.x = nearStar.scale.y = nearStar.scale.z = scale;
+    star.scale.x = star.scale.y = star.scale.z = scale;
   }
 
   canvas.addEventListener('contextmenu', function (event) {
