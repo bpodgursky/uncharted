@@ -120,7 +120,7 @@ public class HYGDatabase implements StarCatalog {
         StarRecord record = new StarRecord(
             identifiers,
             links,
-            AstroConvert.parsecsToLightyears(Double.parseDouble(distanceParsecs)),
+            new ObjectValue(AstroConvert.parsecsToLightyears(Double.parseDouble(distanceParsecs)), ValueSource.SUPPLIED, Unit.LY),
             AstroConvert.hoursToRadians(Double.parseDouble(rightAscension)),
             AstroConvert.degreesToRadians(Double.parseDouble(declination)),
             Double.parseDouble(absMag),
@@ -167,7 +167,7 @@ public class HYGDatabase implements StarCatalog {
     Collection<StarRecord> filteredSet = Collections2.filter(stars, new Predicate<StarRecord>() {
       @Override
       public boolean apply(StarRecord input) {
-        return input.getLightYearDistance() <= maxLyDistance;
+        return input.getSolDistance() <= maxLyDistance;
       }
     });
     LOG.info("Found "+filteredSet.size()+" stars within "+maxLyDistance);

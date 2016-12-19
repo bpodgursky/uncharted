@@ -50,7 +50,7 @@ public class GlieseCatalog implements StarCatalog {
         new StarRecord(
             sunIdentifiers,
             new ExternalLinks(),
-            0.0,
+            new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.LY),
             0.0,
             0.0,
             4.83,
@@ -78,7 +78,7 @@ public class GlieseCatalog implements StarCatalog {
         StarRecord record = new StarRecord(
             identifiers,
             new ExternalLinks(),
-            AstroConvert.parallaxToLightyears(parseOrNull(split[6])),
+            new ObjectValue(AstroConvert.parallaxToLightyears(parseOrNull(split[6])), ValueSource.SUPPLIED, Unit.LY),
             AstroConvert.parseDegreeMinSec(split[2]),
             AstroConvert.parseDegreeMinSec(split[3]),
             parseOrNull(split[32]),
@@ -123,7 +123,7 @@ public class GlieseCatalog implements StarCatalog {
     return Collections2.filter(starsByName.values(), new Predicate<StarRecord>() {
       @Override
       public boolean apply(StarRecord input) {
-        return input.getLightYearDistance() <= maxLyDistance;
+        return input.getSolDistance() <= maxLyDistance;
       }
     });
   }

@@ -3,7 +3,6 @@ package com.bpodgursky.uncharted.datasets.catalogs;
 public class ObjectValue {
 
   private final UnitValue value;
-
   private final ValueSource source;
 
   public ObjectValue(double property, ValueSource source, Unit unit) {

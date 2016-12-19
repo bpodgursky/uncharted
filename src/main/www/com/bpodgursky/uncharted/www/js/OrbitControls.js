@@ -207,7 +207,7 @@ THREE.OrbitControls = function (object, domElement) {
     }
 
 
-    translateX += delta * .04 * dO;
+    translateX += delta * .03 * dO;
 
     this.camera.translateX(translateX);
     this.camera.rotateY(Math.atan(translateX / dO));

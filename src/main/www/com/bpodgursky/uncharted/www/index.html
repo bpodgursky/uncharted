@@ -33,7 +33,8 @@
 
 <div>
   <div id="selector">
-    <h3><span id="info-header" class="accordion-header"></span></h3>
+    <h3><span id="info-header" class="accordion-header"></span><b> - <span id="distance-header"
+                                                                           class="accordion-header"></span></b></h3>
     <div class="overlay-panel">
       <table>
         <tbody id="info-table"></tbody>
@@ -125,6 +126,10 @@
   //    e.preventDefault();
   //  });
 
+  var stats = new Stats();
+  stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+  //  $("#attribution-overlay").append(stats.dom);
+
   $(function () {
     $("#selector").accordion({
       collapsible: true,
@@ -132,11 +137,10 @@
     });
   });
 
-  if (!Detector.webgl) Detector.addGetWebGLMessage();
+  var distanceHeader = $("#distance-header");
+  var lastDistance;
 
-  var stats = new Stats();
-  stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-  //  $("#selector").append(stats.dom);
+  if (!Detector.webgl) Detector.addGetWebGLMessage();
 
   //  constant stuff
 
@@ -265,7 +269,7 @@
 
                 if (isStar(prevStarMesh)) {
                   prevStarMesh.objectData.nearbyObjectIDs.forEach(function (e) {
-                    setStarScale(starsByID[e], currentObjectMesh.objectData.radius.value.quantity * 3000000);
+                    resetStarScale(starsByID[e]);
                   })
                 }
 
@@ -369,7 +373,7 @@
     var cacheKey = label + lineDistance;  // could target each star from each other star.
 
     if (!labelCache[(cacheKey)]) {
-      labelCache[cacheKey] = new TooltipMarker(label, lineDistance, targetMesh.objectData.radius.value.quantity);
+      labelCache[cacheKey] = new TooltipMarker(label, prettyDistance(lineDistance), targetMesh.objectData.radius.value.quantity);
     }
 
     tooltip = labelCache[cacheKey];
@@ -388,7 +392,7 @@
 
   function isRender(objectData) {
 
-    if (objectData.lightYearDistance < renderRadius) {
+    if (objectData.solDistance.value.quantity < renderRadius) {
       return true;
     }
     return false;
@@ -530,7 +534,7 @@
 
     var diffX = Math.abs(mouseDownX - event.clientX);
     var diffY = Math.abs(mouseDownY - event.clientY);
-    var delta = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2))
+    var delta = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2));
 
     if (delta < 5) {
       select(getStarForPoint(event.clientX, event.clientY));
@@ -546,16 +550,15 @@
             vertexShader: shaders.coronaVertexShader,
             fragmentShader: shaders.coronaFragmentShader,
             uniforms: {
-              scale: {type: "f", value: star.radius.value.quantity * 3000000},
+              scale: {type: "f", value: 0.0}, //  will set later
               temp: {type: "f", value: star.temperatureEstimate.value.quantity / 2}
             },
             transparent: true
           });
 
           var surround = new THREE.Mesh(SURROUND_GEOMETRY, shaderSurround);
-          var scale = star.radius.value.quantity * 4000000;
-          surround.scale.set(scale, scale, scale);
           surround.objectData = star;
+          resetStarScale(surround);
 
           surround.position.x = star.cartesianCoordsInLys.x;
           surround.position.y = star.cartesianCoordsInLys.y;
@@ -575,6 +578,7 @@
     });
 
   }
+
 
   function select(mesh) {
 
@@ -610,13 +614,13 @@
 
           $('#info-header').text(newTarget.properName);
 
+          var infoTable = $('#info-table');
+          infoTable.empty();
+
+          infoTable.append(row("Radius", newTarget, 'radius'));
+
+
           if (newTarget.type == "STAR") {
-
-            $('#info-table').empty();
-
-            $('#info-table').append($('<tr></tr>')
-                .appendChild($('<td></td>')))
-
 
             if (currentSystem) {
               scene.remove(currentSystem.object);
@@ -627,8 +631,7 @@
 
             selector.target(mesh.position);
 
-          }else{
-
+          } else {
 
 
           }
@@ -652,22 +655,39 @@
 
   }
 
-  function setLink(data, element) {
-    if (data != null) {
-      element.parent().parent().show();
-      element.attr('href', data);
-    } else {
-      element.parent().parent().hide();
+  function row(name, data, element) {
+    return $('<tr></tr>')
+        .append($('<td></td>').text(name))
+        .append($('<td></td>').text(getValue(data, element)))
+  }
+
+  function getValue(data, element) {
+    var elem = data[element];
+
+    //  just a value
+    if (!elem.source) {
+      return elem;
+    }
+
+    if (elem.source == "DEFAULT") {
+      return "?";
+    }
+
+    return formatObjValue(elem.value);
+  }
+
+  function formatObjValue(objValue){
+    if(objValue.unit == 'LY'){
+      return prettyDistance(objValue.quantity);
     }
   }
 
-  function setInfoData(data, element) {
-    if (data != null) {
-      element.parent().show();
-      element.text(data);
-    } else {
-      element.parent().hide();
+  function prettyDistance(lys) {
+    if (lys > .01) {
+      return lys.toFixed(2) + ' ly';
     }
+
+    return (lys * 9.461e12).toLocaleString('en-US', {maximumSignificantDigits: 3}) + ' km'
   }
 
   function onWindowResize() {
@@ -726,6 +746,14 @@
 
     }
 
+    if (currentObjectMesh) {
+      var newDistance = prettyDistance(camera.position.distanceTo(currentObjectMesh.position));
+      if (lastDistance != newDistance) {
+        lastDistance = newDistance;
+        distanceHeader.text(newDistance);
+      }
+    }
+
     renderer.render(scene, camera);
 
   }
@@ -733,6 +761,12 @@
   function setStarScale(star, scale) {
     star.material.uniforms.scale.value = scale;
     star.scale.x = star.scale.y = star.scale.z = scale;
+  }
+
+  function resetStarScale(star) {
+    star.material.uniforms.scale.value = star.objectData.radius.value.quantity * 3000000;
+    var scale = 7.35355e-8 * 8000000;
+    star.scale.set(scale, scale, scale);
   }
 
   canvas.addEventListener('contextmenu', function (event) {

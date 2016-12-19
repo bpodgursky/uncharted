@@ -19,7 +19,7 @@ public class TestGlieseCatalog {
 
     //  Proxima Centauri
     StarRecord priximaCentari = catalog.getStar("Gl 551");
-    assertEquals(priximaCentari.getLightYearDistance(), 4.22, .01);
+    assertEquals(priximaCentari.getSolDistance(), 4.22, .01);
 
   }
 }

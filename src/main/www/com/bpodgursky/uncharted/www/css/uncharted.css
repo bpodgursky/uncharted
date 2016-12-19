@@ -78,6 +78,10 @@ ul.ui-autocomplete.ui-menu {
   z-index: 1000;
 }
 
+#distance-header{
+  color: #004611;
+}
+
 .ui-accordion-header{
   background-color: #717071;
 }

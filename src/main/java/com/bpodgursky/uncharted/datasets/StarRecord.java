@@ -10,7 +10,7 @@ public class StarRecord extends ObjectRecord{
 
   private final StarIdentifiers identifiers;
 
-  private final Double lightYearDistance;
+  private final ObjectValue solDistance;
   private final Double rightAscensionRadians;
   private final Double declinationRadians;
   private final Double absoluteMagnitude;
@@ -24,7 +24,7 @@ public class StarRecord extends ObjectRecord{
 
   public StarRecord(StarIdentifiers identifiers,
                     ExternalLinks links,
-                    Double lightYearDistance,
+                    ObjectValue lightYearDistance,
                     Double rightAscensionRadians,
                     Double declinationRadians,
                     Double absoluteMagnitude,
@@ -33,13 +33,13 @@ public class StarRecord extends ObjectRecord{
                     Double luminosity) {
     super(identifiers.getPrimaryName(), "STAR");
     this.identifiers = identifiers;
-    this.lightYearDistance = lightYearDistance;
+    this.solDistance = lightYearDistance;
     this.rightAscensionRadians = rightAscensionRadians;
     this.declinationRadians = declinationRadians;
     this.absoluteMagnitude = absoluteMagnitude;
     this.rawStellarClassification = stellarClass;
     this.parsedStellarClassification = StarClassHelper.parseClass(stellarClass);
-    this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(rightAscensionRadians, declinationRadians, lightYearDistance);
+    this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(rightAscensionRadians, declinationRadians, lightYearDistance.getValue().in(Unit.LY).getQuantity());
 
     if (colorIndex == null) {
       this.temperatureEstimate = new ObjectValue(StarClassHelper.getTemperatureEstimate(parsedStellarClassification), ValueSource.DEFAULT, Unit.K);
@@ -59,8 +59,8 @@ public class StarRecord extends ObjectRecord{
     return identifiers;
   }
 
-  public Double getLightYearDistance() {
-    return lightYearDistance;
+  public Double getSolDistance() {
+    return solDistance.getValue().in(Unit.LY).getQuantity();
   }
 
   public Double getRightAscensionRadians() {

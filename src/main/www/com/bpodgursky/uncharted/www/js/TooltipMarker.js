@@ -1,7 +1,5 @@
 //  TODO this is an abomination
-function TooltipMarker(label, distance, radius) {
-
-  var distanceFormatted = distance.toFixed(1) + "ly";
+function TooltipMarker(label, distanceFormatted, radius) {
 
   this.object = new THREE.Group();
 
