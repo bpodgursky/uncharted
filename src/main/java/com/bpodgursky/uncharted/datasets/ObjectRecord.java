@@ -2,6 +2,8 @@ package com.bpodgursky.uncharted.datasets;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.bpodgursky.uncharted.datasets.catalogs.ObjectValue;
+
 abstract class ObjectRecord {
 
   private static final AtomicInteger COUNT = new AtomicInteger();
@@ -11,7 +13,7 @@ abstract class ObjectRecord {
   private final int primaryId;
 
   private ExternalLinks links;
-  private Double radiusInLys;
+  private ObjectValue radius;
 
   public ObjectRecord(String properName,
                       String type){
@@ -24,8 +26,8 @@ abstract class ObjectRecord {
     this.links = links;
   }
 
-  protected void setRadiusInLys(Double radiusInLys) {
-    this.radiusInLys = radiusInLys;
+  protected void setRadius(ObjectValue radius) {
+    this.radius = radius;
   }
 
   public int getPrimaryId() {

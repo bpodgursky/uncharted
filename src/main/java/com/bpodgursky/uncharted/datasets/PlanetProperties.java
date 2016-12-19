@@ -1,11 +1,12 @@
 package com.bpodgursky.uncharted.datasets;
 
-public enum PlanetProperties {
-  SEMI_MAJOR_AXIS_LYS,
-  ECCENTRICTY,
-  ORBITAL_PERIOD_DAYS,
-  INCLINATION,
-  MASS_KG,
-  RADIUS_LYS,
-  DENSITY_GCC
-}
+//public enum PlanetProperties {
+//
+//  private final String prettyName;
+//  private final boolean display;
+//
+//  PlanetProperties(String prettyName, boolean display){
+//    this.prettyName = prettyName;
+//    this.display = display;
+//  }
+//}

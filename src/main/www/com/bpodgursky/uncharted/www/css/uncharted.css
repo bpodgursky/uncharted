@@ -14,45 +14,59 @@ body {
   background-color: #0b0b0b;
   z-index: 1000;
   border: 2px solid #5b0000;
+  color: #ffffff;
+
 }
 
-#info {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 5px;
-  width: 20%;
-  height: 50%;
-}
+/*#accordian-block {*/
+  /*width: 15%;*/
+  /*position: absolute;*/
+  /*top: 10px;*/
+/*}*/
 
 #selector {
-  position: fixed;
-  bottom: 10px;
-  left: 10px;
-  padding: 5px;
-  width: 20%;
-  height: 25%;
+  position: absolute;
+  top: 10px;
 }
 
-.header-row {
-  color: #ffbec0;
-  font-size: 16px;
-}
 
-.child-row {
-  color: #ffffff;
-  font-size: 13px;
-}
+/*#info {*/
+  /*position: absolute;*/
+  /*top: 10px;*/
+  /*left: 10px;*/
+  /*padding: 5px;*/
+  /*width: 20%;*/
+  /*height: 50%;*/
+/*}*/
 
-.external-link {
-  color: #8597ff;
-}
+/*#selector {*/
+  /*position: fixed;*/
+  /*bottom: 10px;*/
+  /*left: 10px;*/
+  /*padding: 5px;*/
+  /*width: 20%;*/
+  /*height: 25%;*/
+/*}*/
+
+/*.header-row {*/
+  /*color: #ffbec0;*/
+  /*font-size: 16px;*/
+/*}*/
+
+/*.child-row {*/
+  /*color: #ffffff;*/
+  /*font-size: 13px;*/
+/*}*/
+
+/*.external-link {*/
+  /*color: #8597ff;*/
+/*}*/
 
 
 #attribution-overlay {
   position: absolute;
   font-family: Monospace;
-  top: 10px;
+  bottom: 10px;
   right: 10px;
   width: 100%;
   text-align: right;
@@ -62,4 +76,8 @@ body {
 
 ul.ui-autocomplete.ui-menu {
   z-index: 1000;
+}
+
+.ui-accordion-header{
+  background-color: #717071;
 }

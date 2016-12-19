@@ -31,8 +31,8 @@ function System(star, position, planets) {
     uniforms: {
       time: uniforms.time,
       scale: uniforms.scale,
-      highTemp: {type: "f", value: starData.temperatureEstimate},
-      lowTemp: {type: "f", value: starData.temperatureEstimate / 4}
+      highTemp: {type: "f", value: starData.temperatureEstimate.value.quantity},
+      lowTemp: {type: "f", value: starData.temperatureEstimate.value.quantity / 4}
     },
     vertexShader: shaders.dynamicVertexShader,
     fragmentShader: shaders.starFragmentShader,
@@ -41,7 +41,7 @@ function System(star, position, planets) {
 
   var starDetail = new THREE.Mesh(DETAIL_GEOMETRY, material);
   starDetail.objectData = starData;
-  starDetail.scale.x = starDetail.scale.y = starDetail.scale.z = starData.radiusInLys;
+  starDetail.scale.x = starDetail.scale.y = starDetail.scale.z = starData.radius.value.quantity;
 
   object.add(starDetail);
 
@@ -61,8 +61,8 @@ function System(star, position, planets) {
 
   planets.forEach(function (planet) {
 
-    var eccentricity = planet.values.ECCENTRICTY.value;
-    var major = planet.values.SEMI_MAJOR_AXIS_LYS.value;
+    var eccentricity = planet.eccentricity.value.quantity;
+    var major = planet.semiMajorAxisLys.value.quantity;
     var minor = major * Math.sqrt(1 - Math.pow(eccentricity, 2));
 
     var focusOffset = Math.sqrt(Math.pow(major/2, 2) - Math.pow(minor/2, 2));
@@ -109,7 +109,7 @@ function System(star, position, planets) {
 //  TODO this is 99.9% unscientific.  I'm using this SO answer http://astronomy.stackexchange.com/questions/13382/planets-classification-by-density?rq=1
 //  to say rocky < .1 jupiter masses.  also the shaders are super crude placeholders.
 function getShader(planetData){
-  if(planetData.values.MASS_KG.value < 1.898e26){ //  10% jupiter
+  if(planetData.massKg.value.quantity < 1.898e26){ //  10% jupiter
     return shaders.rockyPlanetFragmentShader;
   }else{
     return shaders.gasPlanetFragmentShader;
@@ -129,7 +129,7 @@ function getDetailMesh(planetData){
   });
 
   var planetMesh = new THREE.Mesh(DETAIL_GEOMETRY, material);
-  planetMesh.scale.x = planetMesh.scale.y = planetMesh.scale.z = planetData.values.RADIUS_LYS.value;
+  planetMesh.scale.x = planetMesh.scale.y = planetMesh.scale.z = planetData.radius.value.quantity;
 
   planetMesh.rotateY(Math.PI/2);
 

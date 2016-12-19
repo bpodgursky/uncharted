@@ -184,7 +184,7 @@ public class StarClassHelper {
       return star;
     }
 
-//    LOG.warn("Warning: could not parse star classification: " + starClass);
+    LOG.warn("Warning: could not parse star classification: " + starClass);
     return new StellarClassification();
   }
 

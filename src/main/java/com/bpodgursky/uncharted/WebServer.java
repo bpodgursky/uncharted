@@ -39,8 +39,6 @@ public class WebServer implements Runnable {
       NasaExoplanetCatalog planetCatalog = new NasaExoplanetCatalog(new StellarLibrary(hygDatabase.getAllStars(75.0)));
 
 
-
-
       WebAppContext context = new WebAppContext(warUrlString, "/");
       context.addServlet(new ServletHolder(new StarCatalogServlet(hygDatabase, planetCatalog)), "/star_catalog");
       context.addFilter(GzipFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));

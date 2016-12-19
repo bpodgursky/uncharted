@@ -63,8 +63,6 @@ public class GlieseCatalog implements StarCatalog {
       String line = scan.nextLine();
       String[] split = line.split("\\|");
 
-//      Map<DatasetName, String> identitiers = Maps.newHashMap();
-
       String glieseName = split[1].trim();
 
       StarIdentifiers identifiers = new StarIdentifiers();

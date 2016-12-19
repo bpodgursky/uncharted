@@ -1,8 +1,6 @@
 package com.bpodgursky.uncharted.datasets;
 
-import java.util.Map;
-
-import com.bpodgursky.uncharted.datasets.catalogs.PlanetValue;
+import com.bpodgursky.uncharted.datasets.catalogs.ObjectValue;
 
 public class PlanetData extends ObjectRecord{
 
@@ -10,7 +8,13 @@ public class PlanetData extends ObjectRecord{
   private final int starId;
   private final PlanetName name;
 
-  private final Map<PlanetProperties, PlanetValue> values;
+  private final ObjectValue semiMajorAxisLys;
+  private final ObjectValue eccentricity;
+  private final ObjectValue orbitalPeriodDays;
+  private final ObjectValue inclination;
+  private final ObjectValue massKg;
+  private final ObjectValue radiusLys;
+  private final ObjectValue densityGcc;
 
   public static class PlanetName {
 
@@ -30,15 +34,28 @@ public class PlanetData extends ObjectRecord{
   public PlanetData(Integer planetId,
                     int starID,
                     PlanetName name,
-                    Map<PlanetProperties, PlanetValue> values){
+                    ObjectValue semiMajorAxisLys,
+                    ObjectValue eccentricity,
+                    ObjectValue orbitalPeriodDays,
+                    ObjectValue inclination,
+                    ObjectValue massKg,
+                    ObjectValue radiusLys,
+                    ObjectValue densityGcc){
     super(name.toString(), "PLANET");
 
     this.planetId = planetId;
     this.starId = starID;
     this.name = name;
-    this.values = values;
 
-    setRadiusInLys(values.get(PlanetProperties.RADIUS_LYS).getValue());
+    this.semiMajorAxisLys = semiMajorAxisLys;
+    this.eccentricity = eccentricity;
+    this.orbitalPeriodDays = orbitalPeriodDays;
+    this.inclination = inclination;
+    this.massKg = massKg;
+    this.radiusLys = radiusLys;
+    this.densityGcc = densityGcc;
+
+    setRadius(radiusLys);
   }
 
 }

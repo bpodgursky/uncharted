@@ -1,5 +1,8 @@
 package com.bpodgursky.uncharted.datasets;
 
+import com.bpodgursky.uncharted.datasets.catalogs.Unit;
+import com.bpodgursky.uncharted.datasets.catalogs.UnitValue;
+
 public class AstroConvert {
 
   public static final double RADIANS_PER_HOUR = Math.PI / 12;
@@ -24,9 +27,9 @@ public class AstroConvert {
   }
 
   //  http://skyserver.sdss.org/dr1/en/proj/advanced/hr/radius1.asp
-  public static Double getRadiusLys(Double solLuminosityMultiples, Double temperature){
+  public static Double getRadiusLys(Double solLuminosityMultiples, UnitValue temperature){
     Double luminosityWatts = solLuminosityMultiples*3.846*Math.pow(10, 26);
-    Double radiusMeters = Math.sqrt(luminosityWatts / (4*Math.PI*5.67*Math.pow(10, -8) * Math.pow(temperature, 4)));
+    Double radiusMeters = Math.sqrt(luminosityWatts / (4*Math.PI*5.67*Math.pow(10, -8) * Math.pow(temperature.in(Unit.K).getQuantity(), 4)));
     return radiusMeters / (9.461*Math.pow(10, 15));
 
   }

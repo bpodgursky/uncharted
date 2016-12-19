@@ -1,6 +1,6 @@
 package com.bpodgursky.uncharted.datasets.catalogs;
 
-enum ValueSource {
+public enum ValueSource {
   SUPPLIED,
   INFERRED,
   DEFAULT

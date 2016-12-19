@@ -63,8 +63,6 @@ public class CoordinateSpace {
       range.add(-i);
     }
 
-    System.out.println("RANGE: " + range);
-
     for (Integer xDiff : range) {
       for (Integer yDiff : range) {
         for (Integer zDiff : range) {

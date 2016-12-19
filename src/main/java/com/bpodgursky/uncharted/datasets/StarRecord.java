@@ -2,6 +2,10 @@ package com.bpodgursky.uncharted.datasets;
 
 import java.util.Set;
 
+import com.bpodgursky.uncharted.datasets.catalogs.ObjectValue;
+import com.bpodgursky.uncharted.datasets.catalogs.Unit;
+import com.bpodgursky.uncharted.datasets.catalogs.ValueSource;
+
 public class StarRecord extends ObjectRecord{
 
   private final StarIdentifiers identifiers;
@@ -14,7 +18,7 @@ public class StarRecord extends ObjectRecord{
   private final StellarClassification parsedStellarClassification;
   private final Coordinate cartesianCoordsInLys;
 
-  private final Double temperatureEstimate;
+  private final ObjectValue temperatureEstimate;
 
   private Set<Integer> nearbyObjectIDs;
 
@@ -38,13 +42,13 @@ public class StarRecord extends ObjectRecord{
     this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(rightAscensionRadians, declinationRadians, lightYearDistance);
 
     if (colorIndex == null) {
-      this.temperatureEstimate = StarClassHelper.getTemperatureEstimate(parsedStellarClassification);
+      this.temperatureEstimate = new ObjectValue(StarClassHelper.getTemperatureEstimate(parsedStellarClassification), ValueSource.DEFAULT, Unit.K);
     } else {
-      this.temperatureEstimate = AstroConvert.bvToTemperature(colorIndex);
+      this.temperatureEstimate = new ObjectValue(AstroConvert.bvToTemperature(colorIndex), ValueSource.SUPPLIED, Unit.K);
     }
 
     setLinks(links);
-    setRadiusInLys(AstroConvert.getRadiusLys(luminosity, temperatureEstimate));
+    setRadius(new ObjectValue(AstroConvert.getRadiusLys(luminosity, temperatureEstimate.getValue()), ValueSource.INFERRED, Unit.LY));
   }
 
   public void setNearbyObjectIDs(Set<Integer> nearbyObjectIDs){
@@ -83,7 +87,4 @@ public class StarRecord extends ObjectRecord{
     return parsedStellarClassification;
   }
 
-  public Double getTemperatureEstimate() {
-    return temperatureEstimate;
-  }
 }

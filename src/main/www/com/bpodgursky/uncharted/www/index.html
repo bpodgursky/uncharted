@@ -5,14 +5,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
-  <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css">
+  <link rel="stylesheet" type="text/css" href="resources/css/jquery-ui.css">
   <link rel="stylesheet" type="text/css" href="css/uncharted.css">
 
   <script type="text/javascript" src="resources/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="resources/tinycolor-min.js"></script>
   <script type="text/javascript" src="resources/jquery-ui.min.js"></script>
+  <!--<script type="text/javascript" src="resources/css/bootstrap.min.css"></script>-->
   <script src="resources/three.min.js"></script>
   <script src="resources/stats.js"></script>
+  <!--<script src="resources/bootstrap.min.js"></script>-->
   <script src="js/constants.js"></script>
   <script src="js/FreeLookControls.js"></script>
   <script src="js/OrbitControls.js"></script>
@@ -30,148 +32,25 @@
 <body>
 
 <div>
-  <div>
-    <div class="overlay-panel" id="info">
+  <div id="selector">
+    <h3><span id="info-header" class="accordion-header"></span></h3>
+    <div class="overlay-panel">
       <table>
-        <tbody>
-
-        <tr class="header-row">
-          <td>
-            <b>Names</b>
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Proper Name
-          </td>
-          <td id="proper_name_box">
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Bayer Flamsteed
-          </td>
-          <td id="bayer_flamsteed_box">
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Gliese Catalog
-          </td>
-          <td id="gliese_catalog_box">
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Harvard Revised ID
-          </td>
-          <td id="harvard_revised_box">
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Hipparcos ID
-          </td>
-          <td id="hipparcos_box">
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Henry Draper
-          </td>
-          <td id="henry_draper_box">
-          </td>
-        </tr>
-
-        <tr>
-          <td>&nbsp;</td>
-        </tr>
-
-        <tr class="header-row">
-          <td>
-            <b>Details</b>
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Absolute Magnitude
-          </td>
-          <td id="abs-magnitude">
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Spectral Type
-          </td>
-          <td id="spectral-type">
-          </td>
-        </tr>
-
-        <tr>
-          <td>&nbsp;</td>
-        </tr>
-
-        <tr class="header-row">
-          <td>
-            <b>Relative Location</b>
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Distance (lys)
-          </td>
-          <td id="distance_box">
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Right Ascension (radians)
-          </td>
-          <td id="right_ascension_box">
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            Declination (radians)
-          </td>
-          <td id="declination_box">
-          </td>
-        </tr>
-
-        <tr>
-          <td>&nbsp;</td>
-        </tr>
-
-        <tr class="header-row">
-          <td>
-            <b>More Information</b>
-          </td>
-        </tr>
-
-        <tr class="child-row">
-          <td>
-            <a id="wiki_box" class="external-link" href="" target="_blank">Wikipedia</a>
-          </td>
-        </tr>
-
-
-        </tbody>
+        <tbody id="info-table"></tbody>
       </table>
     </div>
 
-    <div class="overlay-panel" id="selector">
+    <h3>Explore</h3>
+    <div class="overlay-panel">
+      <div class="ui-widget">
+        <label for="jump_to_list">Search: </label>
+        <input id="jump_to_list" type="text">
+      </div>
 
+    </div>
+
+    <h3>Controls</h3>
+    <div class="overlay-panel">
       <table>
         <tbody>
 
@@ -223,43 +102,41 @@
           </td>
         </tr>
 
-        <tr class="header-row">
-          <td>
-            <b>Jump to</b>
-          </td>
-        </tr>
-
-        <tr class="child-row">
-
-          <td>
-            <div class="ui-widget">
-              <label for="jump_to_list">Star: </label>
-              <input id="jump_to_list" type="text">
-            </div>
-          </td>
-        </tr>
 
         </tbody>
       </table>
     </div>
 
-    <div id="attribution-overlay">
-      <a href="https://github.com/bpodgursky/uncharted">Source and project info</a><br>
-      <a href="http://bpodgursky.com/">Ben Podgursky</a>
-    </div>
-
-    <canvas id='webgl_canvas'></canvas>
   </div>
+
+  <div id="attribution-overlay">
+    <a href="https://github.com/bpodgursky/uncharted">Source and project info</a><br>
+    <a href="http://bpodgursky.com/">Ben Podgursky</a>
+  </div>
+
+  <canvas id='webgl_canvas'></canvas>
 </div>
 
 <script>
   //  TODO use size of star
 
+  //  $("#info-header").click(function(e){
+  //    console.log("asdf");
+  //    e.preventDefault();
+  //  });
+
+  $(function () {
+    $("#selector").accordion({
+      collapsible: true,
+      animate: 100
+    });
+  });
+
   if (!Detector.webgl) Detector.addGetWebGLMessage();
 
   var stats = new Stats();
   stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-  $("#selector").append(stats.dom);
+  //  $("#selector").append(stats.dom);
 
   //  constant stuff
 
@@ -383,12 +260,12 @@
     tweenControls.setZoom(currentObjectMesh.position, MARKER_RADIUS, 2,
         function () {
           tweenControls.setZoom(currentObjectMesh.position,
-              currentObjectMesh.objectData.radiusInLys * 10, 1,
+              currentObjectMesh.objectData.radius.value.quantity * 10, 1,
               function () {
 
                 if (isStar(prevStarMesh)) {
-                  prevStarMesh.objectData.nearbyObjectIDs.forEach(function(e){
-                    setStarScale(starsByID[e], currentObjectMesh.objectData.radiusInLys * 3000000);
+                  prevStarMesh.objectData.nearbyObjectIDs.forEach(function (e) {
+                    setStarScale(starsByID[e], currentObjectMesh.objectData.radius.value.quantity * 3000000);
                   })
                 }
 
@@ -400,7 +277,7 @@
 
                 orbitControls.orbit(
                     currentObjectMesh.position,
-                    currentObjectMesh.objectData.radiusInLys * 2
+                    currentObjectMesh.objectData.radius.value.quantity * 2
                 )
 
               }
@@ -492,7 +369,7 @@
     var cacheKey = label + lineDistance;  // could target each star from each other star.
 
     if (!labelCache[(cacheKey)]) {
-      labelCache[cacheKey] = new TooltipMarker(label, lineDistance, targetMesh.objectData.radiusInLys);
+      labelCache[cacheKey] = new TooltipMarker(label, lineDistance, targetMesh.objectData.radius.value.quantity);
     }
 
     tooltip = labelCache[cacheKey];
@@ -531,7 +408,7 @@
     stars.forEach(function (starMesh) {
       var data = starMesh.objectData;
       var starID = data.primaryId;
-      var commonName = getLabelText(data.identifiers);
+      var commonName = data.properName;
       nameList.push(commonName);
       visibleStarsByName[commonName] = starMesh;
 
@@ -669,14 +546,14 @@
             vertexShader: shaders.coronaVertexShader,
             fragmentShader: shaders.coronaFragmentShader,
             uniforms: {
-              scale: {type: "f", value: star.radiusInLys * 3000000},
-              temp: {type: "f", value: star.temperatureEstimate / 2}
+              scale: {type: "f", value: star.radius.value.quantity * 3000000},
+              temp: {type: "f", value: star.temperatureEstimate.value.quantity / 2}
             },
             transparent: true
           });
 
           var surround = new THREE.Mesh(SURROUND_GEOMETRY, shaderSurround);
-          var scale = star.radiusInLys * 4000000;
+          var scale = star.radius.value.quantity * 4000000;
           surround.scale.set(scale, scale, scale);
           surround.objectData = star;
 
@@ -731,27 +608,15 @@
 
         if (newTargetPrimaryId != currentObjectPrimaryId) {
 
-//          var bf = null;
-//          if (newStar.identifiers.bayerFlamsteed) {
-//            bf = newStar.identifiers.bayerFlamsteed.prettyName;
-//          }
-//          setInfoData(bf, infoBayerFlamteed);
-//          setInfoData(newStar.identifiers.glieseId, infoGliese);
-//          setInfoData(newStar.identifiers.harvardRevisedId, infoHarvard);
-//          setInfoData(newStar.identifiers.henryDraperId, infoHenryDraper);
-//          setInfoData(newStar.identifiers.hipparcosId, infoHipparcos);
-//          setInfoData(newStar.identifiers.properName, infoProperName);
-//
-//          setInfoData(newStar.rawStellarClassification, infoSpectralType);
-//          setInfoData(newStar.absoluteMagnitude.toFixed(2), infoAbsMagnitude);
-//
-//          setInfoData(newStar.lightYearDistance.toFixed(2), infoDistance);
-//          setInfoData(newStar.declinationRadians.toFixed(5), infoDeclination);
-//          setInfoData(newStar.rightAscensionRadians.toFixed(5), infoRightAscension);
-//
-//          setLink(newStar.links.wikipedia, infoWiki);
-//
+          $('#info-header').text(newTarget.properName);
+
           if (newTarget.type == "STAR") {
+
+            $('#info-table').empty();
+
+            $('#info-table').append($('<tr></tr>')
+                .appendChild($('<td></td>')))
+
 
             if (currentSystem) {
               scene.remove(currentSystem.object);
@@ -761,6 +626,10 @@
             scene.add(currentSystem.object);
 
             selector.target(mesh.position);
+
+          }else{
+
+
 
           }
 
@@ -849,7 +718,7 @@
         var distance = camera.position.distanceTo(nearStar.position) * .2;
         var childUniform = nearStar.material.uniforms;
         if (childUniform.scale.value != distance) {
-          var scale = Math.min(distance, nearStar.objectData.radiusInLys * 3000000);
+          var scale = Math.min(distance, nearStar.objectData.radius.value.quantity * 3000000);
           setStarScale(nearStar, scale);
         }
 
@@ -861,7 +730,7 @@
 
   }
 
-  function setStarScale(star, scale){
+  function setStarScale(star, scale) {
     star.material.uniforms.scale.value = scale;
     star.scale.x = star.scale.y = star.scale.z = scale;
   }
