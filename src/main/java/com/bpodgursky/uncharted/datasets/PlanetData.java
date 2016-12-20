@@ -1,6 +1,8 @@
 package com.bpodgursky.uncharted.datasets;
 
 import com.bpodgursky.uncharted.datasets.catalogs.ObjectValue;
+import com.bpodgursky.uncharted.datasets.catalogs.Unit;
+import com.bpodgursky.uncharted.datasets.catalogs.ValueSource;
 
 public class PlanetData extends ObjectRecord{
 
@@ -9,6 +11,7 @@ public class PlanetData extends ObjectRecord{
   private final PlanetName name;
 
   private final ObjectValue semiMajorAxisLys;
+  private final ObjectValue semiMinorAxisLys;
   private final ObjectValue eccentricity;
   private final ObjectValue orbitalPeriodDays;
   private final ObjectValue inclination;
@@ -48,6 +51,7 @@ public class PlanetData extends ObjectRecord{
     this.name = name;
 
     this.semiMajorAxisLys = semiMajorAxisLys;
+    this.semiMinorAxisLys = computeSemiMinorAxis(semiMajorAxisLys, eccentricity);
     this.eccentricity = eccentricity;
     this.orbitalPeriodDays = orbitalPeriodDays;
     this.inclination = inclination;
@@ -56,6 +60,14 @@ public class PlanetData extends ObjectRecord{
     this.densityGcc = densityGcc;
 
     setRadius(radiusLys);
+  }
+
+  private ObjectValue computeSemiMinorAxis(ObjectValue major, ObjectValue eccentricity){
+    return new ObjectValue(
+        major.getValue().in(Unit.LY).getQuantity() * Math.sqrt(1 - Math.pow(eccentricity.getValue().getQuantity(), 2)),
+        ValueSource.combine(major.getSource(), eccentricity.getSource()),
+        Unit.LY
+    );
   }
 
 }

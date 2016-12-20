@@ -61,9 +61,8 @@ function System(star, position, planets) {
 
   planets.forEach(function (planet) {
 
-    var eccentricity = planet.eccentricity.value.quantity;
     var major = planet.semiMajorAxisLys.value.quantity;
-    var minor = major * Math.sqrt(1 - Math.pow(eccentricity, 2));
+    var minor = planet.semiMinorAxisLys.value.quantity;
 
     var focusOffset = Math.sqrt(Math.pow(major/2, 2) - Math.pow(minor/2, 2));
 

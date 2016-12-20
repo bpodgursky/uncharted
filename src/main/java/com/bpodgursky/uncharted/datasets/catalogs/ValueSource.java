@@ -1,7 +1,12 @@
 package com.bpodgursky.uncharted.datasets.catalogs;
 
 public enum ValueSource {
-  SUPPLIED,
+  DEFAULT,
   INFERRED,
-  DEFAULT
+  SUPPLIED;
+
+  public static ValueSource combine(ValueSource a, ValueSource b){
+    return ValueSource.values()[Math.min(a.ordinal(), b.ordinal())];
+  }
+
 }

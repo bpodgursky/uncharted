@@ -137,6 +137,10 @@
     });
   });
 
+  $("#selector").click(function(e){
+    e.preventDefault();
+  });
+
   var distanceHeader = $("#distance-header");
   var lastDistance;
 
@@ -617,8 +621,8 @@
           var infoTable = $('#info-table');
           infoTable.empty();
 
-          infoTable.append(row("Radius", newTarget, 'radius'));
-
+          infoTable
+              .append(row("Radius", newTarget, 'radius'));
 
           if (newTarget.type == "STAR") {
 
@@ -632,6 +636,13 @@
             selector.target(mesh.position);
 
           } else {
+
+            infoTable
+                .append(row("Mass", newTarget, 'massKg'))
+                .append(row("Density", newTarget, 'densityGcc'))
+                .append(row("Orbital Period", newTarget, 'orbitalPeriodDays'))
+                .append(row("Semi-Major axis", newTarget, 'semiMajorAxisLys'))
+                .append(row("Semi-Minor axis", newTarget, 'semiMinorAxisLys'))
 
 
           }
@@ -658,7 +669,7 @@
   function row(name, data, element) {
     return $('<tr></tr>')
         .append($('<td></td>').text(name))
-        .append($('<td></td>').text(getValue(data, element)))
+        .append($('<td></td>').text(getValue(data, element)).addClass('info-element'))
   }
 
   function getValue(data, element) {
@@ -676,10 +687,18 @@
     return formatObjValue(elem.value);
   }
 
-  function formatObjValue(objValue){
-    if(objValue.unit == 'LY'){
+  function formatObjValue(objValue) {
+    if (objValue.unit == 'LY') {
       return prettyDistance(objValue.quantity);
+    } else if(objValue.unit == 'DAY'){
+      return objValue.quantity+' days';
+    } else if(objValue.unit == 'KG'){
+      return prettyMass(objValue.quantity);
     }
+  }
+
+  function prettyMass(mass){
+    return (mass / 5.9722e24).toLocaleString('en-US', {maximumSignificantDigits: 3}) +' M⊕'
   }
 
   function prettyDistance(lys) {
@@ -687,7 +706,14 @@
       return lys.toFixed(2) + ' ly';
     }
 
-    return (lys * 9.461e12).toLocaleString('en-US', {maximumSignificantDigits: 3}) + ' km'
+    var distKM = lys * 9.461e12;
+    var distAU = distKM / 1.496e8;
+
+    if(distAU > .01){
+      return distAU.toLocaleString('en-US', {maximumSignificantDigits: 3}) + ' AU';
+    }
+
+    return distKM.toLocaleString('en-US', {maximumSignificantDigits: 3}) + ' km'
   }
 
   function onWindowResize() {
@@ -827,9 +853,9 @@
   }
 
   window.addEventListener('resize', onWindowResize, false);
-  document.addEventListener('mousemove', setMouseXY, false);
-  document.addEventListener('mousedown', setmouseDown, false);
-  document.addEventListener('mouseup', onMouseClick, false);
+  canvas.addEventListener('mousemove', setMouseXY, false);
+  canvas.addEventListener('mousedown', setmouseDown, false);
+  canvas.addEventListener('mouseup', onMouseClick, false);
 
   var loader = new THREE.FontLoader();
 
