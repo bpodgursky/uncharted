@@ -133,7 +133,8 @@
   $(function () {
     $("#selector").accordion({
       collapsible: true,
-      animate: 100
+      animate: 100,
+      heightStyle: 'panel'
     });
   });
 
@@ -643,6 +644,7 @@
                 .append(row("Orbital Period", newTarget, 'orbitalPeriodDays'))
                 .append(row("Semi-Major axis", newTarget, 'semiMajorAxisLys'))
                 .append(row("Semi-Minor axis", newTarget, 'semiMinorAxisLys'))
+                .append(row("Inclination", newTarget, 'inclination'))
 
 
           }
@@ -694,7 +696,15 @@
       return objValue.quantity+' days';
     } else if(objValue.unit == 'KG'){
       return prettyMass(objValue.quantity);
+    } else if(objValue.unit == 'DEGREE'){
+      return prettyDegree(objValue.quantity);
+    } else if(objValue.unit == 'NONE'){
+      return objValue.quantity;
     }
+  }
+
+  function prettyDegree(degrees){
+    return degrees.toLocaleString('en-US', {maximumSignificantDigits: 3})+'°'
   }
 
   function prettyMass(mass){

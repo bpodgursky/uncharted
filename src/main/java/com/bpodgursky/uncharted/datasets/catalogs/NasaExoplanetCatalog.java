@@ -79,7 +79,7 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
             ObjectValue.value(semiMajorAxisRaw, Unit.AU, Unit.LY, PlanetDefaults.DEFAULT_SEMI_MAJOR_AXIS),
             ObjectValue.value(eccentricityRaw, Unit.NONE, Unit.NONE, PlanetDefaults.DEFAULT_ECCENTRICITY),
             ObjectValue.value(orbitalPeriodDaysRaw, Unit.DAY, Unit.DAY, PlanetDefaults.DEFAULT_ORBITAL_PERIOD),
-            ObjectValue.value(inclinationRaw, Unit.NONE, Unit.NONE, PlanetDefaults.DEFAULT_INCLINATION),
+            ObjectValue.value(inclinationRaw, Unit.DEGREE, Unit.DEGREE, PlanetDefaults.DEFAULT_INCLINATION),
             ObjectValue.value(massRaw, Unit.MASS_JUP, Unit.KG, PlanetDefaults.DEFAULT_MASS),
             ObjectValue.value(radiusRaw, Unit.RADIUS_JUP, Unit.LY, PlanetDefaults.DEFAULT_RADIUS),
             ObjectValue.value(densityRaw, Unit.G_PER_CC, Unit.G_PER_CC, PlanetDefaults.DENSITY)

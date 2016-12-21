@@ -16,6 +16,8 @@ public enum Unit {
 
   K,
 
+  DEGREE,
+
   NONE;
 
 

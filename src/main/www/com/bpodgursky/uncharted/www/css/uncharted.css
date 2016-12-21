@@ -15,7 +15,7 @@ body {
   z-index: 1000;
   border: 2px solid #5b0000;
   color: #ffffff;
-
+  /*height: 100%;*/
 }
 
 /*#accordian-block {*/
