@@ -138,7 +138,7 @@
     });
   });
 
-  $("#selector").click(function(e){
+  $("#selector").click(function (e) {
     e.preventDefault();
   });
 
@@ -623,9 +623,18 @@
           infoTable.empty();
 
           infoTable
-              .append(row("Radius", newTarget, 'radius'));
+              .append(row("Radius", getValue(newTarget, 'radius')));
 
           if (newTarget.type == "STAR") {
+
+            infoTable
+                .append(row("Class", newTarget.rawStellarClassification))
+                .append(row("Temperature", getValue(newTarget, 'temperatureEstimate')))
+                .append(row("Distance (Sol)", getValue(newTarget, 'solDistance')))
+                .append(row("Right ascension", getValue(newTarget, 'rightAscensionRadians')))
+                .append(row("Declination", getValue(newTarget, 'declinationRadians')))
+                .append(row("Abs Magnitude", getValue(newTarget, 'absoluteMagnitude')))
+            ;
 
             if (currentSystem) {
               scene.remove(currentSystem.object);
@@ -639,12 +648,12 @@
           } else {
 
             infoTable
-                .append(row("Mass", newTarget, 'massKg'))
-                .append(row("Density", newTarget, 'densityGcc'))
-                .append(row("Orbital Period", newTarget, 'orbitalPeriodDays'))
-                .append(row("Semi-Major axis", newTarget, 'semiMajorAxisLys'))
-                .append(row("Semi-Minor axis", newTarget, 'semiMinorAxisLys'))
-                .append(row("Inclination", newTarget, 'inclination'))
+                .append(row("Mass", getValue(newTarget, 'massKg')))
+                .append(row("Density", getValue(newTarget, 'densityGcc')))
+                .append(row("Orbital Period", getValue(newTarget, 'orbitalPeriodDays')))
+                .append(row("Semi-Major axis", getValue(newTarget, 'semiMajorAxisLys')))
+                .append(row("Semi-Minor axis", getValue(newTarget, 'semiMinorAxisLys')))
+                .append(row("Inclination", getValue(newTarget, 'inclination')))
 
 
           }
@@ -668,10 +677,10 @@
 
   }
 
-  function row(name, data, element) {
+  function row(name, value) {
     return $('<tr></tr>')
         .append($('<td></td>').text(name))
-        .append($('<td></td>').text(getValue(data, element)).addClass('info-element'))
+        .append($('<td></td>').text(value).addClass('info-element'))
   }
 
   function getValue(data, element) {
@@ -690,25 +699,41 @@
   }
 
   function formatObjValue(objValue) {
+    var quantity = objValue.quantity;
+
     if (objValue.unit == 'LY') {
-      return prettyDistance(objValue.quantity);
-    } else if(objValue.unit == 'DAY'){
-      return objValue.quantity+' days';
-    } else if(objValue.unit == 'KG'){
-      return prettyMass(objValue.quantity);
-    } else if(objValue.unit == 'DEGREE'){
-      return prettyDegree(objValue.quantity);
-    } else if(objValue.unit == 'NONE'){
-      return objValue.quantity;
+      return prettyDistance(quantity);
+    } else if (objValue.unit == 'DAY') {
+      return quantity + ' days';
+    } else if (objValue.unit == 'KG') {
+      return prettyMass(quantity);
+    } else if (objValue.unit == 'DEGREE_GEOM') {
+      return prettyDegree(quantity);
+    } else if (objValue.unit == 'RADIAN') {
+      return prettyDegree(quantity * 57.2958);
+    } else if (objValue.unit == 'MV') {
+      return prettyMagnitude(quantity);
+    } else if (objValue.unit == 'K') {
+      return prettyTemperature(quantity);
+    } else if (objValue.unit == 'NONE') {
+      return quantity;
     }
   }
 
-  function prettyDegree(degrees){
-    return degrees.toLocaleString('en-US', {maximumSignificantDigits: 3})+'°'
+  function prettyTemperature(k) {
+    return k.toLocaleString('en-US', {maximumSignificantDigits: 3}) + 'K'
   }
 
-  function prettyMass(mass){
-    return (mass / 5.9722e24).toLocaleString('en-US', {maximumSignificantDigits: 3}) +' M⊕'
+  function prettyMagnitude(mv) {
+    return mv.toLocaleString('en-US', {maximumSignificantDigits: 3}) + 'Mv';
+  }
+
+  function prettyDegree(degrees) {
+    return degrees.toLocaleString('en-US', {maximumSignificantDigits: 3}) + '°';
+  }
+
+  function prettyMass(mass) {
+    return (mass / 5.9722e24).toLocaleString('en-US', {maximumSignificantDigits: 3}) + ' M⊕';
   }
 
   function prettyDistance(lys) {
@@ -719,7 +744,7 @@
     var distKM = lys * 9.461e12;
     var distAU = distKM / 1.496e8;
 
-    if(distAU > .01){
+    if (distAU > .01) {
       return distAU.toLocaleString('en-US', {maximumSignificantDigits: 3}) + ' AU';
     }
 

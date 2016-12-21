@@ -11,9 +11,9 @@ public class StarRecord extends ObjectRecord{
   private final StarIdentifiers identifiers;
 
   private final ObjectValue solDistance;
-  private final Double rightAscensionRadians;
-  private final Double declinationRadians;
-  private final Double absoluteMagnitude;
+  private final ObjectValue rightAscensionRadians;
+  private final ObjectValue declinationRadians;
+  private final ObjectValue absoluteMagnitude;
   private final String rawStellarClassification;
   private final StellarClassification parsedStellarClassification;
   private final Coordinate cartesianCoordsInLys;
@@ -25,9 +25,9 @@ public class StarRecord extends ObjectRecord{
   public StarRecord(StarIdentifiers identifiers,
                     ExternalLinks links,
                     ObjectValue lightYearDistance,
-                    Double rightAscensionRadians,
-                    Double declinationRadians,
-                    Double absoluteMagnitude,
+                    ObjectValue rightAscensionRadians,
+                    ObjectValue declinationRadians,
+                    ObjectValue absoluteMagnitude,
                     String stellarClass,
                     Double colorIndex,
                     Double luminosity) {
@@ -39,7 +39,11 @@ public class StarRecord extends ObjectRecord{
     this.absoluteMagnitude = absoluteMagnitude;
     this.rawStellarClassification = stellarClass;
     this.parsedStellarClassification = StarClassHelper.parseClass(stellarClass);
-    this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(rightAscensionRadians, declinationRadians, lightYearDistance.getValue().in(Unit.LY).getQuantity());
+    this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(
+        rightAscensionRadians.getValue(),
+        declinationRadians.getValue(),
+        lightYearDistance.getValue()
+    );
 
     if (colorIndex == null) {
       this.temperatureEstimate = new ObjectValue(StarClassHelper.getTemperatureEstimate(parsedStellarClassification), ValueSource.DEFAULT, Unit.K);
@@ -61,18 +65,6 @@ public class StarRecord extends ObjectRecord{
 
   public Double getSolDistance() {
     return solDistance.getValue().in(Unit.LY).getQuantity();
-  }
-
-  public Double getRightAscensionRadians() {
-    return rightAscensionRadians;
-  }
-
-  public Double getDeclinationRadians() {
-    return declinationRadians;
-  }
-
-  public Double getAbsoluteMagnitude() {
-    return absoluteMagnitude;
   }
 
   public Coordinate getCartesianCoordsInLys() {

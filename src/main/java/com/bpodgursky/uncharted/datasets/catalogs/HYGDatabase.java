@@ -121,9 +121,9 @@ public class HYGDatabase implements StarCatalog {
             identifiers,
             links,
             new ObjectValue(AstroConvert.parsecsToLightyears(Double.parseDouble(distanceParsecs)), ValueSource.SUPPLIED, Unit.LY),
-            AstroConvert.hoursToRadians(Double.parseDouble(rightAscension)),
-            AstroConvert.degreesToRadians(Double.parseDouble(declination)),
-            Double.parseDouble(absMag),
+            new ObjectValue(AstroConvert.hoursToRadians(Double.parseDouble(rightAscension)), ValueSource.SUPPLIED, Unit.RADIAN),
+            new ObjectValue(AstroConvert.degreesToRadians(Double.parseDouble(declination)), ValueSource.SUPPLIED, Unit.RADIAN),
+            new ObjectValue(Double.parseDouble(absMag), ValueSource.SUPPLIED, Unit.MV),
             split[15],
             parseOrNull(split[16]),
             luminosity

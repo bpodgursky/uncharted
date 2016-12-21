@@ -34,11 +34,15 @@ public class AstroConvert {
 
   }
 
-  public static Coordinate equatorialToCartesian(Double rightAscensionRadians, Double declinationRadians, double distance){
+  public static Coordinate equatorialToCartesian(UnitValue rightAscension, UnitValue declination, UnitValue distance){
 
-    double x = distance * Math.cos(rightAscensionRadians) * Math.cos(declinationRadians);
-    double y = distance * Math.sin(rightAscensionRadians) * Math.cos(declinationRadians);
-    double z = distance * Math.sin(declinationRadians);
+    Double rightAscensionRad = rightAscension.in(Unit.RADIAN).getQuantity();
+    Double declinationRad = declination.in(Unit.RADIAN).getQuantity();
+    Double distanceLy = distance.in(Unit.LY).getQuantity();
+
+    double x = distanceLy * Math.cos(rightAscensionRad) * Math.cos(declinationRad);
+    double y = distanceLy * Math.sin(rightAscensionRad) * Math.cos(declinationRad);
+    double z = distanceLy * Math.sin(declinationRad);
 
     return new Coordinate(x, y, z);
   }

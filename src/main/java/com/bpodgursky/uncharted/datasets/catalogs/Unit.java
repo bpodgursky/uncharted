@@ -16,7 +16,10 @@ public enum Unit {
 
   K,
 
-  DEGREE,
+  RADIAN,
+  DEGREE_GEOM,
+
+  MV,
 
   NONE;
 
