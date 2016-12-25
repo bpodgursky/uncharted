@@ -45,6 +45,11 @@ function System(star, position, planets) {
 
   object.add(starDetail);
 
+  var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.9 );
+  directionalLight.position.set(starData.radius.value.quantity*1.1, 0, 0 );
+
+  object.add(directionalLight);
+
   this.selectable = [starDetail];
   var planetSelectable = this.selectable;
 
@@ -66,7 +71,12 @@ function System(star, position, planets) {
 
     var focusOffset = Math.sqrt(Math.pow(major/2, 2) - Math.pow(minor/2, 2));
 
-    axes.push(major+focusOffset);
+    var planetPos = -major + focusOffset;
+    axes.push(planetPos);
+
+    console.log(major);
+    console.log(focusOffset);
+    console.log(planetPos);
 
     var ellipse = new THREE.EllipseCurve(focusOffset, 0, major, minor, 0, 2.0 * Math.PI, false);
     var ellipsePath = new THREE.CurvePath();
@@ -79,13 +89,19 @@ function System(star, position, planets) {
     var planetMesh = getDetailMesh(planet);
 
     var surround = new THREE.Mesh(TRANSPARENT_GEOMETRY, transparentMaterial);
-    surround.scale.set(10, 10, 10);
+
+    var distScale = Math.max(1.0, planet.semiMajorAxisLys.value.quantity / 1.58e-5);
+    var invScale = (7.3896e-9/planet.radius.value.quantity) *
+      distScale *
+      30;
+
+    surround.scale.set(invScale, invScale, invScale);
     surround.objectData = planet;
 
     planetMesh.objectData = planet;
     planetMesh.add(surround);
 
-    planetMesh.position.x = major+focusOffset;
+    planetMesh.position.x = planetPos;
     object.add(planetMesh);
 
     planetSelectable.push(surround);
@@ -93,7 +109,7 @@ function System(star, position, planets) {
 
   });
 
-  var maxDistance = Math.max.apply(null, axes);
+  var maxDistance = Math.min.apply(null, axes);
 
   var geometry = new THREE.Geometry();
   geometry.vertices.push(new THREE.Vector3(0, 0, 0));
@@ -105,32 +121,3 @@ function System(star, position, planets) {
 
 }
 
-//  TODO this is 99.9% unscientific.  I'm using this SO answer http://astronomy.stackexchange.com/questions/13382/planets-classification-by-density?rq=1
-//  to say rocky < .1 jupiter masses.  also the shaders are super crude placeholders.
-function getShader(planetData){
-  if(planetData.massKg.value.quantity < 1.898e26){ //  10% jupiter
-    return shaders.rockyPlanetFragmentShader;
-  }else{
-    return shaders.gasPlanetFragmentShader;
-  }
-}
-
-function getDetailMesh(planetData){
-
-  var material = new THREE.ShaderMaterial({
-    uniforms: {
-      time: uniforms.time,
-      scale: uniforms.scale
-    },
-    vertexShader: shaders.staticVertexShader,
-    fragmentShader: getShader(planetData),
-    transparent: false
-  });
-
-  var planetMesh = new THREE.Mesh(DETAIL_GEOMETRY, material);
-  planetMesh.scale.x = planetMesh.scale.y = planetMesh.scale.z = planetData.radius.value.quantity;
-
-  planetMesh.rotateY(Math.PI/2);
-
-  return planetMesh;
-}

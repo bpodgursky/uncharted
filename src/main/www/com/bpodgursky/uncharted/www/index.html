@@ -25,6 +25,7 @@
   <script src="js/Shaders.js"></script>
   <script src="js/CircularQueue.js"></script>
   <script src="js/RollingAverage.js"></script>
+  <script src="js/PlanetBuilder.js"></script>
   <script src="resources/Detector.js"></script>
 
 </head>
@@ -78,13 +79,13 @@
 
         <tr class="header-row">
           <td>
-            <b>Render Radius (lys)</b>
+            <b>Render Radius (Sol lys)</b>
           </td>
         </tr>
 
         <tr class="child-row">
           <td>
-            <form id="render_radius" name="render_radius" action="#" method="POST">
+            <form id="render_radius" name="render_radius" act ion="#" method="POST">
               <div>
                 <label>
                   <input type="radio" name="render_radius" value="10">
@@ -222,6 +223,9 @@
 
   var shaders = new Shaders();
 
+  var light = new THREE.AmbientLight(0x404040); // soft white light
+  scene.add( light );
+
   scene.add(camera);
   scene.add(intersectCamera);
   scene.add(solMarker.mesh);
@@ -303,47 +307,11 @@
   var currentObjectMesh;
   var currentSystem;
 
-  //  infobox stuff
-  var infoProperName = $("#proper_name_box");
-  var infoBayerFlamteed = $("#bayer_flamsteed_box");
-  var infoGliese = $("#gliese_catalog_box");
-  var infoHarvard = $("#harvard_revised_box");
-  var infoHipparcos = $("#hipparcos_box");
-  var infoHenryDraper = $("#henry_draper_box");
-  var infoSpectralType = $("#spectral-type");
-  var infoAbsMagnitude = $("#abs-magnitude");
-  var infoDistance = $("#distance_box");
-  var infoRightAscension = $("#right_ascension_box");
-  var infoDeclination = $("#declination_box");
   var infoWiki = $("#wiki_box");
 
   infoWiki.click(function (e) {
     window.open(infoWiki.attr('href'), '_blank');
   });
-
-  function getLabelText(identifiers) {
-
-    if (identifiers.properName) {
-      return identifiers.properName;
-    }
-
-    if (identifiers.glieseId) {
-      return identifiers.glieseId;
-    }
-
-    if (identifiers.harvardRevisedId) {
-      return identifiers.harvardRevisedId;
-    }
-
-    if (identifiers.henryDraperId) {
-      return identifiers.henryDraperId;
-    }
-
-    if (identifiers.hipparcosId) {
-      return identifiers.hipparcosId;
-    }
-
-  }
 
   function reassignLabel(targetMesh) {
 
@@ -434,12 +402,12 @@
     });
 
     if (currentObjectPrimaryId == "") {
-      select(starsByID[15472]);
+      select(starsByID[1]);
       reassignLabel(starsByID[70667]);
     }
     //  if we shrunk the render distance
     else if (!renderedStars[currentObjectPrimaryId]) {
-      select(starsByID[15472]);
+      select(starsByID[1]);
     }
 
 
