@@ -23,13 +23,18 @@ public class PlanetData extends ObjectRecord{
 
     private final String starName;
     private final String planetLetter;
+    private final String commonName;
 
-    public PlanetName(String starName, String planetLetter) {
+    public PlanetName(String starName, String planetLetter, String commonName) {
       this.starName = starName;
       this.planetLetter = planetLetter;
+      this.commonName = commonName;
     }
 
     public String toString(){
+      if(commonName != null){
+        return commonName;
+      }
       return starName+" "+planetLetter;
     }
   }

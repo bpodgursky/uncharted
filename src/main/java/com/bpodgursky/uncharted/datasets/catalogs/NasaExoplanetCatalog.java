@@ -75,7 +75,7 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
         allPlanetsByStarID.put(starRecord.getPrimaryId(), new PlanetData(
             planetID,
             starRecord.getPrimaryId(),
-            new PlanetData.PlanetName(starName, planetLetter),
+            new PlanetData.PlanetName(starName, planetLetter, null),
             ObjectValue.value(semiMajorAxisRaw, Unit.AU, Unit.LY, PlanetDefaults.DEFAULT_SEMI_MAJOR_AXIS),
             ObjectValue.value(eccentricityRaw, Unit.NONE, Unit.NONE, PlanetDefaults.DEFAULT_ECCENTRICITY),
             ObjectValue.value(orbitalPeriodDaysRaw, Unit.DAY, Unit.DAY, PlanetDefaults.DEFAULT_ORBITAL_PERIOD),
@@ -89,6 +89,20 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
       }
 
     }
+
+
+    allPlanetsByStarID.put(1, new PlanetData(
+        null,
+        1,
+        new PlanetData.PlanetName("Sol", null, "Earth"),
+        new ObjectValue(1.5812e-5, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(0.0167086, ValueSource.SUPPLIED, Unit.NONE),
+        new ObjectValue(365.256363, ValueSource.SUPPLIED, Unit.DAY),
+        new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.DEGREE_GEOM), // TODO not sure about this
+        new ObjectValue(5.97237e24, ValueSource.SUPPLIED, Unit.KG),
+        new ObjectValue(6.7341e-10, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(5.514, ValueSource.SUPPLIED, Unit.G_PER_CC)
+    ));
 
     LOG.info("Found stars for " + allPlanetsByStarID.size() + "/" + planetCount + " total records");
 

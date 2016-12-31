@@ -267,6 +267,7 @@
           <include>**/*.png</include>
           <include>**/*.gif</include>
           <include>**/*.glsl</include>
+          <include>**/*.jpg</include>
         </includes>
       </resource>
     </resources>
