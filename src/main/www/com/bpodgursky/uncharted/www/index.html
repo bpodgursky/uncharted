@@ -53,6 +53,23 @@
 
     <h3>Controls</h3>
     <div class="overlay-panel">
+
+      <!--<div class="widget">-->
+        <!--<h1>Checkbox and radio button widgets</h1>-->
+
+        <!--<h2>Radio Group</h2>-->
+        <!--<fieldset>-->
+          <!--<legend>Select a Location:</legend>-->
+          <!--<label for="radio-1">New York</label>-->
+          <!--<input class="radioselect" type="radio" name="radio-1" id="radio-1">-->
+          <!--<label for="radio-2">Paris</label>-->
+          <!--<input class="radioselect"type="radio" name="radio-1" id="radio-2">-->
+          <!--<label for="radio-3">London</label>-->
+          <!--<input class="radioselect" type="radio" name="radio-1" id="radio-3">-->
+        <!--</fieldset>-->
+
+      <!--</div>-->
+
       <table>
         <tbody>
 
@@ -139,9 +156,11 @@
     });
   });
 
-  $("#selector").click(function (e) {
-    e.preventDefault();
-  });
+//  $("#selector").click(function (e) {
+//    e.preventDefault();
+//  });
+
+  $(".radioselect").checkboxradio();
 
   var distanceHeader = $("#distance-header");
   var lastDistance;
@@ -224,7 +243,7 @@
   var shaders = new Shaders();
 
   var light = new THREE.AmbientLight(0x404040); // soft white light
-  scene.add( light );
+  scene.add(light);
 
   scene.add(camera);
   scene.add(intersectCamera);
@@ -272,9 +291,25 @@
 
     tweenControls.setZoom(currentObjectMesh.position, MARKER_RADIUS, 2,
         function () {
+
           tweenControls.setZoom(currentObjectMesh.position,
               currentObjectMesh.objectData.radius.value.quantity * 10, 1,
               function () {
+
+                if (isStar(currentObjectMesh)) {
+
+                  if (currentSystem) {
+                    scene.remove(currentSystem.object);
+                  }
+
+                  currentSystem = new System(
+                      currentObjectMesh,
+                      currentObjectMesh.position,
+                      planetsByStarID[currentObjectMesh.objectData.primaryId]
+                  );
+
+                  scene.add(currentSystem.object);
+                }
 
                 if (isStar(prevStarMesh)) {
                   prevStarMesh.objectData.nearbyObjectIDs.forEach(function (e) {
@@ -557,13 +592,10 @@
 
     if (mesh) {
 
-      //  TODO flesh out with more fields
-      //     # planets (display them?)
-
       var newTarget = mesh.objectData;
+      var newCenter = mesh.position;
 
-      if (mesh.objectData.type == "STAR") {
-        var newCenter = mesh.position;
+      if (isStar(mesh)) {
 
         var deltaX = newCenter.x;
         var deltaY = newCenter.y;
@@ -578,7 +610,25 @@
 
       }
 
-//      mesh.updateMatrix();
+//      if (mesh.objectData.type == "PLANET") {
+//
+//        if (currentSystem) {
+//
+//          currentSystem.object.position.x += deltaX;
+//          currentSystem.object.position.y += deltaY;
+//          currentSystem.object.position.z += deltaZ;
+//
+//          console.log("new center: ");
+//          console.log(currentSystem.object.position);
+//
+//          currentSystem.object.children.forEach(function(e){
+//            e.position.x += deltaX;
+//            e.position.y += deltaY;
+//            e.position.z += deltaZ;
+//
+//          })
+//        }
+//      }
 
       if (newTarget != null) {
         var newTargetPrimaryId = newTarget.primaryId;
@@ -601,15 +651,8 @@
                 .append(row("Distance (Sol)", getValue(newTarget, 'solDistance')))
                 .append(row("Right ascension", getValue(newTarget, 'rightAscensionRadians')))
                 .append(row("Declination", getValue(newTarget, 'declinationRadians')))
-                .append(row("Abs Magnitude", getValue(newTarget, 'absoluteMagnitude')))
-            ;
+                .append(row("Abs Magnitude", getValue(newTarget, 'absoluteMagnitude')));
 
-            if (currentSystem) {
-              scene.remove(currentSystem.object);
-            }
-
-            currentSystem = new System(mesh, mesh.position, planetsByStarID[newTarget.primaryId]);
-            scene.add(currentSystem.object);
 
             selector.target(mesh.position);
 
@@ -759,23 +802,22 @@
     selector.updateTo(camera, delta);
     solMarker.updateTo(camera, delta);
 
-    if (currentSystem) {
-      var star = currentSystem.star;
-
-      star.objectData.nearbyObjectIDs.forEach(function (e) {
-        var nearStar = starsByID[e];
-        var distance = camera.position.distanceTo(nearStar.position) * .2;
-        var childUniform = nearStar.material.uniforms;
-        if (childUniform.scale.value != distance) {
-          var scale = Math.min(distance, nearStar.objectData.radius.value.quantity * 3000000);
-          setStarScale(nearStar, scale);
-        }
-
-      });
-
-    }
 
     if (currentObjectMesh) {
+
+      var currentStar = getCurrentStar();
+      if (currentStar) {
+        currentStar.objectData.nearbyObjectIDs.forEach(function (e) {
+          var nearStar = starsByID[e];
+          var distance = camera.position.distanceTo(nearStar.position) * .2;
+          var childUniform = nearStar.material.uniforms;
+          if (childUniform.scale.value != distance) {
+            var scale = Math.min(distance, nearStar.objectData.radius.value.quantity * 3000000);
+            setStarScale(nearStar, scale);
+          }
+        });
+      }
+
       var newDistance = prettyDistance(camera.position.distanceTo(currentObjectMesh.position));
       if (lastDistance != newDistance) {
         lastDistance = newDistance;
@@ -785,6 +827,19 @@
 
     renderer.render(scene, camera);
 
+  }
+
+  //  this is ugly but we don't render the system until zoomed up....
+  function getCurrentStar() {
+    if (isStar(currentObjectMesh)) {
+      return currentObjectMesh;
+    }
+
+    if (currentSystem) {
+      return currentSystem.star;
+    }
+
+    return null;
   }
 
   function setStarScale(star, scale) {

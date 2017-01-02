@@ -104,6 +104,99 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
         new ObjectValue(5.514, ValueSource.SUPPLIED, Unit.G_PER_CC)
     ));
 
+    allPlanetsByStarID.put(1, new PlanetData(
+        null,
+        1,
+        new PlanetData.PlanetName("Sol", null, "Mercury"),
+        new ObjectValue(6.120989e-6, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(0.205630, ValueSource.SUPPLIED, Unit.NONE),
+        new ObjectValue(87.969, ValueSource.SUPPLIED, Unit.DAY),
+        new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.DEGREE_GEOM), // TODO not sure about this
+        new ObjectValue(3.3011e23, ValueSource.SUPPLIED, Unit.KG),
+        new ObjectValue(2.5787e-10, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(5.427, ValueSource.SUPPLIED, Unit.G_PER_CC)
+    ));
+
+    allPlanetsByStarID.put(1, new PlanetData(
+        null,
+        1,
+        new PlanetData.PlanetName("Sol", null, "Venus"),
+        new ObjectValue(1.14376e-5, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(0.006772, ValueSource.SUPPLIED, Unit.NONE),
+        new ObjectValue(224.701, ValueSource.SUPPLIED, Unit.DAY),
+        new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.DEGREE_GEOM), // TODO not sure about this
+        new ObjectValue(4.8675e24, ValueSource.SUPPLIED, Unit.KG),
+        new ObjectValue(6.39675765e-10, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(5.243, ValueSource.SUPPLIED, Unit.G_PER_CC)
+    ));
+
+    allPlanetsByStarID.put(1, new PlanetData(
+        null,
+        1,
+        new PlanetData.PlanetName("Sol", null, "Mars"),
+        new ObjectValue(2.4093185478e-5, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(0.0934, ValueSource.SUPPLIED, Unit.NONE),
+        new ObjectValue(686.971, ValueSource.SUPPLIED, Unit.DAY),
+        new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.DEGREE_GEOM), // TODO not sure about this
+        new ObjectValue(6.4171e23, ValueSource.SUPPLIED, Unit.KG),
+        new ObjectValue(3.582704327e-10, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(3.9335, ValueSource.SUPPLIED, Unit.G_PER_CC)
+    ));
+
+    allPlanetsByStarID.put(1, new PlanetData(
+        null,
+        1,
+        new PlanetData.PlanetName("Sol", null, "Jupiter"),
+        new ObjectValue(8.22661511e-5, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(0.048498, ValueSource.SUPPLIED, Unit.NONE),
+        new ObjectValue(4332.59, ValueSource.SUPPLIED, Unit.DAY),
+        new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.DEGREE_GEOM), // TODO not sure about this
+        new ObjectValue(1.8986e27, ValueSource.SUPPLIED, Unit.KG),
+        new ObjectValue(7.3895985e-9, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(1.326, ValueSource.SUPPLIED, Unit.G_PER_CC)
+    ));
+
+    allPlanetsByStarID.put(1, new PlanetData(
+        null,
+        1,
+        new PlanetData.PlanetName("Sol", null, "Saturn"),
+        new ObjectValue(0.00015108706936, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(0.05555, ValueSource.SUPPLIED, Unit.NONE),
+        new ObjectValue(10759.22, ValueSource.SUPPLIED, Unit.DAY),
+        new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.DEGREE_GEOM), // TODO not sure about this
+        new ObjectValue(5.6836e26, ValueSource.SUPPLIED, Unit.KG),
+        new ObjectValue(6.1551273e-9, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(0.687, ValueSource.SUPPLIED, Unit.G_PER_CC)
+    ));
+
+    allPlanetsByStarID.put(1, new PlanetData(
+        null,
+        1,
+        new PlanetData.PlanetName("Sol", null, "Uranus"),
+        new ObjectValue(0.0003038910924, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(0.046381, ValueSource.SUPPLIED, Unit.NONE),
+        new ObjectValue(30688.5, ValueSource.SUPPLIED, Unit.DAY),
+        new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.DEGREE_GEOM), // TODO not sure about this
+        new ObjectValue(8.6810e25, ValueSource.SUPPLIED, Unit.KG),
+        new ObjectValue(2.6807655e-9, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(1.27, ValueSource.SUPPLIED, Unit.G_PER_CC)
+    ));
+
+    allPlanetsByStarID.put(1, new PlanetData(
+        null,
+        1,
+        new PlanetData.PlanetName("Sol", null, "Neptune"),
+        new ObjectValue(0.00047612071755, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(0.009456, ValueSource.SUPPLIED, Unit.NONE),
+        new ObjectValue(60182, ValueSource.SUPPLIED, Unit.DAY),
+        new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.DEGREE_GEOM), // TODO not sure about this
+        new ObjectValue(1.0243e26, ValueSource.SUPPLIED, Unit.KG),
+        new ObjectValue(2.6025475e-9, ValueSource.SUPPLIED, Unit.LY),
+        new ObjectValue(1.638, ValueSource.SUPPLIED, Unit.G_PER_CC)
+    ));
+
+
+
     LOG.info("Found stars for " + allPlanetsByStarID.size() + "/" + planetCount + " total records");
 
   }

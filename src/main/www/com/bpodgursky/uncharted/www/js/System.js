@@ -1,5 +1,5 @@
 var orbitMaterial = new THREE.LineBasicMaterial({
-  color: 0x33cc33,
+  color: 0x009900,
   depthWrite: false
 });
 
@@ -73,10 +73,6 @@ function System(star, position, planets) {
 
     var planetPos = -major + focusOffset;
     axes.push(planetPos);
-
-    console.log(major);
-    console.log(focusOffset);
-    console.log(planetPos);
 
     var ellipse = new THREE.EllipseCurve(focusOffset, 0, major, minor, 0, 2.0 * Math.PI, false);
     var ellipsePath = new THREE.CurvePath();

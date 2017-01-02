@@ -12,7 +12,14 @@ function getShader(planetData) {
 
 
 var NAME_TO_MAP = {
-  Earth: "images/planets/earthmap1k.jpg"
+  Earth: "images/planets/earthmap1k.jpg",
+  Mercury: "images/planets/mercurymap.jpg",
+  Venus: "images/planets/venusmap.jpg",
+  Mars: "images/planets/marsmap1k.jpg",
+  Jupiter: "images/planets/jupiter2_4k.jpg",
+  Saturn: "images/planets/saturnmap.jpg",
+  Uranus: "images/planets/uranusmap.jpg",
+  Neptune: "images/planets/neptunemap.jpg"
 }
 
 function getMaterial(planetData) {
