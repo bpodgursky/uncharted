@@ -54,22 +54,6 @@
     <h3>Controls</h3>
     <div class="overlay-panel">
 
-      <!--<div class="widget">-->
-        <!--<h1>Checkbox and radio button widgets</h1>-->
-
-        <!--<h2>Radio Group</h2>-->
-        <!--<fieldset>-->
-          <!--<legend>Select a Location:</legend>-->
-          <!--<label for="radio-1">New York</label>-->
-          <!--<input class="radioselect" type="radio" name="radio-1" id="radio-1">-->
-          <!--<label for="radio-2">Paris</label>-->
-          <!--<input class="radioselect"type="radio" name="radio-1" id="radio-2">-->
-          <!--<label for="radio-3">London</label>-->
-          <!--<input class="radioselect" type="radio" name="radio-1" id="radio-3">-->
-        <!--</fieldset>-->
-
-      <!--</div>-->
-
       <table>
         <tbody>
 
@@ -146,7 +130,7 @@
 
   var stats = new Stats();
   stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-  //  $("#attribution-overlay").append(stats.dom);
+  $("#attribution-overlay").append(stats.dom);
 
   $(function () {
     $("#selector").accordion({
@@ -155,12 +139,6 @@
       heightStyle: 'panel'
     });
   });
-
-//  $("#selector").click(function (e) {
-//    e.preventDefault();
-//  });
-
-  $(".radioselect").checkboxradio();
 
   var distanceHeader = $("#distance-header");
   var lastDistance;
@@ -284,6 +262,11 @@
     e.preventDefault();
   });
 
+  var HIGHLIGHT_MAP = new THREE.TextureLoader().load("images/downarrow.png");
+  var SPRITE_MATERIAL = new THREE.SpriteMaterial({map: HIGHLIGHT_MAP});
+
+
+
   function updateTarget(prevStarMesh) {
 
     var prevControlMode = controlMode;
@@ -297,18 +280,7 @@
               function () {
 
                 if (isStar(currentObjectMesh)) {
-
-                  if (currentSystem) {
-                    scene.remove(currentSystem.object);
-                  }
-
-                  currentSystem = new System(
-                      currentObjectMesh,
-                      currentObjectMesh.position,
-                      planetsByStarID[currentObjectMesh.objectData.primaryId]
-                  );
-
-                  scene.add(currentSystem.object);
+                  currentSystem.populatePlanets();
                 }
 
                 if (isStar(prevStarMesh)) {
@@ -568,6 +540,8 @@
           surround.objectData = star;
           resetStarScale(surround);
 
+          surround.add(createHighlightSprite());
+
           surround.position.x = star.cartesianCoordsInLys.x;
           surround.position.y = star.cartesianCoordsInLys.y;
           surround.position.z = star.cartesianCoordsInLys.z;
@@ -587,6 +561,9 @@
 
   }
 
+  function createHighlightSprite(){
+    return new THREE.Sprite(SPRITE_MATERIAL);
+  }
 
   function select(mesh) {
 
@@ -645,6 +622,18 @@
 
           if (newTarget.type == "STAR") {
 
+            if (currentSystem) {
+              scene.remove(currentSystem.object);
+            }
+
+            currentSystem = new System(
+                mesh,
+                mesh.position,
+                planetsByStarID[newTarget.primaryId]
+            );
+
+            scene.add(currentSystem.object);
+
             infoTable
                 .append(row("Class", newTarget.rawStellarClassification))
                 .append(row("Temperature", getValue(newTarget, 'temperatureEstimate')))
@@ -673,7 +662,6 @@
 
           currentObjectMesh = mesh;
           currentObjectPrimaryId = newTargetPrimaryId;
-
 
           updateTarget(prevTargetMesh);
 
@@ -803,9 +791,9 @@
     solMarker.updateTo(camera, delta);
 
 
-    if (currentObjectMesh) {
+    if (currentSystem) {
 
-      var currentStar = getCurrentStar();
+      var currentStar = currentSystem.star;
       if (currentStar) {
         currentStar.objectData.nearbyObjectIDs.forEach(function (e) {
           var nearStar = starsByID[e];
@@ -827,19 +815,6 @@
 
     renderer.render(scene, camera);
 
-  }
-
-  //  this is ugly but we don't render the system until zoomed up....
-  function getCurrentStar() {
-    if (isStar(currentObjectMesh)) {
-      return currentObjectMesh;
-    }
-
-    if (currentSystem) {
-      return currentSystem.star;
-    }
-
-    return null;
   }
 
   function setStarScale(star, scale) {

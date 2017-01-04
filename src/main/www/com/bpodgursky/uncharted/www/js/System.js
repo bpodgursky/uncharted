@@ -23,6 +23,7 @@ function System(star, position, planets) {
 
   this.object = new THREE.Group();
   this.star = star;
+  this.planets = planets;
   var object = this.object;
 
   var starData = star.objectData;
@@ -45,75 +46,85 @@ function System(star, position, planets) {
 
   object.add(starDetail);
 
-  var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.9 );
-  directionalLight.position.set(starData.radius.value.quantity*1.1, 0, 0 );
+  var directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+  directionalLight.position.set(starData.radius.value.quantity * 1.1, 0, 0);
 
   object.add(directionalLight);
 
   this.selectable = [starDetail];
-  var planetSelectable = this.selectable;
 
   this.objectsByID = {};
   this.objectsByID[star.objectData.primaryId] = star;
 
-  var planetsByID = this.objectsByID;
 
   this.object.position.x = position.x;
   this.object.position.y = position.y;
   this.object.position.z = position.z;
 
-  var axes = [];
-
-  planets.forEach(function (planet) {
-
-    var major = planet.semiMajorAxisLys.value.quantity;
-    var minor = planet.semiMinorAxisLys.value.quantity;
-
-    var focusOffset = Math.sqrt(Math.pow(major/2, 2) - Math.pow(minor/2, 2));
-
-    var planetPos = -major + focusOffset;
-    axes.push(planetPos);
-
-    var ellipse = new THREE.EllipseCurve(focusOffset, 0, major, minor, 0, 2.0 * Math.PI, false);
-    var ellipsePath = new THREE.CurvePath();
-    ellipsePath.add(ellipse);
-    var ellipseGeometry = ellipsePath.createPointsGeometry(100);
-    ellipseGeometry.computeTangents();
-    var line = new THREE.Line(ellipseGeometry, orbitMaterial);
-    object.add(line);
-
-    var planetMesh = getDetailMesh(planet);
-
-    var surround = new THREE.Mesh(TRANSPARENT_GEOMETRY, transparentMaterial);
-
-    var distScale = Math.max(1.0, planet.semiMajorAxisLys.value.quantity / 1.58e-5);
-    var invScale = (7.3896e-9/planet.radius.value.quantity) *
-      distScale *
-      30;
-
-    surround.scale.set(invScale, invScale, invScale);
-    surround.objectData = planet;
-
-    planetMesh.objectData = planet;
-    planetMesh.add(surround);
-
-    planetMesh.position.x = planetPos;
-    object.add(planetMesh);
-
-    planetSelectable.push(surround);
-    planetsByID[planet.primaryId] = planetMesh;
-
-  });
-
-  var maxDistance = Math.min.apply(null, axes);
-
-  var geometry = new THREE.Geometry();
-  geometry.vertices.push(new THREE.Vector3(0, 0, 0));
-  geometry.vertices.push(new THREE.Vector3(maxDistance, 0, 0));
-
-  var lineMesh = new THREE.Line(geometry, scaleMaterial);
-
-  object.add(lineMesh);
-
+  this.populated = false;
 }
+
+System.prototype.populatePlanets = function () {
+
+  if (!this.populated) {
+    this.populated = true;
+
+    var axes = [];
+
+    var planetSelectable = this.selectable;
+    var planetsByID = this.objectsByID;
+    var object = this.object;
+
+    this.planets.forEach(function (planet) {
+
+      var major = planet.semiMajorAxisLys.value.quantity;
+      var minor = planet.semiMinorAxisLys.value.quantity;
+
+      var focusOffset = Math.sqrt(Math.pow(major / 2, 2) - Math.pow(minor / 2, 2));
+
+      var planetPos = -major + focusOffset;
+      axes.push(planetPos);
+
+      var ellipse = new THREE.EllipseCurve(focusOffset, 0, major, minor, 0, 2.0 * Math.PI, false);
+      var ellipsePath = new THREE.CurvePath();
+      ellipsePath.add(ellipse);
+      var ellipseGeometry = ellipsePath.createPointsGeometry(100);
+      ellipseGeometry.computeTangents();
+      var line = new THREE.Line(ellipseGeometry, orbitMaterial);
+      object.add(line);
+
+      var planetMesh = getDetailMesh(planet);
+
+      var surround = new THREE.Mesh(TRANSPARENT_GEOMETRY, transparentMaterial);
+
+      var distScale = Math.max(1.0, planet.semiMajorAxisLys.value.quantity / 1.58e-5);
+      var invScale = (7.3896e-9 / planet.radius.value.quantity) *
+        distScale *
+        30;
+
+      surround.scale.set(invScale, invScale, invScale);
+      surround.objectData = planet;
+
+      planetMesh.objectData = planet;
+      planetMesh.add(surround);
+
+      planetMesh.position.x = planetPos;
+      object.add(planetMesh);
+
+      planetSelectable.push(surround);
+      planetsByID[planet.primaryId] = planetMesh;
+
+    });
+
+    var maxDistance = Math.min.apply(null, axes);
+
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(new THREE.Vector3(0, 0, 0));
+    geometry.vertices.push(new THREE.Vector3(maxDistance, 0, 0));
+
+    var lineMesh = new THREE.Line(geometry, scaleMaterial);
+
+    object.add(lineMesh);
+  }
+};
 
