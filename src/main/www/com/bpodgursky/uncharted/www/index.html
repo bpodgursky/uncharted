@@ -105,6 +105,29 @@
           </td>
         </tr>
 
+        <tr class="header-row">
+          <td>
+            <b>Highlight</b>
+          </td>
+        </tr>
+
+        <tr class="child-row">
+          <td>
+            <form id="highlight_mode" name="highlight_mode" action="#" method="POST">
+              <div>
+                <label>
+                  <input type="radio" name="highlight_mode" value="none" checked>
+                </label> None
+                <label>
+                  <input type="radio" name="highlight_mode" value="exoplanets">
+                </label> Exoplanets
+                <label>
+                  <input type="radio" name="highlight_mode" value="all">
+                </label> All
+              </div>
+            </form>
+          </td>
+        </tr>
 
         </tbody>
       </table>
@@ -203,6 +226,7 @@
   var mouseMoved = false;
 
   var controlMode = '';
+  var highlightMode = 'none';
 
   var renderer = new THREE.WebGLRenderer({
     canvas: canvas,
@@ -258,14 +282,22 @@
     updateTarget();
   });
 
+  $("#highlight_mode").click(function (e) {
+    highlightMode = $('input[name=highlight_mode]:checked', '#highlight_mode').val();
+    stars.forEach(function (starMesh) {
+      updateHighlight(starMesh);
+    });
+  });
+
   $("#info").click(function (e) {
     e.preventDefault();
   });
 
   var HIGHLIGHT_MAP = new THREE.TextureLoader().load("images/downarrow.png");
-  var SPRITE_MATERIAL = new THREE.SpriteMaterial({map: HIGHLIGHT_MAP});
-
-
+  var SPRITE_MATERIAL = new THREE.SpriteMaterial({
+    map: HIGHLIGHT_MAP,
+    depthWrite: false
+  });
 
   function updateTarget(prevStarMesh) {
 
@@ -378,6 +410,30 @@
     return false;
   }
 
+  function updateHighlight(starMesh) {
+    var highlight = starMesh.children[0];
+
+    if (highlightMode == 'none' ||
+        (currentSystem && starMesh.objectData.primaryId == currentSystem.star.objectData.primaryId)) {
+      if (highlight) {
+        starMesh.remove(highlight);
+      }
+    } else if (highlightMode == 'exoplanets') {
+      if (planetsByStarID[starMesh.objectData.primaryId][0]) {
+        if (!highlight) {
+          starMesh.add(createHighlightSprite());
+        }
+      }else{
+        starMesh.remove(highlight);
+      }
+    } else if (highlightMode == 'all') {
+      if (!highlight) {
+        starMesh.add(createHighlightSprite());
+      }
+    }
+
+  }
+
   function updateobjectData() {
 
     var renderedStars = {};
@@ -416,7 +472,6 @@
     else if (!renderedStars[currentObjectPrimaryId]) {
       select(starsByID[1]);
     }
-
 
     $("#jump_to_list").autocomplete({
       source: nameList
@@ -533,14 +588,15 @@
               scale: {type: "f", value: 0.0}, //  will set later
               temp: {type: "f", value: star.temperatureEstimate.value.quantity / 2}
             },
-            transparent: true
+            transparent: true,
+            depthWrite: false
           });
 
           var surround = new THREE.Mesh(SURROUND_GEOMETRY, shaderSurround);
           surround.objectData = star;
           resetStarScale(surround);
 
-          surround.add(createHighlightSprite());
+          updateHighlight(surround);
 
           surround.position.x = star.cartesianCoordsInLys.x;
           surround.position.y = star.cartesianCoordsInLys.y;
@@ -561,7 +617,7 @@
 
   }
 
-  function createHighlightSprite(){
+  function createHighlightSprite() {
     return new THREE.Sprite(SPRITE_MATERIAL);
   }
 
@@ -622,17 +678,6 @@
 
           if (newTarget.type == "STAR") {
 
-            if (currentSystem) {
-              scene.remove(currentSystem.object);
-            }
-
-            currentSystem = new System(
-                mesh,
-                mesh.position,
-                planetsByStarID[newTarget.primaryId]
-            );
-
-            scene.add(currentSystem.object);
 
             infoTable
                 .append(row("Class", newTarget.rawStellarClassification))
@@ -659,9 +704,7 @@
           }
 
           var prevTargetMesh = currentObjectMesh;
-
-          currentObjectMesh = mesh;
-          currentObjectPrimaryId = newTargetPrimaryId;
+          updateCurrentTargets(mesh);
 
           updateTarget(prevTargetMesh);
 
@@ -673,6 +716,38 @@
 
     }
 
+
+  }
+
+  function updateCurrentTargets(mesh) {
+
+    currentObjectMesh = mesh;
+    currentObjectPrimaryId = mesh.objectData.primaryId;
+
+    if (mesh.objectData.type == "STAR") {
+
+      //  don't bother if it's already targeted
+      if (currentSystem && currentSystem.star.objectData.primaryId == mesh.objectData.primaryId) {
+        return;
+      }
+
+      var prevSystem = currentSystem;
+
+      currentSystem = new System(
+          mesh,
+          mesh.position,
+          planetsByStarID[mesh.objectData.primaryId]
+      );
+
+      if (prevSystem) {
+        updateHighlight(prevSystem.star);
+        scene.remove(prevSystem.object);
+      }
+
+      updateHighlight(currentSystem.star);
+      scene.add(currentSystem.object);
+
+    }
 
   }
 
