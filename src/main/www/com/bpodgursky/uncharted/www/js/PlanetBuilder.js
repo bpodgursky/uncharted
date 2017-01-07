@@ -22,26 +22,39 @@ var NAME_TO_MAP = {
   Neptune: "images/planets/neptunemap.jpg"
 }
 
-function getMaterial(planetData) {
+function getPlanet(planetData) {
 
   var planetMap = NAME_TO_MAP[planetData.properName];
 
   if (planetMap) {
 
-    return new THREE.MeshLambertMaterial({
-      map: THREE.ImageUtils.loadTexture(planetMap)
-    });
+    return {
+      material:new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture(planetMap)
+      }),
+      //  TODO actual planet axis rotation
+      rotation: {
+        x: 0,
+        y: Math.PI / 2,
+        z: - Math.PI / 2
+    }};
 
   } else {
-    return new THREE.ShaderMaterial({
-      uniforms: {
-        time: uniforms.time,
-        scale: uniforms.scale
-      },
-      vertexShader: shaders.staticVertexShader,
-      fragmentShader: getShader(planetData),
-      transparent: false
-    });
+    return {
+      material: new THREE.ShaderMaterial({
+        uniforms: {
+          time: uniforms.time,
+          scale: uniforms.scale
+        },
+        vertexShader: shaders.staticVertexShader,
+        fragmentShader: getShader(planetData),
+        transparent: false
+      }),
+      rotation: {
+        // z: Math.PI / 2,
+        y: Math.PI / 2,
+      }
+    };
 
   }
 
@@ -49,11 +62,13 @@ function getMaterial(planetData) {
 
 function getDetailMesh(planetData) {
 
-  var planetMesh = new THREE.Mesh(DETAIL_GEOMETRY, getMaterial(planetData));
+  var planet = getPlanet(planetData);
+  var planetMesh = new THREE.Mesh(DETAIL_GEOMETRY, planet.material);
   planetMesh.scale.x = planetMesh.scale.y = planetMesh.scale.z = planetData.radius.value.quantity;
 
-  planetMesh.rotateY(Math.PI / 2);
-  planetMesh.rotateZ(- Math.PI / 2);
+  planetMesh.rotateX(planet.rotation.x);
+  planetMesh.rotateY(planet.rotation.y);
+  planetMesh.rotateZ(planet.rotation.z);
 
   return planetMesh;
 }

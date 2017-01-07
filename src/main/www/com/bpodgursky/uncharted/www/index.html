@@ -364,6 +364,10 @@
 
   var labelCache = {};
 
+  function isSol(mesh){
+    return mesh.objectData.primaryId == 1;
+  }
+
   function doReassign(targetMesh) {
 
     tooltipObject = targetMesh;
@@ -643,26 +647,6 @@
 
       }
 
-//      if (mesh.objectData.type == "PLANET") {
-//
-//        if (currentSystem) {
-//
-//          currentSystem.object.position.x += deltaX;
-//          currentSystem.object.position.y += deltaY;
-//          currentSystem.object.position.z += deltaZ;
-//
-//          console.log("new center: ");
-//          console.log(currentSystem.object.position);
-//
-//          currentSystem.object.children.forEach(function(e){
-//            e.position.x += deltaX;
-//            e.position.y += deltaY;
-//            e.position.z += deltaZ;
-//
-//          })
-//        }
-//      }
-
       if (newTarget != null) {
         var newTargetPrimaryId = newTarget.primaryId;
 
@@ -678,7 +662,6 @@
 
           if (newTarget.type == "STAR") {
 
-
             infoTable
                 .append(row("Class", newTarget.rawStellarClassification))
                 .append(row("Temperature", getValue(newTarget, 'temperatureEstimate')))
@@ -686,7 +669,6 @@
                 .append(row("Right ascension", getValue(newTarget, 'rightAscensionRadians')))
                 .append(row("Declination", getValue(newTarget, 'declinationRadians')))
                 .append(row("Abs Magnitude", getValue(newTarget, 'absoluteMagnitude')));
-
 
             selector.target(mesh.position);
 
@@ -699,7 +681,6 @@
                 .append(row("Semi-Major axis", getValue(newTarget, 'semiMajorAxisLys')))
                 .append(row("Semi-Minor axis", getValue(newTarget, 'semiMinorAxisLys')))
                 .append(row("Inclination", getValue(newTarget, 'inclination')))
-
 
           }
 
@@ -872,7 +853,7 @@
       if (currentStar) {
         currentStar.objectData.nearbyObjectIDs.forEach(function (e) {
           var nearStar = starsByID[e];
-          var distance = camera.position.distanceTo(nearStar.position) * .2;
+          var distance = camera.position.distanceTo(nearStar.position) * .3;
           var childUniform = nearStar.material.uniforms;
           if (childUniform.scale.value != distance) {
             var scale = Math.min(distance, nearStar.objectData.radius.value.quantity * 3000000);
