@@ -304,10 +304,10 @@
     var prevControlMode = controlMode;
     controlMode = 'tween';
 
-    tweenControls.setZoom(currentObjectMesh.position, MARKER_RADIUS, 2,
+    tweenControls.setZoom(currentObjectPosition(), MARKER_RADIUS, 2,
         function () {
 
-          tweenControls.setZoom(currentObjectMesh.position,
+          tweenControls.setZoom(currentObjectPosition(),
               currentObjectMesh.objectData.radius.value.quantity * 10, 1,
               function () {
 
@@ -328,7 +328,7 @@
                 }
 
                 orbitControls.orbit(
-                    currentObjectMesh.position,
+                    currentObjectPosition(),
                     currentObjectMesh.objectData.radius.value.quantity * 2
                 )
 
@@ -364,11 +364,22 @@
 
   var labelCache = {};
 
-  function isSol(mesh){
+  function isSol(mesh) {
     return mesh.objectData.primaryId == 1;
   }
 
+  function currentObjectPosition(){
+    return absolutePosition(currentObjectMesh);
+  }
+
+  function absolutePosition(mesh){
+    var vector = new THREE.Vector3();
+    vector.setFromMatrixPosition( mesh.matrixWorld );
+    return vector;
+  }
+
   function doReassign(targetMesh) {
+    scene.updateMatrixWorld();
 
     tooltipObject = targetMesh;
 
@@ -377,14 +388,16 @@
       scene.remove(tooltip.object);
     }
 
-    var targetPos = targetMesh.position;
+    var targetPos = absolutePosition(targetMesh);
 
     var geometry = new THREE.Geometry();
-    geometry.vertices.push(currentObjectMesh.position);
+    var currentObjPosition = currentObjectPosition();
+
+    geometry.vertices.push(currentObjPosition);
     geometry.vertices.push(targetPos);
     lineSegment = new THREE.Line(geometry, lineMaterial);
 
-    var lineDistance = currentObjectMesh.position.distanceTo(targetPos);
+    var lineDistance = currentObjPosition.distanceTo(targetPos);
     var label = targetMesh.objectData.properName;
     var cacheKey = label + lineDistance;  // could target each star from each other star.
 
@@ -427,7 +440,7 @@
         if (!highlight) {
           starMesh.add(createHighlightSprite());
         }
-      }else{
+      } else {
         starMesh.remove(highlight);
       }
     } else if (highlightMode == 'all') {
@@ -483,22 +496,33 @@
 
   }
 
-  function lastNonPrimaryObject(intersects, currentPrimary) {
-    if (intersects.length > 0) {
-      var lastObject = intersects[intersects.length - 1].object;
+  function closestNonPrimaryObject(intersects, currentPrimary) {
 
-      if (lastObject.objectData.primaryId != currentPrimary) {
-        return lastObject;
-      }
+    //  shortcuts
 
-      if (intersects.length > 1) {
-        return intersects[intersects.length - 2].object
-      }
-
+    if(intersects.length == 0){
       return null;
     }
-  }
 
+    if(intersects.size == 1 && intersects[0].object.objectData.primaryId != currentPrimary){
+      return intersects[0];
+    }
+
+    //  approximate screen distance
+    var lookPoint = camera.position;
+    var min = Number.MAX_VALUE;
+    var best = null;
+    intersects.forEach(function (e) {
+      var screenDistance = e.object.position.distanceTo(e.point) / lookPoint.distanceTo(e.point);
+      if (screenDistance < min && e.object.objectData.primaryId != currentPrimary) {
+        best = e.object;
+        min = screenDistance;
+      }
+    });
+
+    return best;
+
+  }
 
   function getStarForPoint(x, y) {
 
@@ -514,13 +538,13 @@
 
 
       if (currentSystem) {
-        var last = lastNonPrimaryObject(raycaster.intersectObjects(currentSystem.selectable, false), currentObjectPrimaryId);
+        var last = closestNonPrimaryObject(raycaster.intersectObjects(currentSystem.selectable, false), currentObjectPrimaryId);
         if (last) {
           return currentSystem.objectsByID[last.objectData.primaryId];
         }
       }
 
-      var lastStar = lastNonPrimaryObject(raycaster.intersectObjects(visibleStars, false), currentObjectPrimaryId);
+      var lastStar = closestNonPrimaryObject(raycaster.intersectObjects(visibleStars, false), currentObjectPrimaryId);
 
       if (lastStar) {
 //        var primaryId = lastStar.objectData.primaryId;
@@ -628,9 +652,10 @@
   function select(mesh) {
 
     if (mesh) {
+      scene.updateMatrixWorld();
 
       var newTarget = mesh.objectData;
-      var newCenter = mesh.position;
+      var newCenter = absolutePosition(mesh);
 
       if (isStar(mesh)) {
 
@@ -670,7 +695,7 @@
                 .append(row("Declination", getValue(newTarget, 'declinationRadians')))
                 .append(row("Abs Magnitude", getValue(newTarget, 'absoluteMagnitude')));
 
-            selector.target(mesh.position);
+            selector.target(newCenter);
 
           } else {
 
@@ -716,7 +741,7 @@
 
       currentSystem = new System(
           mesh,
-          mesh.position,
+          absolutePosition(mesh),
           planetsByStarID[mesh.objectData.primaryId]
       );
 

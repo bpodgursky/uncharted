@@ -20,7 +20,7 @@ var NAME_TO_MAP = {
   Saturn: "images/planets/saturnmap.jpg",
   Uranus: "images/planets/uranusmap.jpg",
   Neptune: "images/planets/neptunemap.jpg"
-}
+};
 
 function getPlanet(planetData) {
 
@@ -52,7 +52,9 @@ function getPlanet(planetData) {
       }),
       rotation: {
         // z: Math.PI / 2,
+        x: 0,
         y: Math.PI / 2,
+        z: 0
       }
     };
 
