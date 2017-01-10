@@ -172,6 +172,8 @@
 
   var SURROUND_GEOMETRY = new THREE.SphereGeometry(1.0, 8, 8);
 
+  var ZERO = new THREE.Vector3(0, 0, 0);
+
   //  webgl init
 
 
@@ -304,10 +306,10 @@
     var prevControlMode = controlMode;
     controlMode = 'tween';
 
-    tweenControls.setZoom(currentObjectMesh.position, MARKER_RADIUS, 2,
+    tweenControls.setZoom(absolutePosition(currentObjectMesh), MARKER_RADIUS, 2,
         function () {
 
-          tweenControls.setZoom(currentObjectMesh.position,
+          tweenControls.setZoom(absolutePosition(currentObjectMesh),
               currentObjectMesh.objectData.radius.value.quantity * 10, 1,
               function () {
 
@@ -328,7 +330,7 @@
                 }
 
                 orbitControls.orbit(
-                    currentObjectMesh.position,
+                    absolutePosition(currentObjectMesh),
                     currentObjectMesh.objectData.radius.value.quantity * 2
                 )
 
@@ -364,22 +366,14 @@
 
   var labelCache = {};
 
-  function isSol(mesh) {
-    return mesh.objectData.primaryId == 1;
-  }
-
-//  function currentObjectPosition(){
-//    return absolutePosition(currentObjectMesh);
-//  }
-
-  function absolutePosition(mesh){
+  function absolutePosition(mesh) {
+    scene.updateMatrixWorld();
     var vector = new THREE.Vector3();
-    vector.setFromMatrixPosition( mesh.matrixWorld );
+    vector.setFromMatrixPosition(mesh.matrixWorld);
     return vector;
   }
 
   function doReassign(targetMesh) {
-    scene.updateMatrixWorld();
 
     tooltipObject = targetMesh;
 
@@ -391,7 +385,7 @@
     var targetPos = absolutePosition(targetMesh);
 
     var geometry = new THREE.Geometry();
-    var currentObjPosition = currentObjectMesh.position;
+    var currentObjPosition = absolutePosition(currentObjectMesh);
 
     geometry.vertices.push(currentObjPosition);
     geometry.vertices.push(targetPos);
@@ -500,11 +494,11 @@
 
     //  shortcuts
 
-    if(intersects.length == 0){
+    if (intersects.length == 0) {
       return null;
     }
 
-    if(intersects.size == 1 && intersects[0].object.objectData.primaryId != currentPrimary){
+    if (intersects.size == 1 && intersects[0].object.objectData.primaryId != currentPrimary) {
       return intersects[0];
     }
 
@@ -649,25 +643,39 @@
     return new THREE.Sprite(SPRITE_MATERIAL);
   }
 
+  function setOffset(raw, current, offset){
+
+    current.x = raw.x - offset.x;
+    current.y = raw.y - offset.y;
+    current.z = raw.z - offset.z;
+
+  }
+
+  function currentOffset(position){
+    var pos = new THREE.Vector3();
+    pos.add(position);
+    if(currentSystem){
+      pos.add(currentSystem.star.objectData.cartesianCoordsInLys);
+    }
+    return pos;
+  }
+
   function select(mesh) {
 
     if (mesh) {
 
       var newTarget = mesh.objectData;
-      var newCenter = absolutePosition(mesh);
 
-      if (isStar(mesh)) {
 
-        var deltaX = newCenter.x;
-        var deltaY = newCenter.y;
-        var deltaZ = newCenter.z;
+      if(isStar(mesh)) {
+        var offset = mesh.objectData.cartesianCoordsInLys;
 
-        //  TODO only if new system
-        scene.children.forEach(function (e) {
-          e.position.x -= deltaX;
-          e.position.y -= deltaY;
-          e.position.z -= deltaZ;
+        stars.forEach(function (e) {
+          setOffset(e.objectData.cartesianCoordsInLys, e.position, offset);
         });
+
+        setOffset(currentOffset(camera.position), camera.position, offset);
+        setOffset(ZERO, solMarker.mesh.position, offset);
 
       }
 
@@ -693,8 +701,6 @@
                 .append(row("Right ascension", getValue(newTarget, 'rightAscensionRadians')))
                 .append(row("Declination", getValue(newTarget, 'declinationRadians')))
                 .append(row("Abs Magnitude", getValue(newTarget, 'absoluteMagnitude')));
-
-            selector.target(mesh.position);
 
           } else {
 
@@ -740,7 +746,7 @@
 
       currentSystem = new System(
           mesh,
-          mesh.position,
+          ZERO,
           planetsByStarID[mesh.objectData.primaryId]
       );
 
