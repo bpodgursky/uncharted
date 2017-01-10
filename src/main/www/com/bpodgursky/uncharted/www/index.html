@@ -304,10 +304,10 @@
     var prevControlMode = controlMode;
     controlMode = 'tween';
 
-    tweenControls.setZoom(currentObjectPosition(), MARKER_RADIUS, 2,
+    tweenControls.setZoom(currentObjectMesh.position, MARKER_RADIUS, 2,
         function () {
 
-          tweenControls.setZoom(currentObjectPosition(),
+          tweenControls.setZoom(currentObjectMesh.position,
               currentObjectMesh.objectData.radius.value.quantity * 10, 1,
               function () {
 
@@ -328,7 +328,7 @@
                 }
 
                 orbitControls.orbit(
-                    currentObjectPosition(),
+                    currentObjectMesh.position,
                     currentObjectMesh.objectData.radius.value.quantity * 2
                 )
 
@@ -368,9 +368,9 @@
     return mesh.objectData.primaryId == 1;
   }
 
-  function currentObjectPosition(){
-    return absolutePosition(currentObjectMesh);
-  }
+//  function currentObjectPosition(){
+//    return absolutePosition(currentObjectMesh);
+//  }
 
   function absolutePosition(mesh){
     var vector = new THREE.Vector3();
@@ -391,13 +391,13 @@
     var targetPos = absolutePosition(targetMesh);
 
     var geometry = new THREE.Geometry();
-    var currentObjPosition = currentObjectPosition();
+    var currentObjPosition = currentObjectMesh.position;
 
     geometry.vertices.push(currentObjPosition);
     geometry.vertices.push(targetPos);
     lineSegment = new THREE.Line(geometry, lineMaterial);
 
-    var lineDistance = currentObjPosition.distanceTo(targetPos);
+    var lineDistance = currentObjectMesh.position.distanceTo(targetPos);
     var label = targetMesh.objectData.properName;
     var cacheKey = label + lineDistance;  // could target each star from each other star.
 
@@ -652,7 +652,6 @@
   function select(mesh) {
 
     if (mesh) {
-      scene.updateMatrixWorld();
 
       var newTarget = mesh.objectData;
       var newCenter = absolutePosition(mesh);
@@ -695,7 +694,7 @@
                 .append(row("Declination", getValue(newTarget, 'declinationRadians')))
                 .append(row("Abs Magnitude", getValue(newTarget, 'absoluteMagnitude')));
 
-            selector.target(newCenter);
+            selector.target(mesh.position);
 
           } else {
 
@@ -741,7 +740,7 @@
 
       currentSystem = new System(
           mesh,
-          absolutePosition(mesh),
+          mesh.position,
           planetsByStarID[mesh.objectData.primaryId]
       );
 
