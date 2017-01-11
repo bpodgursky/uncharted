@@ -35,7 +35,7 @@ THREE.OrbitControls = function (object, domElement) {
 
   this.dragView = false;
 
-  this.deltaAvg = new RollingAverage(50, 0, .1);
+  this.deltaAvg = new RollingAverage(50, 0, .3);
 
   if (this.domElement !== document) {
     this.domElement.setAttribute('tabindex', -1);

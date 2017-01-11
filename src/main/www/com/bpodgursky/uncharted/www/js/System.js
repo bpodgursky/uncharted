@@ -64,12 +64,14 @@ function System(star, position, planets) {
   this.populated = false;
 }
 
+var DEGREE_IN_RADIANS = Math.PI/180;
+
 System.prototype.populatePlanets = function () {
 
   if (!this.populated) {
     this.populated = true;
 
-    var axes = [];
+    // var axes = [];
 
     var planetSelectable = this.selectable;
     var planetsByID = this.objectsByID;
@@ -83,7 +85,7 @@ System.prototype.populatePlanets = function () {
       var focusOffset = Math.sqrt(Math.pow(major / 2, 2) - Math.pow(minor / 2, 2));
 
       var planetPos = -major + focusOffset;
-      axes.push(planetPos);
+      // axes.push(planetPos);
 
       var ellipse = new THREE.EllipseCurve(focusOffset, 0, major, minor, 0, 2.0 * Math.PI, false);
       var ellipsePath = new THREE.CurvePath();
@@ -91,7 +93,13 @@ System.prototype.populatePlanets = function () {
       var ellipseGeometry = ellipsePath.createPointsGeometry(100);
       ellipseGeometry.computeTangents();
       var line = new THREE.Line(ellipseGeometry, orbitMaterial);
-      object.add(line);
+
+      line.rotation.set(0,0,0);
+
+      //  TODO this could very easily be wrong....
+      line.rotateZ(DEGREE_IN_RADIANS*planet.longAscendingNode.value.quantity);
+      line.rotateY(DEGREE_IN_RADIANS*planet.inclination.value.quantity);
+      // line.rotateX(DEGREE_IN_RADIANS*planet.argumentPerhelion.value.quantity);
 
       var planetMesh = getDetailMesh(planet);
 
@@ -108,23 +116,25 @@ System.prototype.populatePlanets = function () {
       planetMesh.objectData = planet;
       planetMesh.add(surround);
 
-      planetMesh.position.x = planetPos;
-      object.add(planetMesh);
+      planetMesh.position.set(planetPos,0,0);
+      line.add(planetMesh);
+      object.add(line);
 
       planetSelectable.push(surround);
       planetsByID[planet.primaryId] = planetMesh;
 
+
+      var geometry = new THREE.Geometry();
+      geometry.vertices.push(new THREE.Vector3(0, 0, 0));
+      geometry.vertices.push(new THREE.Vector3(planetPos, 0, 0));
+
+      var lineMesh = new THREE.Line(geometry, scaleMaterial);
+
+      line.add(lineMesh);
+
+
     });
 
-    var maxDistance = Math.min.apply(null, axes);
-
-    var geometry = new THREE.Geometry();
-    geometry.vertices.push(new THREE.Vector3(0, 0, 0));
-    geometry.vertices.push(new THREE.Vector3(maxDistance, 0, 0));
-
-    var lineMesh = new THREE.Line(geometry, scaleMaterial);
-
-    object.add(lineMesh);
   }
 };
 
