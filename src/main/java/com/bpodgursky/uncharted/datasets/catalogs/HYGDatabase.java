@@ -48,6 +48,10 @@ public class HYGDatabase implements StarCatalog {
     //  header
     scan.nextLine();
 
+    int matched = 0;
+    int total= 0;
+
+
     //  StarID,HIP,HD,HR,Gliese,BayerFlamsteed,ProperName,RA,Dec,Distance,PMRA,PMDec,RV,Mag,AbsMag,Spectrum,ColorIndex,X,Y,Z,VX,VY,VZ
     while(scan.hasNext()){
       String line = scan.nextLine();
@@ -104,6 +108,13 @@ public class HYGDatabase implements StarCatalog {
       // pmra,pmdec,rv,mag,absmag,spect,ci,x,y,z,vx,vy,vz,rarad,decrad,pmrarad,pmdecrad,bayer,flam,con,comp,comp_primary,base,lum,var,var_min,var_max
 
 
+//      StellarClassification classifier = StarClassifier2.parseClass(split[15]);
+//      if(classifier != null){
+//        matched++;
+//      }
+
+      total++;
+
       if(!rightAscension.equals("") && !declination.equals("")
           && !distanceParsecs.equals("") && !distanceParsecs.equals("10000000")){
 
@@ -128,7 +139,6 @@ public class HYGDatabase implements StarCatalog {
             parseOrNull(split[16]),
             luminosity
         );
-
 
         if(properName.equals("82 G. Eri")){
           System.out.println("PRIMARY SUPER IMPORTANT "+record.getPrimaryId());

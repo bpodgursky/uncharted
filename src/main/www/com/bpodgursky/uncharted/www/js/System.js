@@ -16,6 +16,13 @@ var transparentMaterial = new THREE.MeshBasicMaterial({
   opacity: 0.0
 });
 
+var PLANET_HIGHLIGHT_MAP = new THREE.TextureLoader().load("images/red-highlight.png");
+
+var PLANET_HIGHLIGHT_MATERIAL = new THREE.SpriteMaterial({
+  map: PLANET_HIGHLIGHT_MAP,
+  depthWrite: false
+});
+
 var TRANSPARENT_GEOMETRY = new THREE.SphereGeometry(1.0, 16, 16);
 var DETAIL_GEOMETRY = new THREE.SphereGeometry(1.0, 64, 64);
 
@@ -64,7 +71,7 @@ function System(star, position, planets) {
   this.populated = false;
 }
 
-var DEGREE_IN_RADIANS = Math.PI/180;
+var DEGREE_IN_RADIANS = Math.PI / 180;
 
 System.prototype.populatePlanets = function () {
 
@@ -85,7 +92,6 @@ System.prototype.populatePlanets = function () {
       var focusOffset = Math.sqrt(Math.pow(major / 2, 2) - Math.pow(minor / 2, 2));
 
       var planetPos = -major + focusOffset;
-      // axes.push(planetPos);
 
       var ellipse = new THREE.EllipseCurve(focusOffset, 0, major, minor, 0, 2.0 * Math.PI, false);
       var ellipsePath = new THREE.CurvePath();
@@ -94,12 +100,12 @@ System.prototype.populatePlanets = function () {
       ellipseGeometry.computeTangents();
       var line = new THREE.Line(ellipseGeometry, orbitMaterial);
 
-      line.rotation.set(0,0,0);
+      line.rotation.set(0, 0, 0);
 
       //  TODO this could very easily be wrong....
-      line.rotateZ(DEGREE_IN_RADIANS*planet.longAscendingNode.value.quantity);
-      line.rotateY(DEGREE_IN_RADIANS*planet.inclination.value.quantity);
-      // line.rotateX(DEGREE_IN_RADIANS*planet.argumentPerhelion.value.quantity);
+      line.rotateZ(DEGREE_IN_RADIANS * planet.longAscendingNode.value.quantity);
+      line.rotateY(DEGREE_IN_RADIANS * planet.inclination.value.quantity);
+      line.rotateZ(DEGREE_IN_RADIANS * planet.argumentPerhelion.value.quantity);
 
       var planetMesh = getDetailMesh(planet);
 
