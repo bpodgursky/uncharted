@@ -13,7 +13,7 @@ public class TestGlieseCatalog {
 
     System.out.println(star);
     assertEquals(
-        new StellarClassification().setMainClass(SpectralClass.M),
+        new ParsedClassification().setMainClass(SpectralClass.M),
         star.getParsedStellarClassification()
     );
 

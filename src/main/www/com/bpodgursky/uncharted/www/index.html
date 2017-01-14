@@ -11,10 +11,8 @@
   <script type="text/javascript" src="resources/jquery-2.0.0.min.js"></script>
   <script type="text/javascript" src="resources/tinycolor-min.js"></script>
   <script type="text/javascript" src="resources/jquery-ui.min.js"></script>
-  <!--<script type="text/javascript" src="resources/css/bootstrap.min.css"></script>-->
   <script src="resources/three.min.js"></script>
   <script src="resources/stats.js"></script>
-  <!--<script src="resources/bootstrap.min.js"></script>-->
   <script src="js/constants.js"></script>
   <script src="js/FreeLookControls.js"></script>
   <script src="js/OrbitControls.js"></script>
@@ -144,16 +142,6 @@
 </div>
 
 <script>
-  //  TODO use size of star
-
-  //  $("#info-header").click(function(e){
-  //    console.log("asdf");
-  //    e.preventDefault();
-  //  });
-
-  var stats = new Stats();
-  stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-  $("#attribution-overlay").append(stats.dom);
 
   $(function () {
     $("#selector").accordion({
@@ -643,7 +631,7 @@
     return new THREE.Sprite(SPRITE_MATERIAL);
   }
 
-  function setOffset(raw, current, offset){
+  function setOffset(raw, current, offset) {
 
     current.x = raw.x - offset.x;
     current.y = raw.y - offset.y;
@@ -651,10 +639,10 @@
 
   }
 
-  function currentOffset(position){
+  function currentOffset(position) {
     var pos = new THREE.Vector3();
     pos.add(position);
-    if(currentSystem){
+    if (currentSystem) {
       pos.add(currentSystem.star.objectData.cartesianCoordsInLys);
     }
     return pos;
@@ -667,7 +655,7 @@
       var newTarget = mesh.objectData;
 
 
-      if(isStar(mesh)) {
+      if (isStar(mesh)) {
         var offset = mesh.objectData.cartesianCoordsInLys;
 
         stars.forEach(function (e) {
@@ -747,7 +735,8 @@
       currentSystem = new System(
           mesh,
           ZERO,
-          planetsByStarID[mesh.objectData.primaryId]
+          planetsByStarID[mesh.objectData.primaryId],
+          solMarker.mesh.position
       );
 
       if (prevSystem) {
@@ -846,12 +835,8 @@
   }
 
   function animate() {
-    stats.begin();
     render();
-    stats.end();
-
     requestAnimationFrame(animate);
-
   }
 
   function render() {

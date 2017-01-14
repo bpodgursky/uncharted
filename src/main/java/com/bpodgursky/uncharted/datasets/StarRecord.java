@@ -15,7 +15,7 @@ public class StarRecord extends ObjectRecord{
   private final ObjectValue declinationRadians;
   private final ObjectValue absoluteMagnitude;
   private final String rawStellarClassification;
-  private final StellarClassification parsedStellarClassification;
+  private final ParsedClassification parsedStellarClassification;
   private final Coordinate cartesianCoordsInLys;
 
   private final ObjectValue temperatureEstimate;
@@ -38,7 +38,7 @@ public class StarRecord extends ObjectRecord{
     this.declinationRadians = declinationRadians;
     this.absoluteMagnitude = absoluteMagnitude;
     this.rawStellarClassification = stellarClass;
-    this.parsedStellarClassification = StarClassHelper.parseClass(stellarClass);
+    this.parsedStellarClassification = StarClassifier2.parseClass(stellarClass);
     this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(
         rightAscensionRadians.getValue(),
         declinationRadians.getValue(),
@@ -75,7 +75,7 @@ public class StarRecord extends ObjectRecord{
     return rawStellarClassification;
   }
 
-  public StellarClassification getParsedStellarClassification() {
+  public ParsedClassification getParsedStellarClassification() {
     return parsedStellarClassification;
   }
 

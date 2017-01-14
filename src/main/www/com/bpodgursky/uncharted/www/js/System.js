@@ -16,22 +16,18 @@ var transparentMaterial = new THREE.MeshBasicMaterial({
   opacity: 0.0
 });
 
-var PLANET_HIGHLIGHT_MAP = new THREE.TextureLoader().load("images/red-highlight.png");
-
-var PLANET_HIGHLIGHT_MATERIAL = new THREE.SpriteMaterial({
-  map: PLANET_HIGHLIGHT_MAP,
-  depthWrite: false
-});
-
 var TRANSPARENT_GEOMETRY = new THREE.SphereGeometry(1.0, 16, 16);
 var DETAIL_GEOMETRY = new THREE.SphereGeometry(1.0, 64, 64);
 
-function System(star, position, planets) {
+function System(star, position, planets, lookAt) {
 
   this.object = new THREE.Group();
   this.star = star;
   this.planets = planets;
   var object = this.object;
+
+  //  since exoplanet orientations are with respect to earth
+  this.object.lookAt(lookAt);
 
   var starData = star.objectData;
 
@@ -98,14 +94,14 @@ System.prototype.populatePlanets = function () {
       ellipsePath.add(ellipse);
       var ellipseGeometry = ellipsePath.createPointsGeometry(100);
       ellipseGeometry.computeTangents();
-      var line = new THREE.Line(ellipseGeometry, orbitMaterial);
+      var orbit = new THREE.Line(ellipseGeometry, orbitMaterial);
 
-      line.rotation.set(0, 0, 0);
+      orbit.rotation.set(0, 0, 0);
 
       //  TODO this could very easily be wrong....
-      line.rotateZ(DEGREE_IN_RADIANS * planet.longAscendingNode.value.quantity);
-      line.rotateY(DEGREE_IN_RADIANS * planet.inclination.value.quantity);
-      line.rotateZ(DEGREE_IN_RADIANS * planet.argumentPerhelion.value.quantity);
+      orbit.rotateZ(DEGREE_IN_RADIANS * planet.longAscendingNode.value.quantity);
+      orbit.rotateY(DEGREE_IN_RADIANS * planet.inclination.value.quantity);
+      orbit.rotateZ(DEGREE_IN_RADIANS * planet.argumentPerhelion.value.quantity);
 
       var planetMesh = getDetailMesh(planet);
 
@@ -123,8 +119,8 @@ System.prototype.populatePlanets = function () {
       planetMesh.add(surround);
 
       planetMesh.position.set(planetPos,0,0);
-      line.add(planetMesh);
-      object.add(line);
+      orbit.add(planetMesh);
+      object.add(orbit);
 
       planetSelectable.push(surround);
       planetsByID[planet.primaryId] = planetMesh;
@@ -136,7 +132,7 @@ System.prototype.populatePlanets = function () {
 
       var lineMesh = new THREE.Line(geometry, scaleMaterial);
 
-      line.add(lineMesh);
+      orbit.add(lineMesh);
 
 
     });

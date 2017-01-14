@@ -155,7 +155,7 @@ THREE.OrbitControls = function (object, domElement) {
 
   this.update = function (inDelta) {
 
-    var delta = this.deltaAvg.add(inDelta);
+    // var delta = this.deltaAvg.add(inDelta);
 
     var dO = this.target.distanceTo(this.camera.position);
     var actualMoveSpeed = this.moveDelta * dO;
@@ -207,7 +207,7 @@ THREE.OrbitControls = function (object, domElement) {
     }
 
 
-    translateX += delta * .03 * dO;
+    translateX += inDelta * .03 * dO;
 
     this.camera.translateX(translateX);
     this.camera.rotateY(Math.atan(translateX / dO));
