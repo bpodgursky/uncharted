@@ -49,7 +49,7 @@
 
     </div>
 
-    <h3>Controls</h3>
+    <h3>View</h3>
     <div class="overlay-panel">
 
       <table>
@@ -678,6 +678,7 @@
           infoTable.empty();
 
           infoTable
+              .append($('<tr></tr>').append($('<td class="overlay-header"></td>').text('Characteristics')))
               .append(row("Radius", getValue(newTarget, 'radius')));
 
           if (newTarget.type == "STAR") {
@@ -688,7 +689,25 @@
                 .append(row("Distance (Sol)", getValue(newTarget, 'solDistance')))
                 .append(row("Right ascension", getValue(newTarget, 'rightAscensionRadians')))
                 .append(row("Declination", getValue(newTarget, 'declinationRadians')))
-                .append(row("Abs Magnitude", getValue(newTarget, 'absoluteMagnitude')));
+                .append(row("Abs Magnitude", getValue(newTarget, 'absoluteMagnitude')))
+                .append(row("", ""))
+                .append($('<tr></tr>').append($('<td class="overlay-header"></td>').text('Identifiers')))
+                .append(row("Proper Name", newTarget.identifiers.properName))
+                .append(row("Hipparcos", newTarget.identifiers.hipparcosId))
+                .append(row("Henry Draper", newTarget.identifiers.henryDraperId))
+                .append(row("Harvard Revised", newTarget.identifiers.harvardRevised))
+                .append(row("Gliese", newTarget.identifiers.glieseId))
+                .append(row("Bayer Flamsteed", bfName(newTarget.identifiers.bayerFlamsteed)))
+            ;
+
+
+//            private String hipparcosId;
+//            private String henryDraperId;
+//            private String harvardRevisedId;
+//            private String glieseId;
+//            private BayerFlamsteed bayerFlamsteed;
+//            private String properName;
+
 
           } else {
 
@@ -699,6 +718,8 @@
                 .append(row("Semi-Major axis", getValue(newTarget, 'semiMajorAxisLys')))
                 .append(row("Semi-Minor axis", getValue(newTarget, 'semiMinorAxisLys')))
                 .append(row("Inclination", getValue(newTarget, 'inclination')))
+                .append(row("Lon asc node", getValue(newTarget, 'longAscendingNode')))
+                .append(row("Arg periapsis", getValue(newTarget, 'argumentPeriapsis')))
 
           }
 
@@ -716,6 +737,17 @@
     }
 
 
+  }
+
+  function bfName(bayerFlamsteed){
+    if(bayerFlamsteed){
+      return bayerFlamsteed.prettyName;
+    }
+    return ""
+  }
+
+  function isSol(mesh) {
+    return mesh.objectData.primaryId == 1;
   }
 
   function updateCurrentTargets(mesh) {
@@ -738,6 +770,11 @@
           planetsByStarID[mesh.objectData.primaryId],
           solMarker.mesh.position
       );
+
+      //  to compensate for the ecliptic vs equitorial system diff... this is really fragile
+      if (isSol(mesh)) {
+        currentSystem.object.rotateY(23.5 * Math.PI / 180);
+      }
 
       if (prevSystem) {
         updateHighlight(prevSystem.star);
@@ -769,10 +806,12 @@
       return "?";
     }
 
-    return formatObjValue(elem.value);
+    return formatObjValue(elem);
   }
 
-  function formatObjValue(objValue) {
+  function formatObjValue(elem) {
+
+    var objValue = elem.value;
     var quantity = objValue.quantity;
 
     if (objValue.unit == 'LY') {
@@ -780,7 +819,7 @@
     } else if (objValue.unit == 'DAY') {
       return quantity + ' days';
     } else if (objValue.unit == 'KG') {
-      return prettyMass(quantity);
+      return prettyMass(quantity, elem.measurementQualifier);
     } else if (objValue.unit == 'DEGREE_GEOM') {
       return prettyDegree(quantity);
     } else if (objValue.unit == 'RADIAN') {
@@ -789,9 +828,15 @@
       return prettyMagnitude(quantity);
     } else if (objValue.unit == 'K') {
       return prettyTemperature(quantity);
+    } else if (objValue.unit == 'G_PER_CC') {
+      return prettyDensity(quantity);
     } else if (objValue.unit == 'NONE') {
       return quantity;
     }
+  }
+
+  function prettyDensity(gPerCc){
+    return gPerCc.toLocaleString('en-US', {maximumSignificantDigits: 3}) + ' g/cc';
   }
 
   function prettyTemperature(k) {
@@ -806,8 +851,14 @@
     return degrees.toLocaleString('en-US', {maximumSignificantDigits: 3}) + '°';
   }
 
-  function prettyMass(mass) {
-    return (mass / 5.9722e24).toLocaleString('en-US', {maximumSignificantDigits: 3}) + ' M⊕';
+  function prettyMass(mass, qualifier) {
+
+    var str = (mass / 5.9722e24).toLocaleString('en-US', {maximumSignificantDigits: 3}) + ' M⊕';
+    if (qualifier == 'Msini') {
+      str += " (Msini)"
+    }
+
+    return str;
   }
 
   function prettyDistance(lys) {

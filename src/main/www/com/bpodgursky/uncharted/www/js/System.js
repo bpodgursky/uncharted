@@ -101,7 +101,7 @@ System.prototype.populatePlanets = function () {
       //  TODO this could very easily be wrong....
       orbit.rotateZ(DEGREE_IN_RADIANS * planet.longAscendingNode.value.quantity);
       orbit.rotateY(DEGREE_IN_RADIANS * planet.inclination.value.quantity);
-      orbit.rotateZ(DEGREE_IN_RADIANS * planet.argumentPerhelion.value.quantity);
+      orbit.rotateZ(DEGREE_IN_RADIANS * planet.argumentPeriapsis.value.quantity);
 
       var planetMesh = getDetailMesh(planet);
 

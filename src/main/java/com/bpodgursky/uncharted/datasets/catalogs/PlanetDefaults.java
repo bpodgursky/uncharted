@@ -13,4 +13,5 @@ public class PlanetDefaults {
   public static final UnitValue DENSITY = new UnitValue(1.326, Unit.G_PER_CC); // jupiter
   public static final UnitValue DEFAULT_LONG_ASCENDING = new UnitValue(0.0, Unit.DEGREE_GEOM);
   public static final UnitValue DEFAULT_ARGUMENT_PERHELION = new UnitValue(0.0, Unit.DEGREE_GEOM);
+  public static final UnitValue DEFAULT_AXIAL_TILT = new UnitValue(0.0, Unit.DEGREE_GEOM);
 }

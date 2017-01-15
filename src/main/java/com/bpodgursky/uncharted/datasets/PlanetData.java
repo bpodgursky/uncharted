@@ -19,7 +19,8 @@ public class PlanetData extends ObjectRecord{
   private final ObjectValue radiusLys;
   private final ObjectValue densityGcc;
   private final ObjectValue longAscendingNode;
-  private final ObjectValue argumentPerhelion;
+  private final ObjectValue argumentPeriapsis;
+  private final ObjectValue axialTilt;
 
   public static class PlanetName {
 
@@ -52,7 +53,8 @@ public class PlanetData extends ObjectRecord{
                     ObjectValue radiusLys,
                     ObjectValue densityGcc,
                     ObjectValue longAscendingNode,
-                    ObjectValue argumentPerhelion){
+                    ObjectValue argumentPerhelion,
+                    ObjectValue axialTilt){
     super(name.toString(), "PLANET");
 
     this.planetId = planetId;
@@ -68,7 +70,8 @@ public class PlanetData extends ObjectRecord{
     this.radiusLys = radiusLys;
     this.densityGcc = densityGcc;
     this.longAscendingNode = longAscendingNode;
-    this.argumentPerhelion = argumentPerhelion;
+    this.argumentPeriapsis = argumentPerhelion;
+    this.axialTilt = axialTilt;
 
     setRadius(radiusLys);
   }

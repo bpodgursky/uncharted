@@ -26,17 +26,18 @@ function getPlanet(planetData) {
 
   var planetMap = NAME_TO_MAP[planetData.properName];
 
+  var axialTiltRadians = planetData.axialTilt.value.quantity * DEGREE_IN_RADIANS;
+
   if (planetMap) {
 
     return {
       material:new THREE.MeshLambertMaterial({
         map: THREE.ImageUtils.loadTexture(planetMap)
       }),
-      //  TODO actual planet axis rotation
       rotation: {
-        x: 0,
-        y: Math.PI / 2,
-        z: - Math.PI / 2
+        x: Math.PI / 2,
+        y: 0,
+        z: axialTiltRadians
     }};
 
   } else {
@@ -51,10 +52,9 @@ function getPlanet(planetData) {
         transparent: false
       }),
       rotation: {
-        // z: Math.PI / 2,
         x: 0,
         y: Math.PI / 2,
-        z: 0
+        z: axialTiltRadians
       }
     };
 
@@ -68,9 +68,12 @@ function getDetailMesh(planetData) {
   var planetMesh = new THREE.Mesh(DETAIL_GEOMETRY, planet.material);
   planetMesh.scale.x = planetMesh.scale.y = planetMesh.scale.z = planetData.radius.value.quantity;
 
-  planetMesh.rotateX(planet.rotation.x);
-  planetMesh.rotateY(planet.rotation.y);
-  planetMesh.rotateZ(planet.rotation.z);
+  // planetMesh.rotateX();
+  // planetMesh.rotateY();
+  // planetMesh.rotateZ();
+
+  planetMesh.rotation.set(planet.rotation.x, planet.rotation.y, planet.rotation.z);
+
 
   return planetMesh;
 }

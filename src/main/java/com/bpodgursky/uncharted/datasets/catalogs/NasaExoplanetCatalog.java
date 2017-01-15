@@ -58,6 +58,7 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
       String inclinationRaw = line[17];
 
       String massRaw = line[21];
+      String massCalc = line[25];
       String radiusRaw = line[26];
       String densityRaw = line[30];
 
@@ -80,18 +81,18 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
             ObjectValue.value(eccentricityRaw, Unit.NONE, Unit.NONE, PlanetDefaults.DEFAULT_ECCENTRICITY),
             ObjectValue.value(orbitalPeriodDaysRaw, Unit.DAY, Unit.DAY, PlanetDefaults.DEFAULT_ORBITAL_PERIOD),
             ObjectValue.value(inclinationRaw, Unit.DEGREE_GEOM, Unit.DEGREE_GEOM, PlanetDefaults.DEFAULT_INCLINATION),
-            ObjectValue.value(massRaw, Unit.MASS_JUP, Unit.KG, PlanetDefaults.DEFAULT_MASS),
+            ObjectValue.value(massRaw, Unit.MASS_JUP, Unit.KG, PlanetDefaults.DEFAULT_MASS, massCalc),
             ObjectValue.value(radiusRaw, Unit.RADIUS_JUP, Unit.LY, PlanetDefaults.DEFAULT_RADIUS),
             ObjectValue.value(densityRaw, Unit.G_PER_CC, Unit.G_PER_CC, PlanetDefaults.DENSITY),
-            ObjectValue.value("0.0", Unit.DEGREE_GEOM, Unit.DEGREE_GEOM, PlanetDefaults.DEFAULT_LONG_ASCENDING),
-            ObjectValue.value("0.0", Unit.DEGREE_GEOM, Unit.DEGREE_GEOM, PlanetDefaults.DEFAULT_ARGUMENT_PERHELION)
+            ObjectValue.value("", Unit.DEGREE_GEOM, Unit.DEGREE_GEOM, PlanetDefaults.DEFAULT_LONG_ASCENDING),
+            ObjectValue.value("", Unit.DEGREE_GEOM, Unit.DEGREE_GEOM, PlanetDefaults.DEFAULT_ARGUMENT_PERHELION),
+            ObjectValue.value("", Unit.DEGREE_GEOM, Unit.DEGREE_GEOM, PlanetDefaults.DEFAULT_AXIAL_TILT)
         ));
       } else {
         LOG.warn("Could not find star for name: " + starName);
       }
 
     }
-
 
     allPlanetsByStarID.put(1, new PlanetData(
         null,
@@ -105,7 +106,8 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
         new ObjectValue(6.7341e-10, ValueSource.SUPPLIED, Unit.LY),
         new ObjectValue(5.514, ValueSource.SUPPLIED, Unit.G_PER_CC),
         new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
-        new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
+        new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
+        new ObjectValue(23.4392811, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
     ));
 
     allPlanetsByStarID.put(1, new PlanetData(
@@ -120,7 +122,8 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
         new ObjectValue(2.5787e-10, ValueSource.SUPPLIED, Unit.LY),
         new ObjectValue(5.427, ValueSource.SUPPLIED, Unit.G_PER_CC),
         new ObjectValue(48.331, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
-        new ObjectValue(29.124, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
+        new ObjectValue(29.124, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
+        new ObjectValue(0.034, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
     ));
 
     allPlanetsByStarID.put(1, new PlanetData(
@@ -135,7 +138,8 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
         new ObjectValue(6.39675765e-10, ValueSource.SUPPLIED, Unit.LY),
         new ObjectValue(5.243, ValueSource.SUPPLIED, Unit.G_PER_CC),
         new ObjectValue(76.680, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
-        new ObjectValue(54.884, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
+        new ObjectValue(54.884, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
+        new ObjectValue(2.64, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
     ));
 
     allPlanetsByStarID.put(1, new PlanetData(
@@ -150,7 +154,8 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
         new ObjectValue(3.582704327e-10, ValueSource.SUPPLIED, Unit.LY),
         new ObjectValue(3.9335, ValueSource.SUPPLIED, Unit.G_PER_CC),
         new ObjectValue(49.558, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
-        new ObjectValue(286.502, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
+        new ObjectValue(286.502, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
+        new ObjectValue(25.19, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
     ));
 
     allPlanetsByStarID.put(1, new PlanetData(
@@ -165,8 +170,9 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
         new ObjectValue(7.3895985e-9, ValueSource.SUPPLIED, Unit.LY),
         new ObjectValue(1.326, ValueSource.SUPPLIED, Unit.G_PER_CC),
         new ObjectValue(100.464, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
-        new ObjectValue(273.867, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
-        ));
+        new ObjectValue(273.867, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
+        new ObjectValue(3.13, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
+    ));
 
     allPlanetsByStarID.put(1, new PlanetData(
         null,
@@ -180,7 +186,8 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
         new ObjectValue(6.1551273e-9, ValueSource.SUPPLIED, Unit.LY),
         new ObjectValue(0.687, ValueSource.SUPPLIED, Unit.G_PER_CC),
         new ObjectValue(113.665, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
-        new ObjectValue(339.392, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
+        new ObjectValue(339.392, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
+        new ObjectValue(26.73, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
     ));
 
     allPlanetsByStarID.put(1, new PlanetData(
@@ -195,7 +202,8 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
         new ObjectValue(2.6807655e-9, ValueSource.SUPPLIED, Unit.LY),
         new ObjectValue(1.27, ValueSource.SUPPLIED, Unit.G_PER_CC),
         new ObjectValue(74.006, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
-        new ObjectValue(96.998857, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
+        new ObjectValue(96.998857, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
+        new ObjectValue(97.77, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
     ));
 
     allPlanetsByStarID.put(1, new PlanetData(
@@ -210,7 +218,8 @@ public class NasaExoplanetCatalog implements ExoplanetCatalog {
         new ObjectValue(2.6025475e-9, ValueSource.SUPPLIED, Unit.LY),
         new ObjectValue(1.638, ValueSource.SUPPLIED, Unit.G_PER_CC),
         new ObjectValue(131.784, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
-        new ObjectValue(276.336, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
+        new ObjectValue(276.336, ValueSource.SUPPLIED, Unit.DEGREE_GEOM),
+        new ObjectValue(28.32, ValueSource.SUPPLIED, Unit.DEGREE_GEOM)
     ));
 
     LOG.info("Found stars for " + allPlanetsByStarID.size() + "/" + planetCount + " total records");

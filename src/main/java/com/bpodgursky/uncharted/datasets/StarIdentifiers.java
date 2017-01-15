@@ -76,14 +76,14 @@ public class StarIdentifiers {
     }
 
     if (harvardRevisedId != null) {
-      return harvardRevisedId;
+      return "HR "+harvardRevisedId;
     }
 
     if (henryDraperId != null) {
-      return henryDraperId;
+      return "HD "+henryDraperId;
     }
 
-    return hipparcosId;
+    return "HIP "+hipparcosId;
   }
 
 }
