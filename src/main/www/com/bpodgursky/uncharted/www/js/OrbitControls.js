@@ -179,7 +179,6 @@ THREE.OrbitControls = function (object, domElement) {
     this.moveForward = false;
     this.moveBackward = false;
 
-    //  TODO make this work
     if (this.rotateZL) {
       this.camera.rotateZ(.02);
     }

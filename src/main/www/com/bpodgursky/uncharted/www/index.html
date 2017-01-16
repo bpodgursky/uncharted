@@ -170,8 +170,9 @@
   var scene = new THREE.Scene();
 
   var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.00000000005, 10000);
-  camera.position.set(0, 0, -15);
+  camera.position.set(0, 0, -35);
   camera.rotateZ(Math.PI);
+  camera.rotateY(Math.PI);
 
   var intersectCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, .01, 10000);
 
@@ -459,21 +460,23 @@
       } else {
         if (renderedStars[starID]) {
           scene.remove(starMesh);
+          renderedStars[starID] = null;
         }
       }
     });
 
-    if (currentObjectPrimaryId == "") {
+    if (currentSystem == null) {
       select(starsByID[1]);
       reassignLabel(starsByID[70667]);
     }
     //  if we shrunk the render distance
-    else if (!renderedStars[currentObjectPrimaryId]) {
+    else if (!renderedStars[currentSystem.star.primaryId]) {
       select(starsByID[1]);
     }
 
     $("#jump_to_list").autocomplete({
-      source: nameList
+      source: nameList,
+      minLength:4
     });
 
   }

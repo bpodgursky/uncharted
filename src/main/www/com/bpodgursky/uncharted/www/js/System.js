@@ -98,7 +98,7 @@ System.prototype.populatePlanets = function () {
 
       orbit.rotation.set(0, 0, 0);
 
-      //  TODO this could very easily be wrong....
+      //  I think this is right, but geometry is hard
       orbit.rotateZ(DEGREE_IN_RADIANS * planet.longAscendingNode.value.quantity);
       orbit.rotateY(DEGREE_IN_RADIANS * planet.inclination.value.quantity);
       orbit.rotateZ(DEGREE_IN_RADIANS * planet.argumentPeriapsis.value.quantity);

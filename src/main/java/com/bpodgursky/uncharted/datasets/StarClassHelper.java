@@ -2,19 +2,9 @@ package com.bpodgursky.uncharted.datasets;
 
 import java.util.Map;
 
-import com.bpodgursky.uncharted.datasets.catalogs.GlieseCatalog;
 import com.bpodgursky.uncharted.util.MapBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-/**
- * TODO
- *
- * Look, I'm not happy about this class. Nobody would be.  It's a massive hack around a really confusingly defined
- * classification system, trying to squish things into little boxes.  Someone else please fix this.
- */
 public class StarClassHelper {
-  private static final Logger LOG = LoggerFactory.getLogger(GlieseCatalog.class);
 
   //  from https://en.wikipedia.org/wiki/Stellar_classification, taking medians
   private static final Map<SpectralClass, Integer> SPEC_CLASS_TO_TEMP = MapBuilder.of(SpectralClass.O, 30000)
@@ -32,7 +22,7 @@ public class StarClassHelper {
       .put(SpectralClass.T, 1000)
       .put(SpectralClass.Y, 1000)
 
-      //  mostly guessing  for most of these, in absence of numbers
+      //  TODO mostly guessing  for most of these, in absence of numbers
       .put(SpectralClass.DA, 15000)
       .put(SpectralClass.DAV, 15000)
       .put(SpectralClass.DAP, 15000)
@@ -53,20 +43,21 @@ public class StarClassHelper {
 
       .get();
 
-  //  this is a fallback if we have no bv index
+  //  this is a fallback if we have no bv index.  ideally not used often.
   public static double getTemperatureEstimate(ParsedClassification classification) {
 
     if(classification.getWhiteDwarfTempIndex() != null){
       return 50400.0 / classification.getWhiteDwarfTempIndex();
     }
 
-    //  TODO lolidk
-    if(classification.getMainClass() == null){
-      return 10000;
+    //  dunno what the right answer is, but according to wikipedia class M stars are > 75% of all main sequence stars,
+    //  so.... sure
+    SpectralClass mainClass = classification.getMainClass();
+    if(mainClass == null){
+      mainClass = SpectralClass.M;
     }
 
-    //  TODO use range as well?
-    return SPEC_CLASS_TO_TEMP.get(classification.getMainClass());
+    return SPEC_CLASS_TO_TEMP.get(mainClass);
 
   }
 
