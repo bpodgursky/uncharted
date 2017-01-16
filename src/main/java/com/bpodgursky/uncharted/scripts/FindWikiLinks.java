@@ -1,5 +1,10 @@
 package com.bpodgursky.uncharted.scripts;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import com.bpodgursky.uncharted.datasets.Constellation;
 import com.bpodgursky.uncharted.datasets.ConstellationCorpus;
 import com.bpodgursky.uncharted.datasets.StarRecord;
@@ -9,11 +14,6 @@ import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 public class FindWikiLinks {
 
@@ -44,7 +44,7 @@ public class FindWikiLinks {
 
       if(foundUrl != null){
         System.out.println("Found: "+ foundUrl+"\t"+record.getIdentifiers());
-        matchFile.write(record.getIdentifiers().getPrimaryId() + "\t" + foundUrl + "\n");
+        matchFile.write(record.getPrimaryId() + "\t" + foundUrl + "\n");
       }
 
       //  if we had a reasonable chance...

@@ -13,13 +13,13 @@ public class TestGlieseCatalog {
 
     System.out.println(star);
     assertEquals(
-        new StellarClassification().setMainClass(SpectralClass.M),
+        new ParsedClassification().setMainClass(SpectralClass.M),
         star.getParsedStellarClassification()
     );
 
     //  Proxima Centauri
     StarRecord priximaCentari = catalog.getStar("Gl 551");
-    assertEquals(priximaCentari.getLightYearDistance(), 4.22, .01);
+    assertEquals(priximaCentari.getSolDistance(), 4.22, .01);
 
   }
 }

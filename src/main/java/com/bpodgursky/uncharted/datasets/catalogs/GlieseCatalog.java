@@ -42,7 +42,7 @@ public class GlieseCatalog implements StarCatalog {
     sunIds.put(DatasetName.GLIESE_ID, "Sun");
     sunIds.put(DatasetName.PROPER_NAME, "The Sun");
 
-    StarIdentifiers sunIdentifiers = new StarIdentifiers("Sun");
+    StarIdentifiers sunIdentifiers = new StarIdentifiers();
     sunIdentifiers.setProperName("The Sun");
     sunIdentifiers.setGlieseId("Sun");
 
@@ -50,10 +50,10 @@ public class GlieseCatalog implements StarCatalog {
         new StarRecord(
             sunIdentifiers,
             new ExternalLinks(),
-            0.0,
-            0.0,
-            0.0,
-            4.83,
+            new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.LY),
+            new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.RADIAN),
+            new ObjectValue(0.0, ValueSource.SUPPLIED, Unit.RADIAN),
+            new ObjectValue(4.83, ValueSource.SUPPLIED, Unit.MV),
             "G2V",
             0.65,
             null
@@ -63,11 +63,9 @@ public class GlieseCatalog implements StarCatalog {
       String line = scan.nextLine();
       String[] split = line.split("\\|");
 
-//      Map<DatasetName, String> identitiers = Maps.newHashMap();
-
       String glieseName = split[1].trim();
 
-      StarIdentifiers identifiers = new StarIdentifiers(glieseName);
+      StarIdentifiers identifiers = new StarIdentifiers();
       identifiers.setGlieseId(glieseName);
 
       String otherName = safeTrim(split[41]);
@@ -80,10 +78,10 @@ public class GlieseCatalog implements StarCatalog {
         StarRecord record = new StarRecord(
             identifiers,
             new ExternalLinks(),
-            AstroConvert.parallaxToLightyears(parseOrNull(split[6])),
-            AstroConvert.parseDegreeMinSec(split[2]),
-            AstroConvert.parseDegreeMinSec(split[3]),
-            parseOrNull(split[32]),
+            new ObjectValue(AstroConvert.parallaxToLightyears(parseOrNull(split[6])), ValueSource.SUPPLIED, Unit.LY),
+            new ObjectValue(AstroConvert.parseDegreeMinSec(split[2]), ValueSource.SUPPLIED, Unit.RADIAN),
+            new ObjectValue(AstroConvert.parseDegreeMinSec(split[3]), ValueSource.SUPPLIED, Unit.RADIAN),
+            new ObjectValue(parseOrNull(split[32]), ValueSource.SUPPLIED, Unit.MV),
             safeTrim(split[5]),
             parseOrNull(split[21]),
             null
@@ -125,7 +123,7 @@ public class GlieseCatalog implements StarCatalog {
     return Collections2.filter(starsByName.values(), new Predicate<StarRecord>() {
       @Override
       public boolean apply(StarRecord input) {
-        return input.getLightYearDistance() <= maxLyDistance;
+        return input.getSolDistance() <= maxLyDistance;
       }
     });
   }

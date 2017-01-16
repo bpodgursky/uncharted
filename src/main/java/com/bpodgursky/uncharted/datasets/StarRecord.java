@@ -1,70 +1,70 @@
 package com.bpodgursky.uncharted.datasets;
 
-public class StarRecord {
+import java.util.Set;
+
+import com.bpodgursky.uncharted.datasets.catalogs.ObjectValue;
+import com.bpodgursky.uncharted.datasets.catalogs.Unit;
+import com.bpodgursky.uncharted.datasets.catalogs.ValueSource;
+
+public class StarRecord extends ObjectRecord{
 
   private final StarIdentifiers identifiers;
-  private final ExternalLinks links;
 
-  private final Double lightYearDistance;
-  private final Double rightAscensionRadians;
-  private final Double declinationRadians;
-  private final Double absoluteMagnitude;
+  private final ObjectValue solDistance;
+  private final ObjectValue rightAscensionRadians;
+  private final ObjectValue declinationRadians;
+  private final ObjectValue absoluteMagnitude;
   private final String rawStellarClassification;
-  private final StellarClassification parsedStellarClassification;
+  private final ParsedClassification parsedStellarClassification;
   private final Coordinate cartesianCoordsInLys;
 
+  private final ObjectValue temperatureEstimate;
 
-  private final Double temperatureEstimate;
-  private final Double radiusInLys;
+  private Set<Integer> nearbyObjectIDs;
 
   public StarRecord(StarIdentifiers identifiers,
                     ExternalLinks links,
-                    Double lightYearDistance,
-                    Double rightAscensionRadians,
-                    Double declinationRadians,
-                    Double absoluteMagnitude,
+                    ObjectValue lightYearDistance,
+                    ObjectValue rightAscensionRadians,
+                    ObjectValue declinationRadians,
+                    ObjectValue absoluteMagnitude,
                     String stellarClass,
                     Double colorIndex,
                     Double luminosity) {
+    super(identifiers.getPrimaryName(), "STAR");
     this.identifiers = identifiers;
-    this.links = links;
-    this.lightYearDistance = lightYearDistance;
+    this.solDistance = lightYearDistance;
     this.rightAscensionRadians = rightAscensionRadians;
     this.declinationRadians = declinationRadians;
     this.absoluteMagnitude = absoluteMagnitude;
     this.rawStellarClassification = stellarClass;
-    this.parsedStellarClassification = StarClassHelper.parseClass(stellarClass);
-    this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(rightAscensionRadians, declinationRadians, lightYearDistance);
-
+    this.parsedStellarClassification = StarClassifier2.parseClass(stellarClass);
+    this.cartesianCoordsInLys = AstroConvert.equatorialToCartesian(
+        rightAscensionRadians.getValue(),
+        declinationRadians.getValue(),
+        lightYearDistance.getValue()
+    );
 
     if (colorIndex == null) {
-      this.temperatureEstimate = StarClassHelper.getTemperatureEstimate(parsedStellarClassification);
+      this.temperatureEstimate = new ObjectValue(StarClassHelper.getTemperatureEstimate(parsedStellarClassification), ValueSource.DEFAULT, Unit.K);
     } else {
-      this.temperatureEstimate = AstroConvert.bvToTemperature(colorIndex);
+      this.temperatureEstimate = new ObjectValue(AstroConvert.bvToTemperature(colorIndex), ValueSource.SUPPLIED, Unit.K);
     }
 
-    this.radiusInLys = AstroConvert.getRadiusLys(luminosity, temperatureEstimate);
+    setLinks(links);
+    setRadius(new ObjectValue(AstroConvert.getRadiusLys(luminosity, temperatureEstimate.getValue()), ValueSource.INFERRED, Unit.LY));
+  }
 
+  public void setNearbyObjectIDs(Set<Integer> nearbyObjectIDs){
+    this.nearbyObjectIDs = nearbyObjectIDs;
   }
 
   public StarIdentifiers getIdentifiers() {
     return identifiers;
   }
 
-  public Double getLightYearDistance() {
-    return lightYearDistance;
-  }
-
-  public Double getRightAscensionRadians() {
-    return rightAscensionRadians;
-  }
-
-  public Double getDeclinationRadians() {
-    return declinationRadians;
-  }
-
-  public Double getAbsoluteMagnitude() {
-    return absoluteMagnitude;
+  public Double getSolDistance() {
+    return solDistance.getValue().in(Unit.LY).getQuantity();
   }
 
   public Coordinate getCartesianCoordsInLys() {
@@ -75,11 +75,8 @@ public class StarRecord {
     return rawStellarClassification;
   }
 
-  public StellarClassification getParsedStellarClassification() {
+  public ParsedClassification getParsedStellarClassification() {
     return parsedStellarClassification;
   }
 
-  public Double getTemperatureEstimate() {
-    return temperatureEstimate;
-  }
 }

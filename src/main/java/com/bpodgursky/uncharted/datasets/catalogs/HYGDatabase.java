@@ -34,7 +34,7 @@ public class HYGDatabase implements StarCatalog {
 
     Map<String, String> idToWikiLink = Maps.newHashMap();
 
-    while(wikiLinks.hasNext()){
+    while (wikiLinks.hasNext()) {
       String line = wikiLinks.nextLine();
       String[] split = line.split("\t");
       idToWikiLink.put(split[0], split[1]);
@@ -49,49 +49,48 @@ public class HYGDatabase implements StarCatalog {
     scan.nextLine();
 
     //  StarID,HIP,HD,HR,Gliese,BayerFlamsteed,ProperName,RA,Dec,Distance,PMRA,PMDec,RV,Mag,AbsMag,Spectrum,ColorIndex,X,Y,Z,VX,VY,VZ
-    while(scan.hasNext()){
+    while (scan.hasNext()) {
       String line = scan.nextLine();
       String[] split = line.split(",");
 
       //  id,
       String mainId = split[0];
 
-      StarIdentifiers identifiers = new StarIdentifiers(mainId);
-
+      StarIdentifiers identifiers = new StarIdentifiers();
 
       //  hip
       String hipparcosID = split[1];
-      if(!hipparcosID.equals("") && !hipparcosID.equals("0")){
+      if (!hipparcosID.equals("") && !hipparcosID.equals("0")) {
         identifiers.setHipparcosId(hipparcosID);
       }
 
       // hd
       String henryDraperID = split[2];
-      if(!henryDraperID.equals("")){
+      if (!henryDraperID.equals("")) {
         identifiers.setHenryDraperId(henryDraperID);
       }
 
       //        ,hr
       String harvardRevisedId = split[3];
-      if(!harvardRevisedId.equals("")){
+      if (!harvardRevisedId.equals("")) {
         identifiers.setHarvardRevisedId(harvardRevisedId);
       }
 
       // ,gl
       String glieseId = split[4];
-      if(!glieseId.equals("")){
+      if (!glieseId.equals("")) {
         identifiers.setGlieseId(glieseId);
       }
 
       //  ,bf,
       String bayerFlamsteed = split[5];
-      if(!bayerFlamsteed.equals("")){
+      if (!bayerFlamsteed.equals("")) {
         identifiers.setBayerFlamsteed(BayerFlamsteed.parse(bayerFlamsteed));
       }
 
       // proper,
       String properName = split[6];
-      if(!properName.equals("")){
+      if (!properName.equals("")) {
         identifiers.setProperName(properName);
       }
 
@@ -104,15 +103,14 @@ public class HYGDatabase implements StarCatalog {
 
       // pmra,pmdec,rv,mag,absmag,spect,ci,x,y,z,vx,vy,vz,rarad,decrad,pmrarad,pmdecrad,bayer,flam,con,comp,comp_primary,base,lum,var,var_min,var_max
 
-
-      if(!rightAscension.equals("") && !declination.equals("")
-          && !distanceParsecs.equals("") && !distanceParsecs.equals("10000000")){
+      if (!rightAscension.equals("") && !declination.equals("")
+          && !distanceParsecs.equals("") && !distanceParsecs.equals("10000000")) {
 
         String absMag = split[14];
 
         ExternalLinks links = new ExternalLinks();
 
-        if(idToWikiLink.containsKey(mainId)){
+        if (idToWikiLink.containsKey(mainId)) {
           links.setWikipedia(idToWikiLink.get(mainId));
         }
 
@@ -121,10 +119,10 @@ public class HYGDatabase implements StarCatalog {
         StarRecord record = new StarRecord(
             identifiers,
             links,
-            AstroConvert.parsecsToLightyears(Double.parseDouble(distanceParsecs)),
-            AstroConvert.hoursToRadians(Double.parseDouble(rightAscension)),
-            AstroConvert.degreesToRadians(Double.parseDouble(declination)),
-            Double.parseDouble(absMag),
+            new ObjectValue(AstroConvert.parsecsToLightyears(Double.parseDouble(distanceParsecs)), ValueSource.SUPPLIED, Unit.LY),
+            new ObjectValue(AstroConvert.hoursToRadians(Double.parseDouble(rightAscension)), ValueSource.SUPPLIED, Unit.RADIAN),
+            new ObjectValue(AstroConvert.degreesToRadians(Double.parseDouble(declination)), ValueSource.SUPPLIED, Unit.RADIAN),
+            new ObjectValue(Double.parseDouble(absMag), ValueSource.SUPPLIED, Unit.MV),
             split[15],
             parseOrNull(split[16]),
             luminosity
@@ -154,14 +152,14 @@ public class HYGDatabase implements StarCatalog {
 
   @Override
   public Collection<StarRecord> getAllStars(final double maxLyDistance) {
-    LOG.info("Filtering "+stars.size()+" stars for distance "+maxLyDistance);
+    LOG.info("Filtering " + stars.size() + " stars for distance " + maxLyDistance);
     Collection<StarRecord> filteredSet = Collections2.filter(stars, new Predicate<StarRecord>() {
       @Override
       public boolean apply(StarRecord input) {
-        return input.getLightYearDistance() <= maxLyDistance;
+        return input.getSolDistance() <= maxLyDistance;
       }
     });
-    LOG.info("Found "+filteredSet.size()+" stars within "+maxLyDistance);
+    LOG.info("Found " + filteredSet.size() + " stars within " + maxLyDistance);
 
     return filteredSet;
   }

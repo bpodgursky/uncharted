@@ -1,15 +1,15 @@
 package com.bpodgursky.uncharted.datasets.identifiers;
 
-import com.bpodgursky.uncharted.datasets.ConstellationCorpus;
-import com.bpodgursky.uncharted.datasets.Constellation;
-import com.bpodgursky.uncharted.datasets.GreekLetter;
-import com.google.common.collect.Lists;
-import org.apache.commons.lang.StringUtils;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.bpodgursky.uncharted.datasets.Constellation;
+import com.bpodgursky.uncharted.datasets.ConstellationCorpus;
+import com.bpodgursky.uncharted.datasets.GreekLetter;
+import com.google.common.collect.Lists;
+import org.apache.commons.lang.StringUtils;
 
 public class BayerFlamsteed {
 
@@ -101,6 +101,8 @@ public class BayerFlamsteed {
       flam = matcher5.group("flam");
       bayer = matcher5.group("bayer");
       constellation = matcher5.group("cons");
+    }else{
+      return null;
     }
 
     Integer flamNum= null;
@@ -120,6 +122,43 @@ public class BayerFlamsteed {
 
     return new BayerFlamsteed(flamNum, GreekLetter.getByAbbr(bayer), number, constellation1);
 
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof BayerFlamsteed)) {
+      return false;
+    }
+
+    BayerFlamsteed that = (BayerFlamsteed)o;
+
+    if (flamsteedDesignation != null ? !flamsteedDesignation.equals(that.flamsteedDesignation) : that.flamsteedDesignation != null) {
+      return false;
+    }
+    if (bayerDesignation != null ? !bayerDesignation.equals(that.bayerDesignation) : that.bayerDesignation != null) {
+      return false;
+    }
+    if (number != null ? !number.equals(that.number) : that.number != null) {
+      return false;
+    }
+    if (constellation != null ? !constellation.equals(that.constellation) : that.constellation != null) {
+      return false;
+    }
+    return prettyName != null ? prettyName.equals(that.prettyName) : that.prettyName == null;
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = flamsteedDesignation != null ? flamsteedDesignation.hashCode() : 0;
+    result = 31 * result + (bayerDesignation != null ? bayerDesignation.hashCode() : 0);
+    result = 31 * result + (number != null ? number.hashCode() : 0);
+    result = 31 * result + (constellation != null ? constellation.hashCode() : 0);
+    result = 31 * result + (prettyName != null ? prettyName.hashCode() : 0);
+    return result;
   }
 
   @Override
