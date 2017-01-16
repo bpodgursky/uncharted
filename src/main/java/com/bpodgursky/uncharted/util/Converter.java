@@ -25,6 +25,9 @@ public class Converter {
     addConversion(Unit.MASS_JUP, Unit.KG, 1.898e27);
     addConversion(Unit.RADIUS_JUP, Unit.KM, 69911.0);
     addConversion(Unit.RADIUS_JUP, Unit.LY, 7.3896e-9);
+    addConversion(Unit.RADIUS_EARTH, Unit.RADIUS_JUP, 0.146822127);
+    addConversion(Unit.RADIUS_EARTH, Unit.LY, 6.734e-10);
+
   }
 
 

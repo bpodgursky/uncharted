@@ -295,37 +295,45 @@
     var prevControlMode = controlMode;
     controlMode = 'tween';
 
-    tweenControls.setZoom(absolutePosition(currentObjectMesh), MARKER_RADIUS, 2,
-        function () {
+    var finalZoom = function (approachTime) {
+      return function () {
 
-          tweenControls.setZoom(absolutePosition(currentObjectMesh),
-              currentObjectMesh.objectData.radius.value.quantity * 10, 1,
-              function () {
+        tweenControls.setZoom(absolutePosition(currentObjectMesh),
+            currentObjectMesh.objectData.radius.value.quantity * 10, approachTime,
+            function () {
 
-                if (isStar(currentObjectMesh)) {
-                  currentSystem.populatePlanets();
-                }
-
-                if (isStar(prevStarMesh)) {
-                  prevStarMesh.objectData.nearbyObjectIDs.forEach(function (e) {
-                    resetStarScale(starsByID[e]);
-                  })
-                }
-
-                if (!prevControlMode || prevControlMode == 'tween') {
-                  controlMode = 'orbit';
-                } else {
-                  controlMode = prevControlMode
-                }
-
-                orbitControls.orbit(
-                    absolutePosition(currentObjectMesh),
-                    currentObjectMesh.objectData.radius.value.quantity * 2
-                )
-
+              if (isStar(currentObjectMesh)) {
+                currentSystem.populatePlanets();
               }
-          )
-        });
+
+              if (isStar(prevStarMesh)) {
+                prevStarMesh.objectData.nearbyObjectIDs.forEach(function (e) {
+                  resetStarScale(starsByID[e]);
+                })
+              }
+
+              if (!prevControlMode || prevControlMode == 'tween') {
+                controlMode = 'orbit';
+              } else {
+                controlMode = prevControlMode
+              }
+
+              orbitControls.orbit(
+                  absolutePosition(currentObjectMesh),
+                  currentObjectMesh.objectData.radius.value.quantity * 2
+              )
+
+            }
+        )
+      }
+    };
+
+    //  two-phase zoom for stars since (usually) farther away.  hide numerical issues.
+    if (isStar(currentObjectMesh)) {
+      tweenControls.setZoom(absolutePosition(currentObjectMesh), MARKER_RADIUS, 2, finalZoom(1));
+    } else {
+      finalZoom(2)();
+    }
 
   }
 
@@ -476,21 +484,32 @@
 
     $("#jump_to_list").autocomplete({
       source: nameList,
-      minLength:4
+      minLength: 4
     });
 
   }
 
-  function closestNonPrimaryObject(intersects, currentPrimary) {
+  function closestNonPrimaryObject(intersects, currentPrimary, currentStarPrimary) {
 
-    //  shortcuts
-
+    //  shortcut
     if (intersects.length == 0) {
       return null;
     }
 
-    if (intersects.size == 1 && intersects[0].object.objectData.primaryId != currentPrimary) {
-      return intersects[0];
+    var firstIntersect = intersects[0].object;
+    var firstIntersectId = firstIntersect.objectData.primaryId;
+
+    if (intersects.length == 1 && currentPrimary) {
+
+      //  only select the current system's star if there's no other choice
+      if (firstIntersectId == currentStarPrimary) {
+        return firstIntersect;
+      }
+
+      //  shortcut
+      if (firstIntersectId != currentPrimary) {
+        return firstIntersect;
+      }
     }
 
     //  approximate screen distance
@@ -499,7 +518,11 @@
     var best = null;
     intersects.forEach(function (e) {
       var screenDistance = e.object.position.distanceTo(e.point) / lookPoint.distanceTo(e.point);
-      if (screenDistance < min && e.object.objectData.primaryId != currentPrimary) {
+      var intersectId = e.object.objectData.primaryId;
+
+      if (screenDistance < min
+          && intersectId != currentPrimary
+          && intersectId != currentStarPrimary) {
         best = e.object;
         min = screenDistance;
       }
@@ -523,13 +546,13 @@
 
 
       if (currentSystem) {
-        var last = closestNonPrimaryObject(raycaster.intersectObjects(currentSystem.selectable, false), currentObjectPrimaryId);
+        var last = closestNonPrimaryObject(raycaster.intersectObjects(currentSystem.selectable, false), currentObjectPrimaryId, currentSystem.star.objectData.primaryId);
         if (last) {
           return currentSystem.objectsByID[last.objectData.primaryId];
         }
       }
 
-      var lastStar = closestNonPrimaryObject(raycaster.intersectObjects(visibleStars, false), currentObjectPrimaryId);
+      var lastStar = closestNonPrimaryObject(raycaster.intersectObjects(visibleStars, false), currentObjectPrimaryId, null);
 
       if (lastStar) {
 //        var primaryId = lastStar.objectData.primaryId;
@@ -742,8 +765,8 @@
 
   }
 
-  function bfName(bayerFlamsteed){
-    if(bayerFlamsteed){
+  function bfName(bayerFlamsteed) {
+    if (bayerFlamsteed) {
       return bayerFlamsteed.prettyName;
     }
     return ""
@@ -838,7 +861,7 @@
     }
   }
 
-  function prettyDensity(gPerCc){
+  function prettyDensity(gPerCc) {
     return gPerCc.toLocaleString('en-US', {maximumSignificantDigits: 3}) + ' g/cc';
   }
 

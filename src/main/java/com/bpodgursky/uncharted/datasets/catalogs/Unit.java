@@ -6,6 +6,7 @@ public enum Unit {
   LY,
   KM,
   RADIUS_JUP,
+  RADIUS_EARTH,
 
   KG,
   MASS_JUP,

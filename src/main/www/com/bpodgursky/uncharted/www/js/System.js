@@ -49,10 +49,10 @@ function System(star, position, planets, lookAt) {
 
   object.add(starDetail);
 
-  var directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
-  directionalLight.position.set(starData.radius.value.quantity * 1.1, 0, 0);
+  var pointLight = new THREE.PointLight(0xffffff, 0.9, 1, 2);
+  pointLight.position.set(0, 0, 0);
 
-  object.add(directionalLight);
+  object.add(pointLight);
 
   this.selectable = [starDetail];
 
@@ -107,10 +107,10 @@ System.prototype.populatePlanets = function () {
 
       var surround = new THREE.Mesh(TRANSPARENT_GEOMETRY, transparentMaterial);
 
-      var distScale = Math.max(1.0, planet.semiMajorAxisLys.value.quantity / 1.58e-5);
+      var distScale = planet.semiMajorAxisLys.value.quantity / 1.58e-5;
       var invScale = (7.3896e-9 / planet.radius.value.quantity) *
         distScale *
-        30;
+        140;
 
       surround.scale.set(invScale, invScale, invScale);
       surround.objectData = planet;
