@@ -40,7 +40,9 @@ function System(star, position, planets, lookAt) {
     },
     vertexShader: shaders.dynamicVertexShader,
     fragmentShader: shaders.starFragmentShader,
-    transparent: false
+    transparent: false,
+    polygonOffset: -.1,
+    usePolygonOffset: true
   });
 
   var starDetail = new THREE.Mesh(DETAIL_GEOMETRY, material);

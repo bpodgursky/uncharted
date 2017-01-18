@@ -169,7 +169,7 @@
 
   var scene = new THREE.Scene();
 
-  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.00000000005, 10000);
+  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.0000000005, 10000);
   camera.position.set(0, 0, -35);
   camera.rotateZ(Math.PI);
   camera.rotateY(Math.PI);
@@ -625,7 +625,10 @@
               temp: {type: "f", value: star.temperatureEstimate.value.quantity / 2}
             },
             transparent: true,
-            depthWrite: false
+            depthWrite: false,
+            polygonOffset: .1,
+            usePolygonOffset: true
+
           });
 
           var surround = new THREE.Mesh(SURROUND_GEOMETRY, shaderSurround);
