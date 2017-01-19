@@ -1,8 +1,6 @@
 //  TODO this is 99.9% unscientific.  I'm using this SO answer http://astronomy.stackexchange.com/questions/13382/planets-classification-by-density?rq=1
 //  to say rocky < .1 jupiter masses.  also the shaders are super crude placeholders.
 function getShader(planetData) {
-  console.log(planetData);
-
   if (planetData.massKg.value.quantity < 1.898e26) { //  10% jupiter
     return shaders.rockyPlanetFragmentShader;
   } else {
@@ -10,7 +8,7 @@ function getShader(planetData) {
   }
 }
 
-
+//  images are all from http://planetpixelemporium.com/planets.html
 var NAME_TO_MAP = {
   Earth: "images/planets/earthmap1k.jpg",
   Mercury: "images/planets/mercurymap.jpg",
@@ -67,13 +65,7 @@ function getDetailMesh(planetData) {
   var planet = getPlanet(planetData);
   var planetMesh = new THREE.Mesh(DETAIL_GEOMETRY, planet.material);
   planetMesh.scale.x = planetMesh.scale.y = planetMesh.scale.z = planetData.radius.value.quantity;
-
-  // planetMesh.rotateX();
-  // planetMesh.rotateY();
-  // planetMesh.rotateZ();
-
   planetMesh.rotation.set(planet.rotation.x, planet.rotation.y, planet.rotation.z);
-
 
   return planetMesh;
 }
