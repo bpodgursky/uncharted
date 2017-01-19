@@ -1,4 +1,4 @@
-### Overview ###
+# Overview #
 
 This project is an attempt at a 3D visualization of Earth’s solar neighborhood out to 75 light years, rendered in the browser using WebGL (via the [three.js](https://threejs.org/) library).  This includes all known stars and known exoplanets.
 
@@ -20,7 +20,7 @@ http://uncharted.bpodgursky.com/
 
 - Data about our own solar system and its planets are from Wikipedia.
 
-### Rendering ###
+# Rendering #
 
 Star rendering borrows heavily from the Seed of Andromeda procedural star [rendering guide](https://www.seedofandromeda.com/blogs/51-procedural-star-rendering), trimmed down substantially so it can (attempt) to render in real-time.  The glsl shader is found [here](https://github.com/bpodgursky/uncharted/blob/master/src/main/www/com/bpodgursky/uncharted/www/resources/noise/noise-grainy-fragment.glsl).  There are some noise functions to try to make it look cool, but the important part is that temperature (estimated from BV index if present, and stellar class if not) is mapped to color.
 
@@ -42,7 +42,7 @@ Gas:
 
 ![gas](https://github.com/bpodgursky/uncharted/blob/master/img/gas-planet.png)
 
-# Scale / Visibility #
+### Scale / Visibility ###
 
 Since stars are, in the grand scheme of things, very tiny, I needed additional rendering to make them visible at huge distances.  So the actual visible stars are not the stars themselves, but large transparent meshes with a similar color to the parent star:
 
@@ -54,9 +54,9 @@ Planets are even smaller and harder to see, so they are marked by an a spoke fro
 
 ![uranus](https://github.com/bpodgursky/uncharted/blob/master/img/uranus-selected.png)
 
-### Controls ###
+# Controls #
 
-# Movement #
+## Movement ##
 
 Controls are hopefully intuitive, with two modes, “orbit“ and “free look” (controlled in the upper left)
 
@@ -69,17 +69,17 @@ In both modes:
 
 Orbit mode always maintains a slow orbit around the object in focus, and clicking + dragging rotates the view around that object.  In free look mode there is no fixed target.
 
-# Highlights #
+## Highlights ##
 
 Only a fraction of stars have known exoplanets, so the “Exoplanets” highlight marker adds highlight markers on any stars with known exoplanets.
 
 ![highlights](https://github.com/bpodgursky/uncharted/blob/master/img/exoplanet-highlights.png)
 
-# Render Radius #
+## Render Radius ##
 
 Show only stars within 10 / 25 / 50 / 75 light years of our own sun.
 
-### Project ###
+# Project #
 
 The JavaScript code in his project is truly appalling.  I’m not saying this in a humble-brag / fishing-for-compliments way -- it is truly a horror show.  I’m not a JavaScript developer, this is a side project, please don’t judge me for it (but any suggestions or cleanup is super welcome).
 
